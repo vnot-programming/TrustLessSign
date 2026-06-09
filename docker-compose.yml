@@ -1,0 +1,20 @@
+services:
+  app:
+    build: ./web
+    container_name: trustlesssign-app
+    ports:
+      - "8101:80"
+    environment:
+      - DB_HOST=vnot-shared-postgres
+    networks:
+      - vnot_shared_net
+    volumes:
+      - ./web:/var/www/html
+      - ./pki-keys:/var/www/html/pki-keys
+      - ./secrets:/var/www/html/secrets
+    restart: unless-stopped
+
+networks:
+  vnot_shared_net:
+    external: true
+    name: vnot_shared_net

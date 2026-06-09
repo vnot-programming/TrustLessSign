@@ -1,0 +1,29 @@
+{
+  "Verification": {
+    "title": "Verifikasi Dokumen",
+    "valid": "Dokumen Valid",
+    "invalid": "Tidak Valid",
+    "not_saved": "Dokumen Tidak Valid (Belum Tersimpan)",
+    "signer": "Penandatangan",
+    "signed_at": "Ditandatangani Pada"
+  },
+  "Sign": {
+    "title": "Tanda Tangani Dokumen",
+    "drag_qr": "Geser QR Code ke posisi yang diinginkan",
+    "save_to_drive": "Simpan ke Google Drive",
+    "generate_key": "Buat Private Key",
+    "sign_and_seal": "Sahkan & Segel"
+  },
+  "Welcome": {
+    "badge": "Aman & Terdesentralisasi",
+    "title": "Tanda Tangan Digital Zero-Trust",
+    "desc": "Tanda tangani dokumen offline via Ekstensi Chrome. Verifikasi instan dengan kepastian kriptografi. Tanpa otoritas sentral.",
+    "get_started": "Mulai Sekarang",
+    "auth_providers": "Penyedia otentikasi yang didukung:",
+    "login": "Masuk",
+    "dashboard": "Dasbor",
+    "modal_title": "Pilih Penyedia Masuk",
+    "modal_desc": "Otentikasi diperlukan untuk menandatangani dokumen dan menyimpannya.",
+    "close": "Tutup"
+  }
+}

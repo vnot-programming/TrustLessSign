@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════════
+   Bio-Digital Minimalism 2026 — globals.css
+   ══════════════════════════════════════════════ */
+
+:root {
+  /* Surface (Light Mode) */
+  --surface-primary:     hsl(220, 16%, 98%);
+  --surface-secondary:   hsl(220, 14%, 94%);
+  --surface-tertiary:    hsl(220, 12%, 90%);
+  --surface-elevated:    hsl(0, 0%, 100%);
+  --surface-glass:       hsla(220, 20%, 98%, 0.72);
+  --border-subtle:       hsl(220, 12%, 90%);
+  --border-default:      hsl(220, 12%, 84%);
+  --border-strong:       hsl(220, 12%, 72%);
+
+  /* Text (Light Mode) */
+  --text-primary:        hsl(220, 20%, 12%);
+  --text-secondary:      hsl(220, 12%, 40%);
+  --text-tertiary:       hsl(220, 8%, 56%);
+  --text-inverse:        hsl(220, 16%, 96%);
+
+  /* Shadows (Light Mode) */
+  --shadow-xs:           0 1px 2px hsla(220, 20%, 20%, 0.04);
+  --shadow-sm:           0 1px 3px hsla(220, 20%, 20%, 0.06), 0 1px 2px hsla(220, 20%, 20%, 0.04);
+  --shadow-md:           0 4px 6px -1px hsla(220, 20%, 20%, 0.07), 0 2px 4px -2px hsla(220, 20%, 20%, 0.05);
+  --shadow-lg:           0 10px 15px -3px hsla(220, 20%, 20%, 0.08), 0 4px 6px -4px hsla(220, 20%, 20%, 0.05);
+  --shadow-xl:           0 20px 25px -5px hsla(220, 20%, 20%, 0.08), 0 8px 10px -6px hsla(220, 20%, 20%, 0.04);
+  --shadow-glass:        0 8px 32px hsla(220, 20%, 20%, 0.06), inset 0 0 0 1px hsla(0, 0%, 100%, 0.15);
+
+  /* Accents & Signals */
+  --accent-primary:      hsl(162, 71%, 46%);
+  --accent-primary-soft: hsla(162, 71%, 46%, 0.12);
+  --accent-hover:        hsl(162, 71%, 40%);
+  --accent-active:       hsl(162, 71%, 34%);
+  --accent-success:      hsl(152, 56%, 46%);
+  --accent-success-soft: hsla(152, 56%, 46%, 0.12);
+  --accent-warning:      hsl(38, 92%, 56%);
+  --accent-warning-soft: hsla(38, 92%, 56%, 0.12);
+  --accent-danger:       hsl(0, 72%, 58%);
+  --accent-danger-soft:  hsla(0, 72%, 58%, 0.12);
+  --cursor-glow:         hsla(162, 71%, 46%, 0.04);
+  --grid-line:           rgba(0, 0, 0, 0.05);
+
+  /* Fonts */
+  --font-sans:    'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif:   'Lora', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Border Radius */
+  --radius-sm:   0.375rem;
+  --radius-md:   0.625rem;
+  --radius-lg:   1rem;
+  --radius-xl:   1.5rem;
+
+  /* Motion */
+  --duration-instant:  100ms;
+  --duration-fast:     150ms;
+  --duration-normal:   250ms;
+  --duration-slow:     400ms;
+  --ease-out:         cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:      cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Dark Mode Token Overrides */
+.dark {
+  --surface-primary:     hsl(220, 17%, 7%);
+  --surface-secondary:   hsl(220, 16%, 11%);
+  --surface-tertiary:    hsl(220, 14%, 15%);
+  --surface-elevated:    hsl(220, 16%, 13%);
+  --surface-glass:       hsla(220, 20%, 8%, 0.76);
+  --border-subtle:       hsl(220, 14%, 16%);
+  --border-default:      hsl(220, 14%, 22%);
+  --border-strong:       hsl(220, 14%, 32%);
+
+  --text-primary:        hsl(220, 16%, 92%);
+  --text-secondary:      hsl(220, 10%, 68%);
+  --text-tertiary:       hsl(220, 8%, 48%);
+  --text-inverse:        hsl(220, 20%, 12%);
+  --cursor-glow:         hsla(162, 71%, 46%, 0.08);
+  --grid-line:           rgba(255, 255, 255, 0.03);
+
+  --shadow-xs:           0 1px 2px hsla(220, 40%, 2%, 0.2);
+  --shadow-sm:           0 1px 3px hsla(220, 40%, 2%, 0.3), 0 1px 2px hsla(220, 40%, 2%, 0.2);
+  --shadow-md:           0 4px 6px -1px hsla(220, 40%, 2%, 0.4), 0 2px 4px -2px hsla(220, 40%, 2%, 0.2);
+  --shadow-lg:           0 10px 15px -3px hsla(220, 40%, 2%, 0.4), 0 4px 6px -4px hsla(220, 40%, 2%, 0.2);
+  --shadow-xl:           0 20px 25px -5px hsla(220, 40%, 2%, 0.5), 0 8px 10px -6px hsla(220, 40%, 2%, 0.3);
+  --shadow-glass:        0 8px 32px hsla(220, 40%, 2%, 0.5), inset 0 0 0 1px hsla(0, 0%, 100%, 0.06);
+}
+
+@layer base {
+  body {
+    @apply bg-surface-primary text-text-primary transition-colors duration-normal ease-out antialiased;
+    font-family: var(--font-sans);
+  }
+
+  body:hover #cursor-glow {
+    opacity: 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-text-primary font-semibold tracking-tight;
+  }
+}
+
+/* Custom Utilities for Premium Glassmorphic Effects */
+@layer utilities {
+  .glass-panel {
+    @apply bg-surface-glass backdrop-blur-[20px] border border-border-subtle shadow-glass rounded-lg transition-all duration-normal ease-out;
+    -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  }
+
+  .badge-premium {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-glass backdrop-blur-md border-t border-white/10 shadow-glass text-text-primary text-xs font-semibold tracking-wider uppercase transition-all duration-normal ease-out hover:-translate-y-[1px] hover:shadow-md;
+  }
+  
+  .dark .badge-premium {
+    @apply border-t border-white/5;
+  }
+
+  .pulsing-dot {
+    @apply w-2 h-2 rounded-full bg-accent-success shadow-[0_0_8px_var(--accent-success)] animate-[pulse-breathing_2s_infinite_ease-in-out];
+  }
+  
+  .theme-transitioning,
+  .theme-transitioning * {
+    transition: background-color var(--duration-fast) linear, 
+                color var(--duration-fast) linear, 
+                border-color var(--duration-fast) linear, 
+                box-shadow var(--duration-fast) linear !important;
+  }
+}
+
+@keyframes pulse-breathing {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 hsla(152, 56%, 46%, 0.7);
+  }
+  70% {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px hsla(152, 56%, 46%, 0);
+  }
+  100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 hsla(152, 56%, 46%, 0);
+  }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+}
+
+/* Accessibility reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .pulsing-dot {
+    animation: none;
+    box-shadow: 0 0 4px var(--accent-success);
+  }
+}
+
+/* ══════════════════════════════════════════════
+   A11y & Color Blind Safety Override Systems
+   ══════════════════════════════════════════════ */
+
+/* 1. Partial Color Blindness (Deuteranopia/Protanopia — Red-Green Safety) */
+.colorblind-partial {
+  --accent-success:      hsl(200, 85%, 45%); /* Blue/Teal instead of green */
+  --accent-success-soft: hsla(200, 85%, 45%, 0.12);
+  
+  --accent-danger:       hsl(25, 95%, 50%); /* Orange/Vermilion instead of red */
+  --accent-danger-soft:  hsla(25, 95%, 50%, 0.12);
+  
+  --accent-warning:      hsl(45, 95%, 48%); /* High-contrast Gold */
+  --accent-warning-soft: hsla(45, 95%, 48%, 0.12);
+
+  --accent-primary:      hsl(215, 90%, 52%); /* High-contrast Royal Blue */
+}
+
+/* 2. Total Color Blindness (Monochromatic Grayscale) */
+.colorblind-total {
+  --accent-success:      hsl(0, 0%, 25%);
+  --accent-success-soft: hsla(0, 0%, 25%, 0.12);
+  
+  --accent-danger:       hsl(0, 0%, 5%);
+  --accent-danger-soft:  hsla(0, 0%, 5%, 0.12);
+  
+  --accent-warning:      hsl(0, 0%, 45%);
+  --accent-warning-soft: hsla(0, 0%, 45%, 0.12);
+  
+  --accent-primary:      hsl(0, 0%, 15%);
+}
+
+.dark.colorblind-total,
+.dark .colorblind-total {
+  --accent-success:      hsl(0, 0%, 80%);
+  --accent-danger:       hsl(0, 0%, 98%);
+  --accent-warning:      hsl(0, 0%, 60%);
+  --accent-primary:      hsl(0, 0%, 90%);
+}
+
+/* react-pdf text and annotation layer overrides to prevent selection interference during signature drag */
+.react-pdf__Page__textLayer,
+.react-pdf__Page__textContent,
+.textLayer {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+.react-pdf__Page__annotationLayer,
+.annotationLayer {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+

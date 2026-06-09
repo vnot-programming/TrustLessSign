@@ -1,0 +1,63 @@
+# Software Development Plan (SDP)
+## Project: TrustlessSign
+## Current State / Log Progress
+
+- **2026-06-09 18:22**: 
+  - Shared Postgres network `vnot_shared_net` and container created.
+  - `trustlesssign` database created.
+  - Laravel 11 project scaffolded successfully (using PHP 8.2 compatible image).
+  - Backend dependencies installed (Inertia, Ziggy, Sanctum, Socialite).
+  - Frontend NPM dependencies installed (React, Inertia React, Tailwind, react-pdf, react-draggable).
+  - Chrome extension directory skeleton created (`chrome-extension/`).
+  - `.env` configured for postgres and `docker-compose.yml` configured for backend.
+  - Boilerplate models, migrations, controllers, seeder, and PKI service directories generated.
+  - Laravel updated to run on PHP 8.4-fpm-alpine.
+  - Migrations updated to follow architecture constraints and successfully executed.
+  - ReasonCategorySeeder implemented and database seeded successfully.
+  - PKI Service (`CAManager.php`) implemented using Native PHP OpenSSL (RSA-2048).
+  - Root CA bootstrapping and User Certificate issuing from CSR tested successfully.
+  - **2026-06-09 18:40**:
+    - Resolved container storage permission errors (`Failed to open stream: Permission denied`) by adjusting ownership/permissions of `storage` and `bootstrap/cache` on the host side to `777`.
+    - Implemented `app/Services/PKI/CertValidator.php` to parse and validate X.509 certificate chains against the Root CA and look up DB revocation.
+    - Implemented REST Controllers: `CertificateController.php`, `DocumentController.php`, `VerificationController.php`, and `AuthController.php` (web session and Sanctum bearer token authentication).
+    - Registered and validated all API endpoints in `routes/api.php`, including the custom role-based admin authorization check.
+    - Updated the published Laravel Sanctum migration file to use `uuidMorphs` to prevent column type mismatch on UUID primary keys.
+    - Configured the global `api` rate limiter (60 req/min) in `AppServiceProvider.php`.
+    - Developed a comprehensive integration test `tests/Feature/TrustlessSignApiTest.php` to verify the entire API lifecycle (100% test pass with 47 assertions).
+    - **NEXT TASK**: Set up the full-stack React and Inertia.js views (auth screens, user dashboard, document signer config, and the public verification landing page) and integrate Tailwind CSS.
+- **2026-06-09 18:58**:
+  - Migrated Docker container to `php:8.5-fpm-alpine`.
+  - Upgraded Laravel framework to version `^13.0` and completed composer dependency resolution without conflicts.
+  - Verified API endpoint accessibility.
+  - **NEXT TASK**: Implement UI features (Draggable QR Code layout), Chrome Extension Key storage using `chrome.storage.local`, Google/Facebook Social Login, and Multi-language support (id, en, th) without hardcoded text. Handle Document status "Belum Tersimpan" logic.
+  - **2026-06-09 19:05**: 
+    - Database migrations aligned, verifying schema includes `google_id`, `facebook_id`, `avatar`, and document `status`, `drive_url`.
+    - Integrated `chrome.storage.local` within Chrome extension `popup.js` per Opsi 1 constraints.
+    - Implemented UI constraints using React Inertia:
+      - Multi-language dictionary files (`en.json`, `id.json`, `th.json`) parsed via `HandleInertiaRequests.php` middleware.
+      - `react-draggable` applied to QR code configuration component.
+      - `VerificationController.php` updated to check for `is_saved_to_drive` (returns Dokumen Tidak Valid / Belum Tersimpan).
+    - Resolved frontend Vite builds successfully with Tailwind configurations mapped for Laravel 13.
+    - **STATUS**: Complete. Ready for deployment and live testing.
+  - **2026-06-09 19:21**:
+    - Fixed "Get Started" and "Login" loops on the landing page where clicking them previously just reloaded `/login` (which rendered the home page again).
+    - Passed `autoOpenLogin` prop from Laravel web router when visiting `/login`.
+    - Integrated a premium, fully-accessible modal dialog for oauth provider selection (Google, Facebook, Line) following the Bio-Digital Minimalism style.
+    - Updated translation dictionary files (`en.json`, `id.json`, `th.json`) to map all modal labels and eliminate hardcoded UI text.
+    - Added reactive state to automatically open the modal if the user targets `/login` or clicks header/hero buttons, and direct to dashboard when already authenticated.
+    - **STATUS**: Selesai.
+  - **2026-06-09 22:01**:
+    - Added `LanguageSwitcher` and `ThemeToggle` elements to the header of the Sign Document (`/sign`) page matching the Dashboard interface.
+    - Resolved the QR code draggable interference bug by applying `pointer-events-none` and `user-select-none` to the underlaying react-pdf text and annotation layer classes in CSS.
+    - Updated the signature button text and alert trigger messaging to "Sign & Seal" across all language translation files (`en.json`, `id.json`, `th.json`).
+    - Fixed stacking context issue of the header element by adding `relative z-50` class, ensuring language switcher dropdown is no longer covered by main content.
+    - Compiled assets with Vite production build successfully.
+    - **STATUS**: Selesai.
+- **2026-06-09 23:15**:
+  - Aligned progress overlay text and icons in `SignDocument.jsx` and `popup.html` / `popup.js` to match the exact format: `✔️`, `⏳`, and `🔄` (spinning emoji), with Google Drive references and upload progress percentage indicators.
+  - Removed standard strikethrough (`line-through`) visual format for completed steps in the status overlay checklist.
+  - Aligned certificate warning modal buttons on `Dashboard.jsx` to follow the parenthesized naming conventions: `( BATAL )` and `(( YA, REPLACE SERTIFIKAT ))` / `(( GENERATE SERTIFIKAT ))`.
+  - Ran PHPUnit feature tests to verify API endpoints, registration, and revocation (all 47 assertions passing successfully).
+  - Re-compiled frontend assets via Vite production build cleanly.
+  - **STATUS**: Selesai.
+  - **Catatan untuk AI selanjutnya (Handoff Note)**: Proyek siap dipindahkan dari temporary disk ke lokasi persisten (`/home/vnot/docker`) setelah pengguna mengonfirmasi persetujuan akhir. Semuanya sudah diuji dan berjalan normal.

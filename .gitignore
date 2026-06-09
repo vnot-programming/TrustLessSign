@@ -1,0 +1,34 @@
+# System / Environment Files
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Cryptographic Keys (Root CA & Certificates)
+pki-keys/
+secrets/
+chrome-extension/key.pem
+safari-extension/**/key.pem
+
+# Web Monolith Subfolder Ignores
+web/.env
+web/node_modules/
+web/vendor/
+web/public/build/
+web/public/hot/
+web/public/storage/
+web/storage/*.key
+web/storage/pail/
+web/.phpunit.cache
+web/.phpunit.result.cache
+
+# IDEs
+.idea/
+.vscode/
+.zed/
+.fleet/
+.nova/

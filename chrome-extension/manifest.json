@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "TrustlessSign",
+  "version": "1.0.0",
+  "description": "Zero-Trust PDF Digital Signature",
+  "permissions": [
+    "storage",
+    "identity",
+    "downloads",
+    "activeTab",
+    "scripting",
+    "windows"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "http://localhost/*",
+    "https://tsign.vnot.my.id/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost/*",
+        "https://tsign.vnot.my.id/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}

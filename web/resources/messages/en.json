@@ -1,0 +1,29 @@
+{
+  "Verification": {
+    "title": "Document Verification",
+    "valid": "Document Valid",
+    "invalid": "Not Valid",
+    "not_saved": "Dokumen Tidak Valid (Belum Tersimpan)",
+    "signer": "Signer",
+    "signed_at": "Signed At"
+  },
+  "Sign": {
+    "title": "Sign Document",
+    "drag_qr": "Drag QR Code to position",
+    "save_to_drive": "Save to Google Drive",
+    "generate_key": "Generate Private Key",
+    "sign_and_seal": "Sign & Seal"
+  },
+  "Welcome": {
+    "badge": "Secure & Decentralized",
+    "title": "Zero-Trust Digital Signatures",
+    "desc": "Sign documents offline via Chrome Extension. Verify instantly with cryptographic certainty. No central authority required.",
+    "get_started": "Get Started",
+    "auth_providers": "Supported authentication providers:",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "modal_title": "Select Sign In Provider",
+    "modal_desc": "Authentication is required to sign documents and save them.",
+    "close": "Close"
+  }
+}
