@@ -1,4 +1,4 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.5-fpm-alpine
 
 # Install dependencies and extensions
 RUN apk add --no-cache \

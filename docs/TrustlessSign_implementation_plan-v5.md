@@ -29,13 +29,13 @@
 
 ## Tech Stack (Final)
 
-### 1. Monolith Core — **Laravel 13 (PHP 8.2+)**
+### 1. Monolith Core — **Laravel 13 (PHP 8.5+)**
 
 Laravel bertindak sebagai **single command center**: mengelola database, logika PKI, autentikasi sosial, REST API untuk extension, sekaligus menyajikan semua halaman web via Inertia.js.
 
 | Layer | Library / Tech | Fungsi |
 |-------|---------------|--------|
-| **Core Engine** | Laravel 13 (PHP 8.2+) | REST API + Inertia Monolith engine |
+| **Core Engine** | Laravel 13 (PHP 8.5+) | REST API + Inertia Monolith engine |
 | **Database ORM** | Eloquent ORM | Abstraksi PostgreSQL |
 | **DB Migration** | Laravel Migrations | Schema versioning (ganti Alembic) |
 | **Auth (Web)** | Laravel Session + Breeze | Amankan sesi dashboard web |
