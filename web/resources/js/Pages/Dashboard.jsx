@@ -321,7 +321,7 @@ export default function Dashboard() {
                     onClick={() => setModalOpen(false)}
                     className="px-4 py-2 border border-border-default rounded-md hover:bg-surface-secondary transition-colors text-sm font-semibold cursor-pointer"
                   >
-                    ({t.btn_cancel})
+                    {t.btn_cancel}
                   </button>
                   <button 
                     disabled={
@@ -334,7 +334,7 @@ export default function Dashboard() {
                     className="px-4 py-2 bg-accent-danger text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {loading && <Loader2 className="animate-spin" size={16} />}
-                    {activeCertificate ? `(( ${t.btn_yes_replace} ))` : `(( ${t.btn_generate_cert} ))`}
+                    {activeCertificate ? t.btn_yes_replace : t.btn_generate_cert}
                   </button>
                 </div>
               </>

@@ -29,6 +29,10 @@ Route::get('/certificates/{serial}/download', [CertificateController::class, 'do
 
 // Authenticated extension endpoints (Sanctum Bearer Token)
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return response()->json($request->user());
+    });
+    
     Route::post('/certificates/issue', [CertificateController::class, 'issue']);
     Route::get('/certificates/me', [CertificateController::class, 'myCertificate']);
     

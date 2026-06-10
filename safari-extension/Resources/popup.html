@@ -44,6 +44,35 @@
       }
     }
 
+    /* Class-based theme overrides */
+    body.dark-mode {
+      --surface-primary:     hsl(220, 17%, 7%);
+      --surface-secondary:   hsl(220, 16%, 11%);
+      --surface-elevated:    hsl(220, 16%, 13%);
+      --surface-glass:       rgba(18, 20, 24, 0.76);
+      
+      --text-primary:        hsl(220, 16%, 92%);
+      --text-secondary:      hsl(220, 10%, 68%);
+      --text-tertiary:       hsl(220, 8%, 48%);
+      
+      --border-subtle:       hsl(220, 14%, 16%);
+      --border-default:      hsl(220, 14%, 22%);
+    }
+
+    body.light-mode {
+      --surface-primary:     hsl(220, 16%, 98%);
+      --surface-secondary:   hsl(220, 14%, 94%);
+      --surface-elevated:    hsl(0, 0%, 100%);
+      --surface-glass:       rgba(248, 249, 250, 0.72);
+      
+      --text-primary:        hsl(220, 20%, 12%);
+      --text-secondary:      hsl(220, 12%, 40%);
+      --text-tertiary:       hsl(220, 8%, 56%);
+      
+      --border-subtle:       hsl(220, 12%, 90%);
+      --border-default:      hsl(220, 12%, 84%);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       width: 100%;
@@ -322,13 +351,27 @@
       </svg>
       <h1>TrustlessSign</h1>
     </div>
-    <button id="btn-popout" class="btn-popout" title="Pop out into window">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 3h6v6"/>
-        <path d="M10 14 21 3"/>
-        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-      </svg>
-    </button>
+    <div style="display: flex; align-items: center; gap: 4px;">
+      <!-- Language Switcher -->
+      <select id="extension-lang-select" class="form-control" style="width: auto; padding: 4px 6px; font-size: 0.7rem; height: 28px; line-height: 1; margin-bottom: 0; outline: none; border-radius: 6px; border: 1px solid var(--border-default); background-color: var(--surface-secondary); color: var(--text-primary);">
+        <option value="en">EN</option>
+        <option value="id">ID</option>
+        <option value="th">TH</option>
+      </select>
+      <!-- Theme Toggle -->
+      <button id="btn-theme-toggle" class="btn-popout" title="Toggle Theme" style="padding: 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+        </svg>
+      </button>
+      <button id="btn-popout" class="btn-popout" title="Pop out into window" style="padding: 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h6v6"/>
+          <path d="M10 14 21 3"/>
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <main>
