@@ -1,4 +1,5 @@
 // background.js for TrustlessSign Safari Extension
+self.window = self;
 
 importScripts('assets/forge.min.js', 'assets/pdf-lib.min.js', 'signing/signer.js', 'signing/gdrive.js');
 

@@ -1,4 +1,5 @@
 // service-worker.js for TrustlessSign Extension (Manifest V3)
+self.window = self;
 
 importScripts('../assets/forge.min.js', '../assets/pdf-lib.min.js', '../signing/signer.js', '../signing/gdrive.js');
 

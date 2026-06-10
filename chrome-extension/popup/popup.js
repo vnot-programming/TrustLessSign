@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Setup PDFjs
   const pdfjsLib = window['pdfjs-dist/build/pdf'];
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '../assets/pdf.worker.min.js';
 
   // 1. Detect Popout View
   const urlParams = new URLSearchParams(window.location.search);
