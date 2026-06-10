@@ -61,3 +61,9 @@
   - Re-compiled frontend assets via Vite production build cleanly.
   - **STATUS**: Selesai.
   - **Catatan untuk AI selanjutnya (Handoff Note)**: Proyek siap dipindahkan dari temporary disk ke lokasi persisten (`/home/vnot/docker`) setelah pengguna mengonfirmasi persetujuan akhir. Semuanya sudah diuji dan berjalan normal.
+  - **2026-06-10 07:30**:
+    - Configured and registered the self-hosted GitHub Actions runner on the VPS for the repository.
+    - Updated `.github/workflows/deploy.yml` to run `./vendor/bin/phpunit` instead of `php artisan test` because the `test` artisan command is not defined in this Laravel setup.
+    - Successfully pushed the fixes and triggered the automated CI/CD pipeline.
+    - **STATUS**: Selesai (CI/CD active and verified).
+
