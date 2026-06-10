@@ -369,7 +369,7 @@ export default function SignDocument() {
                 <CheckCircle2 size={48} />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-text-primary">Dokumen Berhasil Disahkan!</h2>
+                <h2 className="text-2xl font-bold text-text-primary">Document Successfully Signed!</h2>
                 <p className="text-sm text-text-secondary">Signature has been embedded and metadata successfully registered.</p>
               </div>
 
@@ -435,7 +435,7 @@ export default function SignDocument() {
                     <>
                       {/* Reason Category dropdown */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Kategori Alasan</label>
+                        <label className="block text-xs font-semibold text-text-secondary">Reason Category</label>
                         <select 
                           value={selectedCategoryId} 
                           onChange={(e) => {
@@ -454,14 +454,14 @@ export default function SignDocument() {
 
                       {/* Reason Subcategory dropdown */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Alasan Tanda Tangan</label>
+                        <label className="block text-xs font-semibold text-text-secondary">Signing Reason</label>
                         <select 
                           value={selectedSubCategoryId} 
                           onChange={(e) => setSelectedSubCategoryId(e.target.value)}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
                           required
                         >
-                          <option value="">-- Pilih Alasan --</option>
+                          <option value="">-- Select Reason --</option>
                           {subCategories.map(sub => (
                             <option key={sub.id} value={sub.id}>
                               {locale === 'id' ? sub.reason_text_id : locale === 'th' ? sub.reason_text_th : sub.reason_text_en}
@@ -472,22 +472,22 @@ export default function SignDocument() {
 
                       {/* Custom note / Detail input */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Detail Alasan / Custom Note</label>
+                        <label className="block text-xs font-semibold text-text-secondary">Reason Detail / Custom Note</label>
                         <textarea 
                           value={customReason}
                           onChange={(e) => setCustomReason(e.target.value)}
-                          placeholder="Masukkan detail atau alasan kustom..."
+                          placeholder="Enter detail or custom reason..."
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary h-20 resize-none"
                         />
                       </div>
 
                       {/* Notes text area */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Notes Tambahan (Opsional)</label>
+                        <label className="block text-xs font-semibold text-text-secondary">Additional Notes (Optional)</label>
                         <textarea 
                           value={notes}
                           onChange={(e) => setNotes(e.target.value)}
-                          placeholder="Catatan tambahan..."
+                          placeholder="Additional notes..."
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary h-16 resize-none"
                         />
                       </div>
@@ -495,13 +495,13 @@ export default function SignDocument() {
                       {/* Password input */}
                       <div className="space-y-1">
                         <label className="block text-xs font-semibold text-text-secondary flex items-center gap-1">
-                          <Key size={12} /> Master Password Sertifikat
+                          <Key size={12} /> Master Certificate Password
                         </label>
                         <input 
                           type="password" 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Masukkan password sertifikat..."
+                          placeholder="Enter certificate password..."
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
                           required
                         />

@@ -296,6 +296,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     keysStatus.textContent = msg;
   };
 
+  // Determine language based on browser UI locale
+  const getLangCode = () => {
+    const uiLang = (chrome.i18n.getUILanguage() || 'en').toLowerCase();
+    if (uiLang.startsWith('id')) return 'id';
+    if (uiLang.startsWith('th')) return 'th';
+    return 'en';
+  };
+  const langCode = getLangCode();
+
   // 6. Load Reason Dropdowns
   const loadReasons = async (baseUrl, token) => {
     try {
@@ -311,7 +320,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         reasonsCategories.forEach(cat => {
           const opt = document.createElement('option');
           opt.value = cat.id;
-          opt.textContent = cat.name_id; // Default to Indo for local
+          opt.textContent = langCode === 'id' ? cat.name_id : langCode === 'th' ? cat.name_th : cat.name_en;
           categorySelect.appendChild(opt);
         });
 
@@ -327,12 +336,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectedCatId = categorySelect.value;
     const cat = reasonsCategories.find(c => c.id.toString() === selectedCatId);
     
-    subcategorySelect.innerHTML = '<option value="">-- Pilih Alasan --</option>';
+    const placeholderText = langCode === 'id' ? '-- Pilih Alasan --' : langCode === 'th' ? '-- เลือกเหตุผล --' : '-- Select Reason --';
+    subcategorySelect.innerHTML = `<option value="">${placeholderText}</option>`;
     if (cat && cat.sub_categories) {
       cat.sub_categories.forEach(sub => {
         const opt = document.createElement('option');
         opt.value = sub.id;
-        opt.textContent = sub.reason_text_id;
+        opt.textContent = langCode === 'id' ? sub.reason_text_id : langCode === 'th' ? sub.reason_text_th : sub.reason_text_en;
         subcategorySelect.appendChild(opt);
       });
     }
@@ -549,12 +559,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressBar.style.width = `${pct}%`;
     progressPct.textContent = `${pct}%`;
 
+    const isIndo = langCode === 'id';
+    const isThai = langCode === 'th';
+
+    const tProgress = {
+      downloading: isIndo ? "Membaca berkas asli dari Google Drive..." : isThai ? "กำลังอ่านไฟล์ต้นฉบับจาก Google Drive..." : "Reading original file from Google Drive...",
+      stamping: isIndo ? "Menyisipkan tanda tangan kriptografi & QR Code..." : isThai ? "กำลังฝังลายเซ็นเข้ารหัสและ QR Code..." : "Embedding cryptographic signature & QR Code...",
+      uploading: isIndo ? "Mengunggah dokumen ter-stamp kembali ke Google Drive..." : isThai ? "กำลังอัปโหลดเอกสารที่ประทับตรากลับไปยัง Google Drive..." : "Uploading stamped document back to Google Drive...",
+      success: isIndo ? "Sukses! Mencatat URL dokumen ter-stamp ke server TrustlessSign." : isThai ? "สำเร็จ! บันทึก URL เอกสารที่ประทับตราไปยังเซิร์ฟเวอร์ TrustlessSign เรียบร้อยแล้ว" : "Success! Recorded stamped document URL to TrustlessSign server.",
+      title: isIndo ? "Memproses Dokumen Berkas..." : isThai ? "กำลังประมวลผลเอกสาร..." : "Processing Document...",
+      step1: isIndo ? "Membaca berkas asli dari Google Drive" : isThai ? "อ่านไฟล์ต้นฉบับจาก Google Drive" : "Read original file from Google Drive",
+      step2: isIndo ? "Menyisipkan tanda tangan kriptografi & QR Code" : isThai ? "ฝังลายเซ็นเข้ารหัสและ QR Code" : "Embed cryptographic signature & QR Code",
+      step3: isIndo ? "Mengunggah dokumen ter-stamp kembali ke Google Drive" : isThai ? "อัปโหลดเอกสารที่ประทับตรากลับไปยัง Google Drive" : "Upload stamped document back to Google Drive"
+    };
+
+    // Update progress overlay title dynamically
+    const titleEl = progressOverlay.querySelector('h4');
+    if (titleEl) {
+      titleEl.textContent = tProgress.title;
+    }
+
     // Map stages
     const steps = {
-      'DOWNLOADING': { text: 'Membaca berkas asli dari Google Drive...', elements: [stepDownload] },
-      'STAMPING': { text: 'Menyisipkan tanda tangan kriptografi & QR Code...', elements: [stepDownload, stepStamp] },
-      'UPLOADING': { text: 'Mengunggah dokumen ter-stamp kembali ke Google Drive...', elements: [stepDownload, stepStamp, stepUpload] },
-      'SUCCESS': { text: 'Sukses! Mencatat URL dokumen ter-stamp ke server TrustlessSign.', elements: [stepDownload, stepStamp, stepUpload] }
+      'DOWNLOADING': { text: tProgress.downloading, elements: [stepDownload] },
+      'STAMPING': { text: tProgress.stamping, elements: [stepDownload, stepStamp] },
+      'UPLOADING': { text: tProgress.uploading, elements: [stepDownload, stepStamp, stepUpload] },
+      'SUCCESS': { text: tProgress.success, elements: [stepDownload, stepStamp, stepUpload] }
     };
 
     const currentStep = steps[stage];
@@ -562,9 +592,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       progressDesc.textContent = currentStep.text;
       
       const stepNames = {
-        'step-download': 'Membaca berkas asli dari Google Drive',
-        'step-stamp': 'Menyisipkan tanda tangan kriptografi & QR Code',
-        'step-upload': 'Mengunggah dokumen ter-stamp kembali ke Google Drive'
+        'step-download': tProgress.step1,
+        'step-stamp': tProgress.step2,
+        'step-upload': tProgress.step3
       };
 
       // Reset icons and texts
@@ -588,7 +618,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           textEl.style.color = 'var(--text-primary)';
           textEl.style.fontWeight = 'bold';
           if (el.id === 'step-upload') {
-            textEl.textContent = `Mengunggah dokumen ter-stamp kembali ke Google Drive (${pct}%)`;
+            textEl.textContent = `${tProgress.step3} (${pct}%)`;
           }
         } else {
           iconEl.innerHTML = '✔️';

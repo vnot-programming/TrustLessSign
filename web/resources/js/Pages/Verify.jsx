@@ -13,7 +13,7 @@ export default function Verify({ token }) {
     title: "Document Verification",
     valid: "Document Valid",
     invalid: "Not Valid",
-    not_saved: "Dokumen Tidak Valid (Belum Tersimpan)",
+    not_saved: "Document Not Valid (Not Yet Saved)",
     signer: "Signer",
     signed_at: "Signed At"
   };

@@ -221,27 +221,27 @@ export default function Dashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 text-accent-danger">
                       <AlertTriangle size={28} />
-                      <h2 className="text-xl font-bold tracking-tight">⚠️ PERINGATAN KEAMANAN CRITICAL!</h2>
+                      <h2 className="text-xl font-bold tracking-tight">⚠️ CRITICAL SECURITY WARNING!</h2>
                     </div>
                     
                     <div className="text-sm text-text-secondary space-y-2 leading-relaxed">
-                      <p>Anda telah memiliki sertifikat aktif yang terdaftar di sistem.</p>
-                      <p className="font-semibold text-text-primary">Jika Anda melanjutkan untuk membuat/mengganti dengan sertifikat baru:</p>
+                      <p>You already have an active certificate registered in the system.</p>
+                      <p className="font-semibold text-text-primary">If you continue to create/replace with a new certificate:</p>
                       <ol className="list-decimal list-inside pl-1 space-y-1">
-                        <li>Sertifikat lama Anda akan otomatis <strong>DICABUT (Revoked)</strong>.</li>
-                        <li>SEMUA dokumen PDF yang telah Anda tanda tangani sebelumnya akan menjadi <strong>TIDAK VALID</strong> saat orang lain melakukan verifikasi.</li>
-                        <li>Status dokumen lama akan berubah menjadi <strong>"SERTIFIKAT DICABUT"</strong>.</li>
+                        <li>Your old certificate will automatically be <strong>REVOKED</strong>.</li>
+                        <li>ALL PDF documents you have previously signed will become <strong>INVALID</strong> when others verify them.</li>
+                        <li>The status of old documents will change to <strong>"CERTIFICATE REVOKED"</strong>.</li>
                       </ol>
-                      <p className="font-semibold mt-4">Apakah Anda yakin ingin melanjutkan?</p>
+                      <p className="font-semibold mt-4">Are you sure you want to continue?</p>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs font-semibold text-text-secondary">Ketik "SAYA MENGERTI" untuk melanjutkan</label>
+                      <label className="block text-xs font-semibold text-text-secondary">Type "I UNDERSTAND" to continue</label>
                       <input 
                         type="text" 
                         value={confirmText} 
                         onChange={(e) => setConfirmText(e.target.value)} 
-                        placeholder="SAYA MENGERTI"
+                        placeholder="I UNDERSTAND"
                         className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                       />
                     </div>
@@ -251,27 +251,27 @@ export default function Dashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-accent-primary">
                     <Key size={20} />
-                    <h3 className="font-bold text-lg">{activeCertificate ? 'Buat Kunci Baru' : 'Generate Secure Key'}</h3>
+                    <h3 className="font-bold text-lg">{activeCertificate ? 'Create New Key' : 'Generate Secure Key'}</h3>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-text-secondary">Password Baru Sertifikat (Min 8 Karakter)</label>
+                    <label className="block text-xs font-semibold text-text-secondary">New Certificate Password (Min 8 Characters)</label>
                     <input 
                       type="password" 
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)} 
-                      placeholder="Masukkan password baru..."
+                      placeholder="Enter new password..."
                       className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-text-secondary">Konfirmasi Password Baru</label>
+                    <label className="block text-xs font-semibold text-text-secondary">Confirm New Password</label>
                     <input 
                       type="password" 
                       value={confirmPassword} 
                       onChange={(e) => setConfirmPassword(e.target.value)} 
-                      placeholder="Konfirmasi password baru..."
+                      placeholder="Confirm new password..."
                       className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                     />
                   </div>
@@ -289,11 +289,11 @@ export default function Dashboard() {
                     onClick={() => setModalOpen(false)}
                     className="px-4 py-2 border border-border-default rounded-md hover:bg-surface-secondary transition-colors text-sm font-semibold cursor-pointer"
                   >
-                    ( BATAL )
+                    ( CANCEL )
                   </button>
                   <button 
                     disabled={
-                      (activeCertificate && confirmText !== 'SAYA MENGERTI') || 
+                      (activeCertificate && confirmText !== 'I UNDERSTAND') || 
                       password.length < 8 || 
                       password !== confirmPassword || 
                       loading
@@ -302,7 +302,7 @@ export default function Dashboard() {
                     className="px-4 py-2 bg-accent-danger text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {loading && <Loader2 className="animate-spin" size={16} />}
-                    {activeCertificate ? '(( YA, REPLACE SERTIFIKAT ))' : '(( GENERATE SERTIFIKAT ))'}
+                    {activeCertificate ? '(( YES, REPLACE CERTIFICATE ))' : '(( GENERATE CERTIFICATE ))'}
                   </button>
                 </div>
               </>
