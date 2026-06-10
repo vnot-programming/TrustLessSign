@@ -437,49 +437,48 @@
     }
     /* Footer */
     .popup-footer {
-      padding: 16px;
+      margin: 0 16px 16px 16px;
+      padding: 12px;
       text-align: center;
-      background-color: var(--bg-surface);
-      border-top: 1px solid var(--border-color);
+      background-color: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
     }
     .footer-actions {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .footer-btn {
       background: none;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 0.8rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
       color: var(--text-secondary);
       cursor: pointer;
-      transition: all 0.2s var(--ease-spring);
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       gap: 6px;
     }
     .footer-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      background-color: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1);
-    }
-    .footer-jazakallah {
-      font-weight: 500;
+      border-color: var(--text-primary);
       color: var(--text-primary);
-      margin: 0;
+      background-color: var(--surface-elevated);
     }
-    .footer-made {
-      color: var(--text-tertiary);
+    .footer-bottom-text {
       display: flex;
       justify-content: center;
-      gap: 16px;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
     }
     .heart {
       color: #e25555;
@@ -742,19 +741,16 @@
   <footer class="popup-footer">
     <div class="footer-actions">
       <button id="supportBtn" class="footer-btn footer-btn--support">
-        <span>🪙</span> Support Development
+        <span>☕</span> Support Development
       </button>
       <button id="privacyBtn" class="footer-btn footer-btn--privacy">
         <span>🔒</span> Privacy Policy
       </button>
-      <button id="termsBtn" class="footer-btn footer-btn--terms">
-        <span>📝</span> Terms of Service
-      </button>
     </div>
-    <p class="footer-jazakallah">Jazakumullah Khairan 🙏</p>
-    <div class="footer-made">
-      <span>Made with <span class="heart">♥</span></span>
-      <span>Version <span id="extensionVersion">—</span></span>
+    <div class="footer-bottom-text">
+      <span>Jazakumullah Khairan 🙏</span>
+      <span>Made with <span class="heart">💖</span></span>
+      <span>Version <span id="extensionVersion">1.0.0</span></span>
     </div>
   </footer>
 
