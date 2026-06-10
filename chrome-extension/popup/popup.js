@@ -707,8 +707,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   qrDragBox.addEventListener('mousedown', (e) => {
     isDragging = true;
-    startX = e.clientX - qrDragBox.offsetLeft;
-    startY = e.clientY - qrDragBox.offsetTop;
+    const rect = qrDragBox.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
     e.preventDefault();
   });
 
