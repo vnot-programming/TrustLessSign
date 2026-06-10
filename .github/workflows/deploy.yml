@@ -73,12 +73,42 @@ jobs:
 
       - name: 🪟 Sync Desktop-PC via Tailscale SSH
         run: |
-          echo "🪟 Syncing Desktop-PC (100.106.132.107)..."
+          echo "🪟 Syncing Desktop-PC (100.106.132.107) via Git..."
           ssh \
             -o StrictHostKeyChecking=accept-new \
             -o ConnectTimeout=20 \
             -i ~/.ssh/id_ed25519 \
             Server@100.106.132.107 \
             'cd /d "D:\~dev\~iseng\TrustLessSign" && git pull origin main && echo [Desktop-PC] Sync complete && git log --oneline -1'
+
+      - name: 📂 Sync Ignored Files via SCP
+        run: |
+          echo "📂 Copying directories and keys to Desktop-PC via SCP..."
+          
+          # Create target directories on Windows target
+          ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 Server@100.106.132.107 \
+            "mkdir \"D:\~dev\~iseng\TrustLessSign\docs\scripts\" \"D:\~dev\~iseng\TrustLessSign\pki-keys\" \"D:\~dev\~iseng\TrustLessSign\secrets\" 2>nul || ver >nul"
+
+          # SCP directories content
+          scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+            ${{ env.PROJECT_PATH }}/docs/scripts/* \
+            Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\docs\scripts/" || true
+
+          scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+            ${{ env.PROJECT_PATH }}/pki-keys/* \
+            Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\pki-keys/" || true
+
+          scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+            ${{ env.PROJECT_PATH }}/secrets/* \
+            Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\secrets/" || true
+
+          # SCP individual files
+          for file in docs/catatan.md docs/CI-CD.md docs/TrustlessSign_implementation_plan-v5.md docs/TrustlessSign_implementation_plan-v6.md; do
+            if [ -f "${{ env.PROJECT_PATH }}/$file" ]; then
+              scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+                "${{ env.PROJECT_PATH }}/$file" \
+                Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign/$file"
+            fi
+          done
 
           echo "✅ Deployment complete at $(date '+%Y-%m-%d %H:%M:%S UTC')"

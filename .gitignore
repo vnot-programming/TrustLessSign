@@ -35,3 +35,7 @@ web/.phpunit.result.cache
 
 # Sensitive Docs (contains credentials / private key info)
 docs/CI-CD.md
+docs/scripts/
+docs/TrustlessSign_implementation_plan-v5.md
+docs/TrustlessSign_implementation_plan-v6.md
+docs/catatan.md
