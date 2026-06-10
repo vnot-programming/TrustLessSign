@@ -71,5 +71,10 @@
     - Fixed `ReferenceError: window is not defined` in background service worker context by mocking `self.window = self` before importing minified libraries.
     - Successfully pushed extension updates to GitHub.
     - **STATUS**: Selesai.
+  - **2026-06-10 07:45**:
+    - Added the base64 public key to `chrome-extension/manifest.json` as the `"key"` property to ensure a persistent extension ID (`depnfhiklhdabclnlpibbiieaoghbiae`) during development.
+    - Noted requirement to delete this `"key"` property prior to publishing on the Chrome Web Store.
+    - **STATUS**: Selesai.
+
 
 
