@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import { ShieldAlert, ShieldCheck, Download, AlertTriangle, Loader2 } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Download, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 export default function Verify({ token }) {
@@ -15,7 +15,12 @@ export default function Verify({ token }) {
     invalid: "Not Valid",
     not_saved: "Document Not Valid (Not Yet Saved)",
     signer: "Signer",
-    signed_at: "Signed At"
+    signed_at: "Signed At",
+    cert_status: "Certificate Status",
+    doc_hash: "Document Hash",
+    verifying: "Verifying cryptographic signature...",
+    sig_verified: "Signature Verified",
+    view_doc: "View Original Document",
   };
 
   useEffect(() => {
@@ -39,7 +44,7 @@ export default function Verify({ token }) {
           {loading && (
             <div className="flex flex-col items-center py-12 text-text-tertiary">
               <Loader2 className="animate-spin mb-4 text-accent-primary" size={32} />
-              <p>Verifying cryptographic signature...</p>
+              <p>{t.verifying}</p>
             </div>
           )}
 
@@ -49,7 +54,7 @@ export default function Verify({ token }) {
                 <ShieldAlert size={32} />
               </div>
               <h2 className="text-xl font-bold text-accent-danger">
-                {error.includes('Belum Tersimpan') ? t.not_saved : t.invalid}
+                {error.includes('Belum Tersimpan') || error.includes('Not Yet Saved') ? t.not_saved : t.invalid}
               </h2>
               <p className="text-sm text-text-secondary">{error}</p>
             </div>
@@ -64,7 +69,7 @@ export default function Verify({ token }) {
                 <h2 className="text-xl font-bold text-accent-success">{t.valid}</h2>
                 <div className="badge-premium bg-surface-secondary shadow-none border-border-default mt-2">
                   <span className="pulsing-dot"></span>
-                  Signature Verified
+                  {t.sig_verified}
                 </div>
               </div>
 
@@ -78,13 +83,13 @@ export default function Verify({ token }) {
                   <span className="font-semibold">{new Date(data.document.signed_at).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between border-b border-border-default pb-2">
-                  <span className="text-text-tertiary">Certificate Status</span>
+                  <span className="text-text-tertiary">{t.cert_status}</span>
                   <span className={`font-semibold capitalize ${data.certificate.status === 'valid' ? 'text-accent-success' : 'text-accent-danger'}`}>
                     {data.certificate.status}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-text-tertiary">Document Hash</span>
+                  <span className="text-text-tertiary">{t.doc_hash}</span>
                   <span className="font-mono text-xs truncate max-w-[150px]" title={data.document.doc_hash_sha256}>
                     {data.document.doc_hash_sha256}
                   </span>
@@ -98,7 +103,7 @@ export default function Verify({ token }) {
                   rel="noreferrer"
                   className="w-full flex items-center justify-center gap-2 bg-text-primary text-surface-primary py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors focus:ring focus:outline-none"
                 >
-                  <Download size={18} /> View Original Document
+                  <Download size={18} /> {t.view_doc}
                 </a>
               )}
             </div>

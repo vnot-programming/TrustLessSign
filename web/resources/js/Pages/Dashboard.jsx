@@ -19,13 +19,45 @@ export default function Dashboard() {
   const [errorMsg, setErrorMsg] = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false });
 
-  // Translation keys
-  const t = messages?.Sign || {
-    title: "Sign Document",
-    drag_qr: "Drag QR Code to position",
-    save_to_drive: "Save to Google Drive",
-    generate_key: "Generate Private Key",
-    sign_and_seal: "Sign & Seal"
+  // Translation keys - Dashboard section
+  const t = messages?.Dashboard || {
+    welcome_back: "Welcome Back",
+    sign_new_doc: "Sign New Document",
+    sign_new_doc_desc: "Upload a PDF and place your cryptographic QR signature securely.",
+    my_documents: "My Documents",
+    my_documents_desc: "View documents stored in your connected Google Drive.",
+    cert_active: "Certificate Active",
+    cert_none: "No Active Certificate",
+    cert_none_desc: "Generate a certificate to sign documents offline with cryptographic certainty.",
+    btn_regenerate: "Re-generate / Replace Certificate",
+    btn_generate: "Generate Certificate",
+    logout: "Logout",
+    warning_title: "⚠️ CRITICAL SECURITY WARNING!",
+    warning_desc: "You already have an active certificate registered in the system.",
+    warning_continue: "If you continue to create/replace with a new certificate:",
+    warning_item1: "Your old certificate will automatically be",
+    warning_item1_strong: "REVOKED",
+    warning_item2: "ALL PDF documents you have previously signed will become",
+    warning_item2_strong: "INVALID",
+    warning_item2_suffix: "when others verify them.",
+    warning_item3: "The status of old documents will change to",
+    warning_item3_strong: '"CERTIFICATE REVOKED"',
+    warning_confirm: "Are you sure you want to continue?",
+    confirm_label: 'Type "I UNDERSTAND" to continue',
+    confirm_placeholder: "I UNDERSTAND",
+    confirm_keyword: "I UNDERSTAND",
+    create_new_key: "Create New Key",
+    generate_secure_key: "Generate Secure Key",
+    new_cert_password: "New Certificate Password (Min 8 Characters)",
+    new_password_placeholder: "Enter new password...",
+    confirm_password_label: "Confirm New Password",
+    confirm_password_placeholder: "Confirm new password...",
+    btn_cancel: "CANCEL",
+    btn_yes_replace: "YES, REPLACE CERTIFICATE",
+    btn_generate_cert: "GENERATE CERTIFICATE",
+    cert_issued: "Certificate Issued!",
+    cert_issued_desc: "Your certificate and secure key have been generated and saved locally.",
+    extension_alert: "TrustlessSign Extension is required. Please install the extension first.",
   };
 
   // Check if extension is installed
@@ -62,7 +94,7 @@ export default function Dashboard() {
 
   const handleCertificateAction = () => {
     if (!extensionStatus.installed) {
-      alert("TrustlessSign Extension is required. Please install the extension first.");
+      alert(t.extension_alert);
       return;
     }
     setModalOpen(true);
@@ -148,13 +180,13 @@ export default function Dashboard() {
             </div>
             <div className="w-px h-6 bg-border-default hidden sm:block"></div>
             <Link href="/logout" method="post" as="button" className="text-sm font-semibold text-text-secondary hover:text-accent-danger flex items-center gap-2 transition-colors">
-              <LogOut size={16} /> <span className="hidden sm:inline">Logout</span>
+              <LogOut size={16} /> <span className="hidden sm:inline">{t.logout}</span>
             </Link>
           </div>
         </header>
 
         <main className="max-w-5xl mx-auto p-4 lg:p-8 mt-6">
-          <h1 className="text-3xl font-bold mb-6">Welcome Back</h1>
+          <h1 className="text-3xl font-bold mb-6">{t.welcome_back}</h1>
           
           {/* Certificate Management Section */}
           <div className="glass-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -164,12 +196,12 @@ export default function Dashboard() {
               </div>
               <div className="space-y-1">
                 <h3 className="font-bold text-lg leading-none">
-                  {activeCertificate ? 'Certificate Active' : 'No Active Certificate'}
+                  {activeCertificate ? t.cert_active : t.cert_none}
                 </h3>
                 <p className="text-sm text-text-secondary leading-normal">
                   {activeCertificate 
                     ? `Serial: ${activeCertificate.serial_number} (Expires: ${new Date(activeCertificate.expires_at).toLocaleDateString()})` 
-                    : 'Generate a certificate to sign documents offline with cryptographic certainty.'}
+                    : t.cert_none_desc}
                 </p>
               </div>
             </div>
@@ -177,7 +209,7 @@ export default function Dashboard() {
               onClick={handleCertificateAction}
               className={`px-6 py-3 rounded-lg font-bold text-sm transition-all focus:ring focus:outline-none cursor-pointer ${activeCertificate ? 'bg-accent-danger text-white hover:bg-opacity-90' : 'bg-accent-success text-white hover:bg-opacity-90'}`}
             >
-              {activeCertificate ? 'Re-generate / Replace Certificate' : 'Generate Certificate'}
+              {activeCertificate ? t.btn_regenerate : t.btn_generate}
             </button>
           </div>
 
@@ -187,8 +219,8 @@ export default function Dashboard() {
                 <FileSignature size={32} />
               </div>
               <div>
-                <h3 className="font-bold text-lg">Sign New Document</h3>
-                <p className="text-sm text-text-secondary mt-1">Upload a PDF and place your cryptographic QR signature securely.</p>
+                <h3 className="font-bold text-lg">{t.sign_new_doc}</h3>
+                <p className="text-sm text-text-secondary mt-1">{t.sign_new_doc_desc}</p>
               </div>
             </Link>
             
@@ -197,8 +229,8 @@ export default function Dashboard() {
                 <UploadCloud size={32} />
               </div>
               <div>
-                <h3 className="font-bold text-lg">My Documents</h3>
-                <p className="text-sm text-text-secondary mt-1">View documents stored in your connected Google Drive.</p>
+                <h3 className="font-bold text-lg">{t.my_documents}</h3>
+                <p className="text-sm text-text-secondary mt-1">{t.my_documents_desc}</p>
               </div>
             </div>
           </div>
@@ -212,8 +244,8 @@ export default function Dashboard() {
             {success ? (
               <div className="text-center py-6 space-y-4">
                 <CheckCircle className="mx-auto text-accent-success" size={64} />
-                <h3 className="text-xl font-bold">Certificate Issued!</h3>
-                <p className="text-sm text-text-secondary">Your certificate and secure key have been generated and saved locally.</p>
+                <h3 className="text-xl font-bold">{t.cert_issued}</h3>
+                <p className="text-sm text-text-secondary">{t.cert_issued_desc}</p>
               </div>
             ) : (
               <>
@@ -221,27 +253,27 @@ export default function Dashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 text-accent-danger">
                       <AlertTriangle size={28} />
-                      <h2 className="text-xl font-bold tracking-tight">⚠️ CRITICAL SECURITY WARNING!</h2>
+                      <h2 className="text-xl font-bold tracking-tight">{t.warning_title}</h2>
                     </div>
                     
                     <div className="text-sm text-text-secondary space-y-2 leading-relaxed">
-                      <p>You already have an active certificate registered in the system.</p>
-                      <p className="font-semibold text-text-primary">If you continue to create/replace with a new certificate:</p>
+                      <p>{t.warning_desc}</p>
+                      <p className="font-semibold text-text-primary">{t.warning_continue}</p>
                       <ol className="list-decimal list-inside pl-1 space-y-1">
-                        <li>Your old certificate will automatically be <strong>REVOKED</strong>.</li>
-                        <li>ALL PDF documents you have previously signed will become <strong>INVALID</strong> when others verify them.</li>
-                        <li>The status of old documents will change to <strong>"CERTIFICATE REVOKED"</strong>.</li>
+                        <li>{t.warning_item1} <strong>{t.warning_item1_strong}</strong>.</li>
+                        <li>{t.warning_item2} <strong>{t.warning_item2_strong}</strong> {t.warning_item2_suffix}</li>
+                        <li>{t.warning_item3} <strong>{t.warning_item3_strong}</strong>.</li>
                       </ol>
-                      <p className="font-semibold mt-4">Are you sure you want to continue?</p>
+                      <p className="font-semibold mt-4">{t.warning_confirm}</p>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-xs font-semibold text-text-secondary">Type "I UNDERSTAND" to continue</label>
+                      <label className="block text-xs font-semibold text-text-secondary">{t.confirm_label}</label>
                       <input 
                         type="text" 
                         value={confirmText} 
                         onChange={(e) => setConfirmText(e.target.value)} 
-                        placeholder="I UNDERSTAND"
+                        placeholder={t.confirm_placeholder}
                         className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                       />
                     </div>
@@ -251,27 +283,27 @@ export default function Dashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-accent-primary">
                     <Key size={20} />
-                    <h3 className="font-bold text-lg">{activeCertificate ? 'Create New Key' : 'Generate Secure Key'}</h3>
+                    <h3 className="font-bold text-lg">{activeCertificate ? t.create_new_key : t.generate_secure_key}</h3>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-text-secondary">New Certificate Password (Min 8 Characters)</label>
+                    <label className="block text-xs font-semibold text-text-secondary">{t.new_cert_password}</label>
                     <input 
                       type="password" 
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)} 
-                      placeholder="Enter new password..."
+                      placeholder={t.new_password_placeholder}
                       className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-text-secondary">Confirm New Password</label>
+                    <label className="block text-xs font-semibold text-text-secondary">{t.confirm_password_label}</label>
                     <input 
                       type="password" 
                       value={confirmPassword} 
                       onChange={(e) => setConfirmPassword(e.target.value)} 
-                      placeholder="Confirm new password..."
+                      placeholder={t.confirm_password_placeholder}
                       className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                     />
                   </div>
@@ -289,11 +321,11 @@ export default function Dashboard() {
                     onClick={() => setModalOpen(false)}
                     className="px-4 py-2 border border-border-default rounded-md hover:bg-surface-secondary transition-colors text-sm font-semibold cursor-pointer"
                   >
-                    ( CANCEL )
+                    ({t.btn_cancel})
                   </button>
                   <button 
                     disabled={
-                      (activeCertificate && confirmText !== 'I UNDERSTAND') || 
+                      (activeCertificate && confirmText !== t.confirm_keyword) || 
                       password.length < 8 || 
                       password !== confirmPassword || 
                       loading
@@ -302,7 +334,7 @@ export default function Dashboard() {
                     className="px-4 py-2 bg-accent-danger text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {loading && <Loader2 className="animate-spin" size={16} />}
-                    {activeCertificate ? '(( YES, REPLACE CERTIFICATE ))' : '(( GENERATE CERTIFICATE ))'}
+                    {activeCertificate ? `(( ${t.btn_yes_replace} ))` : `(( ${t.btn_generate_cert} ))`}
                   </button>
                 </div>
               </>

@@ -50,7 +50,34 @@ export default function SignDocument() {
     drag_qr: "Drag QR Code to position",
     save_to_drive: "Save to Google Drive",
     generate_key: "Generate Private Key",
-    sign_and_seal: "Sign & Seal"
+    sign_and_seal: "Sign & Seal",
+    upload_pdf: "Upload PDF",
+    upload_hint: "Click or drag PDF to upload",
+    reason_category: "Reason Category",
+    signing_reason: "Signing Reason",
+    select_reason: "-- Select Reason --",
+    reason_detail: "Reason Detail / Custom Note",
+    reason_detail_placeholder: "Enter detail or custom reason...",
+    additional_notes: "Additional Notes (Optional)",
+    notes_placeholder: "Additional notes...",
+    cert_password: "Master Certificate Password",
+    cert_password_placeholder: "Enter certificate password...",
+    qr_hint: "Position the QR code exactly where you want your cryptographic signature to appear.",
+    preview_hint: "Document preview will appear here",
+    qr_area: "QR Code Area",
+    status_progress: "Status Progress",
+    detail_status: "Detail Status:",
+    success_title: "Document Successfully Signed!",
+    success_desc: "Signature has been embedded and metadata successfully registered.",
+    file_name: "File Name:",
+    sha256_hash: "SHA-256 Hash:",
+    verify_token: "Verify Token:",
+    download_pdf: "Download Signed PDF",
+    view_on_drive: "View on Drive",
+    sign_another: "Sign another document",
+    back_to_dashboard: "Back to Dashboard",
+    extension_required: "TrustlessSign Extension Required",
+    extension_desc: "Please download and install our browser extension to secure and sign your PDFs offline.",
   };
 
   const progressTranslations = {
@@ -347,7 +374,7 @@ export default function SignDocument() {
                 onClick={() => router.visit('/dashboard')}
                 className="text-sm font-semibold text-text-secondary hover:text-accent-primary transition-all focus:outline-none cursor-pointer"
               >
-                Back to Dashboard
+                {t.back_to_dashboard}
               </button>
             </div>
           </header>
@@ -356,8 +383,8 @@ export default function SignDocument() {
             <div className="bg-accent-warning-soft border border-accent-warning text-text-primary p-4 rounded-lg flex items-center gap-3">
               <AlertCircle className="text-accent-warning" size={24} />
               <div>
-                <h4 className="font-bold">TrustlessSign Extension Required</h4>
-                <p className="text-xs text-text-secondary">Please download and install our browser extension to secure and sign your PDFs offline.</p>
+                <h4 className="font-bold">{t.extension_required}</h4>
+                <p className="text-sm text-text-secondary">{t.extension_desc}</p>
               </div>
             </div>
           )}
@@ -369,23 +396,23 @@ export default function SignDocument() {
                 <CheckCircle2 size={48} />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-text-primary">Document Successfully Signed!</h2>
-                <p className="text-sm text-text-secondary">Signature has been embedded and metadata successfully registered.</p>
+                <h2 className="text-2xl font-bold text-text-primary">{t.success_title}</h2>
+                <p className="text-sm text-text-secondary">{t.success_desc}</p>
               </div>
 
               <div className="p-4 bg-surface-primary rounded-lg text-left space-y-3 border border-border-subtle text-xs">
                 <div className="flex justify-between border-b border-border-subtle pb-2">
-                  <span className="text-text-tertiary">File Name:</span>
+                  <span className="text-text-tertiary">{t.file_name}</span>
                   <span className="font-semibold text-text-primary">{file.name}</span>
                 </div>
                 <div className="flex justify-between border-b border-border-subtle pb-2">
-                  <span className="text-text-tertiary">SHA-256 Hash:</span>
+                  <span className="text-text-tertiary">{t.sha256_hash}</span>
                   <span className="font-mono text-text-primary overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px]" title={signResult.hash}>
                     {signResult.hash}
                   </span>
                 </div>
                 <div className="flex justify-between pb-2">
-                  <span className="text-text-tertiary">Verify Token:</span>
+                  <span className="text-text-tertiary">{t.verify_token}</span>
                   <span className="font-mono text-text-primary">{signResult.verifyToken}</span>
                 </div>
               </div>
@@ -395,7 +422,7 @@ export default function SignDocument() {
                   onClick={downloadSignedPdf}
                   className="flex items-center justify-center gap-2 bg-accent-success text-white px-5 py-3 rounded-lg hover:bg-opacity-90 font-semibold transition-all text-sm cursor-pointer shadow-md"
                 >
-                  <Save size={16} /> Download Signed PDF
+                  <Save size={16} /> {t.download_pdf}
                 </button>
                 {signResult.gdriveUrl && (
                   <a 
@@ -404,7 +431,7 @@ export default function SignDocument() {
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 border border-border-strong px-5 py-3 rounded-lg hover:bg-surface-secondary text-text-primary font-semibold transition-all text-sm cursor-pointer"
                   >
-                    <ExternalLink size={16} /> View on Drive
+                    <ExternalLink size={16} /> {t.view_on_drive}
                   </a>
                 )}
               </div>
@@ -413,7 +440,7 @@ export default function SignDocument() {
                   onClick={() => { setFile(null); setSignResult(null); }}
                   className="text-sm text-accent-primary font-semibold hover:underline cursor-pointer"
                 >
-                  Sign another document
+                  {t.sign_another}
                 </button>
               </div>
             </div>
@@ -423,11 +450,11 @@ export default function SignDocument() {
               <aside className="glass-panel p-6 space-y-6 h-fit lg:col-span-1">
                 <form onSubmit={handleSign} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-semibold mb-2">Upload PDF</label>
+                    <label className="block text-sm font-semibold mb-2">{t.upload_pdf}</label>
                     <div className="border-2 border-dashed border-border-strong rounded-lg p-6 text-center hover:border-accent-primary transition-colors cursor-pointer relative">
                       <input type="file" accept=".pdf" onChange={onFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required />
                       <Upload className="mx-auto text-text-tertiary mb-2" size={24} />
-                      <p className="text-sm text-text-secondary">Click or drag PDF to upload</p>
+                      <p className="text-sm text-text-secondary">{t.upload_hint}</p>
                     </div>
                   </div>
 
@@ -435,7 +462,7 @@ export default function SignDocument() {
                     <>
                       {/* Reason Category dropdown */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Reason Category</label>
+                        <label className="block text-xs font-semibold text-text-secondary">{t.reason_category}</label>
                         <select 
                           value={selectedCategoryId} 
                           onChange={(e) => {
@@ -454,14 +481,14 @@ export default function SignDocument() {
 
                       {/* Reason Subcategory dropdown */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Signing Reason</label>
+                        <label className="block text-xs font-semibold text-text-secondary">{t.signing_reason}</label>
                         <select 
                           value={selectedSubCategoryId} 
                           onChange={(e) => setSelectedSubCategoryId(e.target.value)}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
                           required
                         >
-                          <option value="">-- Select Reason --</option>
+                          <option value="">{t.select_reason}</option>
                           {subCategories.map(sub => (
                             <option key={sub.id} value={sub.id}>
                               {locale === 'id' ? sub.reason_text_id : locale === 'th' ? sub.reason_text_th : sub.reason_text_en}
@@ -472,22 +499,22 @@ export default function SignDocument() {
 
                       {/* Custom note / Detail input */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Reason Detail / Custom Note</label>
+                        <label className="block text-xs font-semibold text-text-secondary">{t.reason_detail}</label>
                         <textarea 
                           value={customReason}
                           onChange={(e) => setCustomReason(e.target.value)}
-                          placeholder="Enter detail or custom reason..."
+                          placeholder={t.reason_detail_placeholder}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary h-20 resize-none"
                         />
                       </div>
 
                       {/* Notes text area */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Additional Notes (Optional)</label>
+                        <label className="block text-xs font-semibold text-text-secondary">{t.additional_notes}</label>
                         <textarea 
                           value={notes}
                           onChange={(e) => setNotes(e.target.value)}
-                          placeholder="Additional notes..."
+                          placeholder={t.notes_placeholder}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary h-16 resize-none"
                         />
                       </div>
@@ -495,13 +522,13 @@ export default function SignDocument() {
                       {/* Password input */}
                       <div className="space-y-1">
                         <label className="block text-xs font-semibold text-text-secondary flex items-center gap-1">
-                          <Key size={12} /> Master Certificate Password
+                          <Key size={12} /> {t.cert_password}
                         </label>
                         <input 
                           type="password" 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Enter certificate password..."
+                          placeholder={t.cert_password_placeholder}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
                           required
                         />
@@ -509,7 +536,7 @@ export default function SignDocument() {
 
                       <div className="p-3 bg-surface-elevated border border-border-subtle rounded-md">
                         <p className="text-xs font-semibold text-accent-primary mb-1">{t.drag_qr}</p>
-                        <p className="text-[10px] text-text-tertiary">Position the QR code exactly where you want your cryptographic signature to appear.</p>
+                        <p className="text-[10px] text-text-tertiary">{t.qr_hint}</p>
                       </div>
                     </>
                   )}
@@ -534,7 +561,7 @@ export default function SignDocument() {
                 {!file ? (
                   <div className="text-center text-text-tertiary">
                     <Eye className="mx-auto mb-2 opacity-50" size={48} />
-                    <p>Document preview will appear here</p>
+                    <p>{t.preview_hint}</p>
                   </div>
                 ) : (
                   <div className="relative border border-border-default shadow-md bg-white select-none" ref={containerRef}>
@@ -558,7 +585,7 @@ export default function SignDocument() {
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                           QR Position: x:{Math.round(qrPosition.x)}, y:{Math.round(qrPosition.y)}
                         </div>
-                        <span className="text-accent-primary font-bold text-xs text-center pointer-events-none select-none">QR Code<br/>Area</span>
+                        <span className="text-accent-primary font-bold text-xs text-center pointer-events-none select-none">{t.qr_area}</span>
                       </div>
                     </Draggable>
                   </div>
@@ -587,14 +614,14 @@ export default function SignDocument() {
                 />
               </div>
               <div className="flex justify-between text-xs font-semibold text-text-secondary">
-                <span>Status Progress</span>
+                <span>{t.status_progress}</span>
                 <span>{signingStatus.percentage}%</span>
               </div>
             </div>
 
             {/* Detailed Checklist Status */}
             <div className="pt-2 border-t border-border-subtle space-y-3 text-sm">
-              <p className="text-xs font-bold uppercase tracking-wider text-text-tertiary mb-2">Detail Status:</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-text-tertiary mb-2">{t.detail_status}</p>
               
               <div className="flex items-center">
                 {getStepStatus('DOWNLOADING').icon}
