@@ -84,7 +84,11 @@
     "btn_generate_cert": "GENERATE CERTIFICATE",
     "cert_issued": "Certificate Issued!",
     "cert_issued_desc": "Your certificate and secure key have been generated and saved locally.",
-    "extension_alert": "TrustlessSign Extension is required. Please install the extension first."
+    "extension_alert": "TrustlessSign Extension is required. Please install the extension first.",
+    "install_ext_title": "Extension Required",
+    "install_ext_desc": "TrustlessSign extension is required to generate cryptographic certificates safely in your browser. This guarantees your private key never touches our servers.",
+    "btn_chrome_store": "Install from Chrome Store",
+    "btn_manual_install": "Download .crx (Manual Install)"
   },
   "Welcome": {
     "badge": "Secure & Decentralized",

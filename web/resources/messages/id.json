@@ -84,7 +84,11 @@
     "btn_generate_cert": "BUAT SERTIFIKAT",
     "cert_issued": "Sertifikat Diterbitkan!",
     "cert_issued_desc": "Sertifikat dan kunci aman Anda telah dibuat dan disimpan secara lokal.",
-    "extension_alert": "Ekstensi TrustlessSign diperlukan. Silakan instal ekstensi terlebih dahulu."
+    "extension_alert": "Ekstensi TrustlessSign diperlukan. Silakan instal ekstensi terlebih dahulu.",
+    "install_ext_title": "Ekstensi Diperlukan",
+    "install_ext_desc": "Ekstensi TrustlessSign diperlukan untuk membuat sertifikat kriptografi dengan aman di browser Anda. Ini menjamin private key Anda tidak pernah menyentuh server kami.",
+    "btn_chrome_store": "Instal dari Chrome Store",
+    "btn_manual_install": "Unduh .crx (Instal Manual)"
   },
   "Welcome": {
     "badge": "Aman & Terdesentralisasi",

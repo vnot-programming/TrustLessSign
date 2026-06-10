@@ -9,7 +9,7 @@ TrustlessSign is a decentralized, zero-trust digital signature application. Its 
    - The private key must *never* leave the local device.
    - The private key must be saved in `chrome.storage.local` encrypted using AES-256-GCM via a Master Password.
 2. **Offline PDF Signature Generation**:
-   - PDF signing must happen client-side using `pdf-lib` and `node-forge`.
+   - PDF signing must happen client-side using `pdf-lib` (`@pdfme/pdf-lib": "^1.18.4"`) and `node-forge`.
    - The extension downloads the target PDF from Google Drive, computes the SHA-256 hash, signs the hash using the local private key, and embeds the signature block along with the X.509 certificate chain.
 3. **Google Drive Integration**:
    - The signed PDF must be uploaded back to the user's Google Drive via the Google Drive API.

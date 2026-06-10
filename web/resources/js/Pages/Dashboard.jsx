@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false });
+  const [extensionModalOpen, setExtensionModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // Translation keys - Dashboard section
@@ -96,7 +97,7 @@ export default function Dashboard() {
 
   const handleCertificateAction = () => {
     if (!extensionStatus.installed) {
-      alert(t.extension_alert);
+      setExtensionModalOpen(true);
       return;
     }
     setModalOpen(true);
@@ -362,6 +363,48 @@ export default function Dashboard() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {/* Extension Required Modal */}
+      {extensionModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-panel max-w-md w-full p-6 space-y-6 bg-surface-elevated animate-fade-in relative z-55">
+            <div className="space-y-4 text-center">
+              <div className="w-16 h-16 rounded-full bg-accent-warning-soft text-accent-warning mx-auto flex items-center justify-center">
+                <AlertTriangle size={32} />
+              </div>
+              <h2 className="text-xl font-bold tracking-tight">{t.install_ext_title || "Extension Required"}</h2>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t.install_ext_desc || "TrustlessSign extension is required to generate cryptographic certificates safely in your browser."}
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-3 pt-2">
+              <a 
+                href="https://chrome.google.com/webstore/detail/trustlesssign"
+                target="_blank" rel="noreferrer"
+                className="w-full px-4 py-3 bg-accent-primary text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold flex justify-center items-center text-center cursor-pointer"
+              >
+                {t.btn_chrome_store || "Install from Chrome Store"}
+              </a>
+              <a 
+                href={`https://github.com/vnot-programming/TrustLessSign/releases/download/v${__EXTENSION_VERSION__}/trustlesssign-v${__EXTENSION_VERSION__}.crx`}
+                target="_blank" rel="noreferrer"
+                className="w-full px-4 py-3 border border-border-default rounded-md hover:bg-surface-secondary transition-colors text-sm font-semibold flex justify-center items-center text-center cursor-pointer"
+              >
+                {t.btn_manual_install || "Download .crx (Manual Install)"}
+              </a>
+            </div>
+
+            <div className="flex justify-center pt-2">
+              <button 
+                onClick={() => setExtensionModalOpen(false)}
+                className="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors cursor-pointer"
+              >
+                {t.btn_cancel || "CANCEL"}
+              </button>
+            </div>
           </div>
         </div>
       )}

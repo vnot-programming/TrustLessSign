@@ -100,8 +100,8 @@
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya:** Reason dropdown di Chrome Extension tidak memuat data karena tabel `reason_categories` di database masih kosong. Saya sudah memasukkan `ReasonCategorySeeder` ke dalam `DatabaseSeeder.php` dan menjalankan seedernya ke database secara manual. Status 404 pada `/api/certificates/me` adalah normal jika user belum pernah melakukan generate Secure Key (belum memiliki sertifikat aktif).
 
-- **Tanggal/Waktu:** 2026-06-10T08:58Z
-- **Tugas yang diselesaikan:** Fix Uncaught TypeError sendMessage in content.js
-- **File yang diubah/dibuat:** `chrome-extension/content.js`, `web/resources/js/Pages/SignDocument.jsx`
+- **Tanggal/Waktu:** 2026-06-10T12:20:00Z
+- **Tugas yang diselesaikan:** Fix database wiping issue caused by test environment using main database connection and RefreshDatabase
+- **File yang diubah/dibuat:** [phpunit.xml](file:///home/vnot/extra_disk/docker-temp/trustlesssign/web/phpunit.xml)
 - **Status saat ini:** Selesai
-- **Catatan untuk AI selanjutnya:** Menambahkan exception/catch handling saat context extension menjadi invalid (diakibatkan proses reload extension tapi page web belum ter-refresh). content.js sekarang akan mengembalikan `TRUSTLESS_SIGN_ERROR` agar UI tidak stuck di 96% "Uploading". SignDocument.jsx telah diubah untuk menangkap postMessage error tersebut dan memunculkannya ke user UI.
+- **Catatan untuk AI selanjutnya (Handoff Note):** Isolated testing environment to SQLite in-memory, preventing test suite run via CI/CD (which triggers RefreshDatabase) from wiping the main PostgreSQL database. Re-seeded Reason Categories using `ReasonCategorySeeder` so dropdowns are fully loaded again.
