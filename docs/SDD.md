@@ -37,6 +37,6 @@ TrustlessSign is structured as a standalone monolith combining a Laravel 13 back
    - User private keys are encrypted in browser local storage (`chrome.storage.local`) using AES-256-GCM derived from the user's Master Password.
 
 ## 4. Extension ID Pinning & Deployment Notes
-- **Development Extension ID Pinning**: The `"key"` property is defined in `chrome-extension/manifest.json` to lock the extension ID to `depnfhiklhdabclnlpibbiieaoghbiae` (derived from the development key pair) across all local test machines and reinstalls.
+- **Development Extension ID Pinning**: The `"key"` property is defined in `chrome-extension/manifest.json` to lock the extension ID to `jdfdjlkcemajaabnkllbacmajdalooib` (derived from the development key pair) across all local test machines and reinstalls.
 - **Production Publishing**: Before zipping and uploading the extension to the Chrome Web Store, the `"key"` property **MUST** be removed from `manifest.json`. Chrome Web Store will automatically sign the package with its own keys and assign the production ID.
 
