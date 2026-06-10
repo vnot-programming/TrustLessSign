@@ -32,3 +32,6 @@ web/.phpunit.result.cache
 .zed/
 .fleet/
 .nova/
+
+# Sensitive Docs (contains credentials / private key info)
+docs/CI-CD.md
