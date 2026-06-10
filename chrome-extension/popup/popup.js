@@ -370,6 +370,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
+      // Eagerly show the main view with loading states to prevent flicker
+      showMainView();
+
       try {
         // Fetch current user details via Sanctum
         const response = await fetch(`${baseUrl}/api/reasons/categories`, {
