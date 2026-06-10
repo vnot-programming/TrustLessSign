@@ -66,4 +66,10 @@
     - Updated `.github/workflows/deploy.yml` to run `./vendor/bin/phpunit` instead of `php artisan test` because the `test` artisan command is not defined in this Laravel setup.
     - Successfully pushed the fixes and triggered the automated CI/CD pipeline.
     - **STATUS**: Selesai (CI/CD active and verified).
+  - **2026-06-10 07:38**:
+    - Resolved Content Security Policy (CSP) violations in Manifest V3 chrome and safari extensions by downloading and bundling `pdf.min.js` and `pdf.worker.min.js` locally in `assets/`.
+    - Fixed `ReferenceError: window is not defined` in background service worker context by mocking `self.window = self` before importing minified libraries.
+    - Successfully pushed extension updates to GitHub.
+    - **STATUS**: Selesai.
+
 
