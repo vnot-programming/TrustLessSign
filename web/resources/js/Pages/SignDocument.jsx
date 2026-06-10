@@ -118,7 +118,7 @@ export default function SignDocument() {
   // 1. Fetch active extension presence & categories
   useEffect(() => {
     // Check extension
-    if (window.__TRUSTLESS_SIGN_EXTENSION_INSTALLED__ === true) {
+    if (window.__TRUSTLESS_SIGN_EXTENSION_INSTALLED__ === true || document.documentElement.dataset.trustlessSignInstalled === "true") {
       setExtensionInstalled(true);
     } else {
       const handlePingResponse = (e) => {

@@ -10,12 +10,29 @@
     "activeTab",
     "scripting"
   ],
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "http://localhost/*",
+    "https://tsign.vnot.my.id/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost/*",
+        "https://tsign.vnot.my.id/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
   "browser_specific_settings": {
     "safari": {
       "strict_min_version": "15.4"

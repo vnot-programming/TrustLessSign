@@ -25,6 +25,7 @@
       --accent-success:      hsl(152, 56%, 46%);
       --accent-danger:       hsl(0, 72%, 58%);
       --accent-danger-soft:  rgba(239, 68, 68, 0.12);
+      --grid-line:           rgba(0, 0, 0, 0.05);
     }
 
     /* Dark Mode (circadian override) */
@@ -41,6 +42,7 @@
         
         --border-subtle:       hsl(220, 14%, 16%);
         --border-default:      hsl(220, 14%, 22%);
+        --grid-line:           rgba(255, 255, 255, 0.03);
       }
     }
 
@@ -57,6 +59,7 @@
       
       --border-subtle:       hsl(220, 14%, 16%);
       --border-default:      hsl(220, 14%, 22%);
+      --grid-line:           rgba(255, 255, 255, 0.03);
     }
 
     body.light-mode {
@@ -71,6 +74,98 @@
       
       --border-subtle:       hsl(220, 12%, 90%);
       --border-default:      hsl(220, 12%, 84%);
+      --grid-line:           rgba(0, 0, 0, 0.05);
+    }
+
+    /* Background grid and orb effects */
+    .fixed-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+      background-size: 60px 60px;
+      -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+      mask-image: radial-gradient(ellipse at 50% 50%, black 20%, transparent 70%);
+      opacity: 0.3;
+    }
+    body.dark-mode .grid-bg {
+      opacity: 0.2;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.4;
+    }
+    body.dark-mode .orb {
+      opacity: 0.3;
+    }
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      top: -200px;
+      right: -100px;
+      animation: orbFloat 20s ease-in-out infinite;
+      background-image: radial-gradient(circle, rgba(34,201,151,0.3), transparent 70%);
+    }
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      bottom: -100px;
+      left: -50px;
+      animation: orbFloat 25s ease-in-out infinite reverse;
+      background-image: radial-gradient(circle, rgba(139,92,246,0.25), transparent 70%);
+    }
+    .orb-3 {
+      width: 300px;
+      height: 300px;
+      top: 40%;
+      left: 50%;
+      animation: orbFloat 18s ease-in-out infinite 5s;
+      background-image: radial-gradient(circle, rgba(212,168,67,0.2), transparent 70%);
+    }
+    .orb-4 {
+      width: 500px;
+      height: 500px;
+      top: -150px;
+      left: 20%;
+      animation: orbFloat 22s ease-in-out infinite;
+      background-image: radial-gradient(circle, rgba(34,201,151,0.2), transparent 70%);
+    }
+    .orb-5 {
+      width: 350px;
+      height: 350px;
+      bottom: -50px;
+      right: 10%;
+      animation: orbFloat 26s ease-in-out infinite reverse;
+      background-image: radial-gradient(circle, rgba(139,92,246,0.2), transparent 70%);
+    }
+    .particles-container {
+      position: absolute;
+      inset: 0;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -30px) scale(1.05); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+    @keyframes particleFloat {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -342,6 +437,56 @@
   </style>
 </head>
 <body class="popup-view">
+  <div class="fixed-bg">
+    <div class="grid-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="orb orb-5"></div>
+    <div class="particles-container">
+      <div class="particle" style="width: 1.12453px; height: 1.12453px; left: 23.7893%; top: 45.5269%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 22.7317s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.19615px; height: 4.19615px; left: 92.5567%; top: 76.2041%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 16.6819s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.69051px; height: 2.69051px; left: 91.3296%; top: 70.6845%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 28.8496s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.17994px; height: 2.17994px; left: 73.5939%; top: 91.2302%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 21.9248s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.75614px; height: 1.75614px; left: 84.8217%; top: 53.5792%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 15.0406s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.32969px; height: 4.32969px; left: 50.0924%; top: 67.5074%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 22.0091s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.02644px; height: 3.02644px; left: 11.2356%; top: 71.3384%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 17.0419s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.5577px; height: 3.5577px; left: 46.5273%; top: 34.8885%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 20.3433s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.78058px; height: 3.78058px; left: 41.9354%; top: 47.2563%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 26.3054s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.42283px; height: 1.42283px; left: 3.04514%; top: 81.4687%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 17.7803s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.80811px; height: 4.80811px; left: 98.5372%; top: 18.0017%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 26.5923s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.46536px; height: 4.46536px; left: 95.3085%; top: 19.0464%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 28.3727s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.38606px; height: 4.38606px; left: 33.068%; top: 56.0377%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 18.4249s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.20653px; height: 2.20653px; left: 8.71422%; top: 94.9532%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 33.6367s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.77811px; height: 3.77811px; left: 22.7733%; top: 91.4851%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 30.5482s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.4524px; height: 2.4524px; left: 70.697%; top: 87.0297%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 21.5569s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.3911px; height: 3.3911px; left: 55.325%; top: 42.8413%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 30.6061s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.53312px; height: 2.53312px; left: 14.4673%; top: 74.7908%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 34.7078s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.9201px; height: 3.9201px; left: 21.588%; top: 23.0847%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 29.8061s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.66377px; height: 1.66377px; left: 27.7035%; top: 83.3099%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 32.4908s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.31547px; height: 4.31547px; left: 62.9257%; top: 59.6919%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 30.0342s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.21051px; height: 2.21051px; left: 22.3123%; top: 69.026%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 33.4225s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.15477px; height: 4.15477px; left: 23.4681%; top: 98.5665%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 17.7237s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.73992px; height: 1.73992px; left: 98.6856%; top: 91.1787%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 29.0395s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.0091px; height: 2.0091px; left: 53.4664%; top: 7.79013%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 22.318s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.15696px; height: 3.15696px; left: 14.1639%; top: 75.281%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 15.0303s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.44789px; height: 1.44789px; left: 70.3864%; top: 59.8644%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 21.9678s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.20177px; height: 1.20177px; left: 75.0745%; top: 19.0424%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 27.4537s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.02068px; height: 3.02068px; left: 47.8357%; top: 94.8722%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 25.6444s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.12248px; height: 1.12248px; left: 4.00496%; top: 38.2094%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 34.4543s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 3.75689px; height: 3.75689px; left: 42.2601%; top: 50.6806%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 24.9197s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 2.2026px; height: 2.2026px; left: 0.462904%; top: 33.6349%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 24.93s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.39083px; height: 4.39083px; left: 7.18198%; top: 18.4485%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 19.7183s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.7834px; height: 4.7834px; left: 28.9124%; top: 44.469%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 24.1932s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 1.96564px; height: 1.96564px; left: 44.4228%; top: 15.0398%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 21.6133s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.67046px; height: 4.67046px; left: 99.2992%; top: 68.3415%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 30.2352s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.18425px; height: 4.18425px; left: 30.6198%; top: 49.3722%; background: rgba(34, 201, 151, 0.6); animation: particleFloat 32.2592s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.1592px; height: 4.1592px; left: 0.370179%; top: 44.5603%; background: rgba(212, 168, 67, 0.5); animation: particleFloat 16.2481s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.90813px; height: 4.90813px; left: 41.3904%; top: 6.01314%; background: rgba(139, 92, 246, 0.5); animation: particleFloat 25.6479s linear 0s infinite normal none running;"></div>
+      <div class="particle" style="width: 4.70212px; height: 4.70212px; left: 64.0474%; top: 54.1434%; background: rgba(0, 0, 0, 0.2); animation: particleFloat 33.5756s linear 0s infinite normal none running;"></div>
+    </div>
+  </div>
 
   <header>
     <div class="brand">

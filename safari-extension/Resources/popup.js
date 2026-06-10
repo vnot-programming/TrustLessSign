@@ -367,7 +367,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         // Fetch current user details via Sanctum
         const response = await fetch(`${baseUrl}/api/reasons/categories`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
         });
 
         if (!response.ok) {
@@ -376,7 +379,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Fetch user cert details
         const meRes = await fetch(`${baseUrl}/api/certificates/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
         });
 
         let activeCert = null;
@@ -391,7 +397,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Fetch user info from /api/user
         const userRes = await fetch(`${baseUrl}/api/user`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
         });
         
         let userNameText = "Authenticated User";
@@ -592,7 +601,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadReasons = async (baseUrl, token) => {
     try {
       const response = await fetch(`${baseUrl}/api/reasons/categories`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
       });
       if (response.ok) {
         reasonsCategories = await response.json();

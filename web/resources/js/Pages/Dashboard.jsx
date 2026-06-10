@@ -63,7 +63,7 @@ export default function Dashboard() {
   // Check if extension is installed
   useEffect(() => {
     const checkExtension = () => {
-      if (window.__TRUSTLESS_SIGN_EXTENSION_INSTALLED__ === true) {
+      if (window.__TRUSTLESS_SIGN_EXTENSION_INSTALLED__ === true || document.documentElement.dataset.trustlessSignInstalled === "true") {
         setExtensionStatus({ checked: true, installed: true });
       } else {
         // Double check via quick message ping

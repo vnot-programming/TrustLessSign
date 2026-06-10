@@ -82,6 +82,13 @@
     - Integrated multi-language select menu (EN, ID, TH) and manual theme switcher (Light / Dark) into the header of Chrome & Safari extensions.
     - Re-built frontend production assets cleanly.
     - **STATUS**: Selesai.
+  - **2026-06-10 08:17**:
+    - Resolved CORS redirects on unauthorized extension API calls by adding `'Accept': 'application/json'` to all backend fetch requests in `popup.js` (Chrome & Safari).
+    - Fixed CSP inline script violation in content scripts by replacing inline script injection with HTML dataset attribute `document.documentElement.dataset.trustlessSignInstalled`.
+    - Aligned React components `Dashboard.jsx` and `SignDocument.jsx` to verify extension presence via both the window object and the HTML dataset attribute.
+    - Integrated `content.js` bridge inside `safari-extension` and configured `content_scripts` in Safari `manifest.json`.
+    - Compiled all production assets successfully with Vite inside the Docker container.
+    - **STATUS**: Selesai. Ready for deployment review.
 
 
 
