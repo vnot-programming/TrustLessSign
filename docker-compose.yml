@@ -12,6 +12,7 @@ services:
       - ./web:/var/www/html
       - ./pki-keys:/var/www/html/pki-keys
       - ./secrets:/var/www/html/secrets
+      - ./chrome-extension:/var/www/chrome-extension:ro
     restart: unless-stopped
 
 networks:
