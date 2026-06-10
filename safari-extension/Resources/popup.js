@@ -374,6 +374,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (!response.ok) {
+          if (response.status === 401) {
+            chrome.storage.local.remove(['sanctumToken', 'gdriveToken']);
+          }
           throw new Error('Unauthorized');
         }
 
@@ -768,7 +771,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Compile final reason text
         const selectedSubId = subcategorySelect.value;
-        const subCategory = subCategories.find(s => s.id.toString() === selectedSubId);
+        const allSubcategories = reasonsCategories.reduce((acc, cat) => {
+          if (cat.sub_categories) {
+            return acc.concat(cat.sub_categories);
+          }
+          return acc;
+        }, []);
+        const subCategory = allSubcategories.find(s => s.id.toString() === selectedSubId);
         const subText = subCategory ? subCategory.reason_text_id : '';
         const detailText = customReasonText.value;
         const reasonFinal = subText && detailText ? `${subText}: ${detailText}`

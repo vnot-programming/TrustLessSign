@@ -105,3 +105,9 @@
 - **File yang diubah/dibuat:** [phpunit.xml](file:///home/vnot/extra_disk/docker-temp/trustlesssign/web/phpunit.xml)
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Isolated testing environment to SQLite in-memory, preventing test suite run via CI/CD (which triggers RefreshDatabase) from wiping the main PostgreSQL database. Re-seeded Reason Categories using `ReasonCategorySeeder` so dropdowns are fully loaded again.
+
+- **Tanggal/Waktu:** 2026-06-10T12:55:00Z
+- **Tugas yang diselesaikan:** Fix ReferenceError on subCategories and Auth check error loop in Chrome/Safari extension.
+- **File yang diubah/dibuat:** [popup.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/popup/popup.js), [popup.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/safari-extension/Resources/popup.js), [package.json](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/package.json), [manifest.json](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/manifest.json)
+- **Status saat ini:** Selesai (Bumped version to 1.0.2)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Fixed ReferenceError where subCategories was used without declaration in popup.js during document signing. Handled 401 Unauthorized by removing expired/invalid tokens from chrome.storage.local. Bumped version to 1.0.2 in both package.json and manifest.json. Rebuilt trustlesssign-v1.0.2.crx.
