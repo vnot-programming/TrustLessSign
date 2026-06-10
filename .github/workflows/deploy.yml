@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "🔬 Running PHPUnit tests..."
           docker exec ${{ env.APP_CONTAINER }} \
-            php artisan test --stop-on-failure 2>&1
+            ./vendor/bin/phpunit --stop-on-failure 2>&1
           echo "✅ Tests passed."
 
   # ════════════════════════════════════════════════════════════════
