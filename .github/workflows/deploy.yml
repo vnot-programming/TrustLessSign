@@ -1,0 +1,128 @@
+name: 🚀 CI/CD — TrustlessSign
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  # ── Path di VPS ──────────────────────────────────────────────────
+  PROJECT_PATH: /home/vnot/extra_disk/docker-temp/trustlesssign
+  TARGET_PATH:  /home/vnot/docker/trustlesssign
+  APP_CONTAINER: trustlesssign-app
+
+jobs:
+  # ════════════════════════════════════════════════════════════════
+  # JOB 1 — Automated Tests (PHPUnit)
+  # ════════════════════════════════════════════════════════════════
+  test:
+    name: 🧪 Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run PHPUnit via SSH on VPS container
+        # Hanya jalankan test saat push ke main, bukan PR dari fork external
+        if: github.event_name == 'push'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.VPS_HOST }}
+          port:     ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key:      ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "🔬 Running PHPUnit tests..."
+            docker exec ${{ env.APP_CONTAINER }} \
+              php artisan test --stop-on-failure 2>&1
+            echo "✅ Tests passed."
+
+  # ════════════════════════════════════════════════════════════════
+  # JOB 2 — Deploy ke VPS (hanya di push ke main)
+  # ════════════════════════════════════════════════════════════════
+  deploy:
+    name: 🚀 Deploy to VPS
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Pull, Build & Sync via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.VPS_HOST }}
+          port:     ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key:      ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            # ─────────────────────────────────────────────────────
+            # 1. Pull kode terbaru dari GitHub
+            # ─────────────────────────────────────────────────────
+            echo "📦 Pulling latest code from GitHub..."
+            cd ${{ env.PROJECT_PATH }}
+            git pull origin main
+
+            # ─────────────────────────────────────────────────────
+            # 2. Build frontend assets (Vite) di dalam container
+            # ─────────────────────────────────────────────────────
+            echo "🔨 Building frontend assets (npm run build)..."
+            docker exec ${{ env.APP_CONTAINER }} \
+              sh -c "cd /var/www/html && npm run build"
+
+            # ─────────────────────────────────────────────────────
+            # 3. Clear & cache Laravel
+            # ─────────────────────────────────────────────────────
+            echo "🧹 Clearing Laravel caches..."
+            docker exec ${{ env.APP_CONTAINER }} php artisan cache:clear
+            docker exec ${{ env.APP_CONTAINER }} php artisan view:clear
+            docker exec ${{ env.APP_CONTAINER }} php artisan route:clear
+            docker exec ${{ env.APP_CONTAINER }} php artisan config:clear
+
+            # ─────────────────────────────────────────────────────
+            # 4. Sync HANYA 4 item yang dibutuhkan ke TARGET_PATH
+            #    (komputer target tidak perlu folder web/)
+            # ─────────────────────────────────────────────────────
+            echo "📂 Syncing target folders to ${{ env.TARGET_PATH }}..."
+            mkdir -p ${{ env.TARGET_PATH }}
+
+            rsync -av --delete \
+              ${{ env.PROJECT_PATH }}/chrome-extension/ \
+              ${{ env.TARGET_PATH }}/chrome-extension/
+
+            rsync -av --delete \
+              ${{ env.PROJECT_PATH }}/docs/ \
+              ${{ env.TARGET_PATH }}/docs/
+
+            rsync -av --delete \
+              ${{ env.PROJECT_PATH }}/safari-extension/ \
+              ${{ env.TARGET_PATH }}/safari-extension/
+
+            cp ${{ env.PROJECT_PATH }}/README.md \
+               ${{ env.TARGET_PATH }}/README.md
+
+            # ─────────────────────────────────────────────────────
+            # 5. Verifikasi isi target folder
+            # ─────────────────────────────────────────────────────
+            echo ""
+            echo "📋 Target folder contents (${{ env.TARGET_PATH }}):"
+            ls -la ${{ env.TARGET_PATH }}/
+
+            echo ""
+            echo "✅ Deployment complete at $(date '+%Y-%m-%d %H:%M:%S UTC')"
+
+      - name: 🔔 Notify Deployment Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deploy SUKSES ke VPS ${{ secrets.VPS_HOST }}"
+          else
+            echo "❌ Deploy GAGAL — Periksa log di atas"
+            exit 1
+          fi
