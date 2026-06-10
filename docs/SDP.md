@@ -75,6 +75,14 @@
     - Added the base64 public key to `chrome-extension/manifest.json` as the `"key"` property to ensure a persistent extension ID (`jdfdjlkcemajaabnkllbacmajdalooib`) during development.
     - Noted requirement to delete this `"key"` property prior to publishing on the Chrome Web Store.
     - **STATUS**: Selesai.
+  - **2026-06-10 08:00**:
+    - Cleaned up bracketed buttons on Web Dashboard modal (e.g. `(CANCEL)` -> `CANCEL`, `(( GENERATE CERTIFICATE ))` -> `GENERATE CERTIFICATE`).
+    - Added `/api/user` endpoint to backend to allow extension to fetch real user details.
+    - Modified extension popup profile widget to render authenticated user's actual name, email, and Google profile picture instead of generic placeholders.
+    - Integrated multi-language select menu (EN, ID, TH) and manual theme switcher (Light / Dark) into the header of Chrome & Safari extensions.
+    - Re-built frontend production assets cleanly.
+    - **STATUS**: Selesai.
+
 
 
 
