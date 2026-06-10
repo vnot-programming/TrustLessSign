@@ -15,6 +15,12 @@ class SocialiteController extends Controller
         if ($request->has('redirect_to_extension')) {
             session(['redirect_to_extension' => $request->query('redirect_to_extension')]);
         }
+        if ($provider === 'google') {
+            return Socialite::driver($provider)
+                ->scopes(['https://www.googleapis.com/auth/drive.file'])
+                ->with(['access_type' => 'offline', 'prompt' => 'consent'])
+                ->redirect();
+        }
         return Socialite::driver($provider)->redirect();
     }
 

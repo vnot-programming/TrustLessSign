@@ -34,7 +34,8 @@ async function uploadToGDrive(filename, signedPdfStr, gdriveToken) {
   });
 
   if (!uploadRes.ok) {
-    throw new Error('Google Drive upload failed.');
+    const errorText = await uploadRes.text();
+    throw new Error(`Google Drive upload failed: ${errorText}`);
   }
 
   const uploadData = await uploadRes.json();

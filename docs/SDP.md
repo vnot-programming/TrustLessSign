@@ -93,3 +93,15 @@
 
 
 
+
+- **Tanggal/Waktu:** 2026-06-10T08:33Z
+- **Tugas yang diselesaikan:** Fix blank "Reason Category" & "Signature Reason" dropdowns
+- **File yang diubah/dibuat:** `web/database/seeders/DatabaseSeeder.php`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Reason dropdown di Chrome Extension tidak memuat data karena tabel `reason_categories` di database masih kosong. Saya sudah memasukkan `ReasonCategorySeeder` ke dalam `DatabaseSeeder.php` dan menjalankan seedernya ke database secara manual. Status 404 pada `/api/certificates/me` adalah normal jika user belum pernah melakukan generate Secure Key (belum memiliki sertifikat aktif).
+
+- **Tanggal/Waktu:** 2026-06-10T08:58Z
+- **Tugas yang diselesaikan:** Fix Uncaught TypeError sendMessage in content.js
+- **File yang diubah/dibuat:** `chrome-extension/content.js`, `web/resources/js/Pages/SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Menambahkan exception/catch handling saat context extension menjadi invalid (diakibatkan proses reload extension tapi page web belum ter-refresh). content.js sekarang akan mengembalikan `TRUSTLESS_SIGN_ERROR` agar UI tidak stuck di 96% "Uploading". SignDocument.jsx telah diubah untuk menangkap postMessage error tersebut dan memunculkannya ke user UI.

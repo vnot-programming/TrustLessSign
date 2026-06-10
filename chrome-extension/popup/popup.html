@@ -169,21 +169,22 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      height: 100%;
+    }
     body {
       width: 100%;
       height: 100%;
       font-family: 'Outfit', sans-serif;
       background-color: var(--surface-primary);
       color: var(--text-primary);
-      overflow-x: hidden;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
-
-    /* Set default popup size when in small view */
     body.popup-view {
-      width: 360px;
-      height: 520px;
+      width: 400px;
+      height: 600px;
     }
 
     header {
@@ -433,6 +434,55 @@
     .spin {
       display: inline-block;
       animation: spin 2s linear infinite;
+    }
+    /* Footer */
+    .popup-footer {
+      padding: 16px;
+      text-align: center;
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .footer-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s var(--ease-spring);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background-color: hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1);
+    }
+    .footer-jazakallah {
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .footer-made {
+      color: var(--text-tertiary);
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+    .heart {
+      color: #e25555;
     }
   </style>
 </head>
@@ -687,6 +737,26 @@
       </div>
     </div>
   </div>
+
+  <!-- FOOTER -->
+  <footer class="popup-footer">
+    <div class="footer-actions">
+      <button id="supportBtn" class="footer-btn footer-btn--support">
+        <span>🪙</span> Support Development
+      </button>
+      <button id="privacyBtn" class="footer-btn footer-btn--privacy">
+        <span>🔒</span> Privacy Policy
+      </button>
+      <button id="termsBtn" class="footer-btn footer-btn--terms">
+        <span>📝</span> Terms of Service
+      </button>
+    </div>
+    <p class="footer-jazakallah">Jazakumullah Khairan 🙏</p>
+    <div class="footer-made">
+      <span>Made with <span class="heart">♥</span></span>
+      <span>Version <span id="extensionVersion">—</span></span>
+    </div>
+  </footer>
 
   <script src="popup.js"></script>
 </body>

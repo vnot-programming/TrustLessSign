@@ -63,6 +63,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnThemeToggle = document.getElementById('btn-theme-toggle');
   const langSelect = document.getElementById('extension-lang-select');
 
+  // Footer elements
+  const supportBtn = document.getElementById('supportBtn');
+  const privacyBtn = document.getElementById('privacyBtn');
+  const termsBtn = document.getElementById('termsBtn');
+  const extensionVersion = document.getElementById('extensionVersion');
+
   // Shared state variables
   let currentFileBytes = null;
   let pdfPageWidthPoints = 600;
@@ -942,6 +948,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   initLanguage();
   checkAuth();
+
+  // Footer Setup
+  try {
+    const manifest = chrome.runtime.getManifest();
+    if (extensionVersion) {
+      extensionVersion.textContent = manifest.version;
+    }
+  } catch (e) {
+    console.error('Error fetching manifest:', e);
+  }
+
+  if (supportBtn) {
+    supportBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://saweria.co/vnot01' });
+    });
+  }
+
+  if (privacyBtn) {
+    privacyBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('privacy.html') });
+    });
+  }
+
+  if (termsBtn) {
+    termsBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('terms.html') });
+    });
+  }
 });
 
 // Helper: Convert ArrayBuffer to Base64 string

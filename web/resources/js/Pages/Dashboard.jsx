@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Head, usePage, Link, router } from '@inertiajs/react';
 import LanguageSwitcher from '../Components/LanguageSwitcher';
 import ThemeToggle from '../Components/ThemeToggle';
-import { LogOut, FileSignature, UploadCloud, ShieldCheck, AlertTriangle, Key, Loader2, CheckCircle } from 'lucide-react';
+import { LogOut, FileSignature, UploadCloud, ShieldCheck, AlertTriangle, Key, Loader2, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 
 export default function Dashboard() {
@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Translation keys - Dashboard section
   const t = messages?.Dashboard || {
@@ -52,6 +53,7 @@ export default function Dashboard() {
     new_password_placeholder: "Enter new password...",
     confirm_password_label: "Confirm New Password",
     confirm_password_placeholder: "Confirm new password...",
+    password_min_length: "Password must be at least 8 characters",
     btn_cancel: "CANCEL",
     btn_yes_replace: "YES, REPLACE CERTIFICATE",
     btn_generate_cert: "GENERATE CERTIFICATE",
@@ -288,24 +290,45 @@ export default function Dashboard() {
 
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-text-secondary">{t.new_cert_password}</label>
-                    <input 
-                      type="password" 
-                      value={password} 
-                      onChange={(e) => setPassword(e.target.value)} 
-                      placeholder={t.new_password_placeholder}
-                      className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
-                    />
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? "text" : "password"} 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        placeholder={t.new_password_placeholder}
+                        className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none pr-10"
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    {password.length > 0 && password.length < 8 && (
+                      <p className="text-xs text-accent-danger">{t.password_min_length}</p>
+                    )}
                   </div>
 
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-text-secondary">{t.confirm_password_label}</label>
-                    <input 
-                      type="password" 
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
-                      placeholder={t.confirm_password_placeholder}
-                      className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
-                    />
+                    <div className="relative">
+                      <input 
+                        type={showPassword ? "text" : "password"} 
+                        value={confirmPassword} 
+                        onChange={(e) => setConfirmPassword(e.target.value)} 
+                        placeholder={t.confirm_password_placeholder}
+                        className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none pr-10"
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

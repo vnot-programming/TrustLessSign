@@ -266,6 +266,11 @@ export default function SignDocument() {
             setErrorMsg(result?.message || "Failed to sign document.");
             setSigningStatus({ isActive: false, stage: 'ERROR', percentage: 0, message: '' });
           }
+        } else if (evt.data && evt.data.type === 'TRUSTLESS_SIGN_ERROR') {
+          window.removeEventListener('message', handleExtensionResponse);
+          const result = evt.data.payload;
+          setErrorMsg(result?.message || "Extension communication error.");
+          setSigningStatus({ isActive: false, stage: 'ERROR', percentage: 0, message: '' });
         }
       };
 
