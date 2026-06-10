@@ -64,6 +64,13 @@ jobs:
           docker exec ${{ env.APP_CONTAINER }} php artisan route:clear
           docker exec ${{ env.APP_CONTAINER }} php artisan config:clear
 
+      - name: 📦 Build Chrome Extension (.crx)
+        run: |
+          echo "📦 Packaging Chrome Extension CRX..."
+          cd ${{ env.PROJECT_PATH }}/chrome-extension
+          npm install
+          npm run build:crx
+
       - name: 🪟 Sync Desktop-PC via Tailscale SSH
         run: |
           echo "🪟 Syncing Desktop-PC (100.106.132.107)..."

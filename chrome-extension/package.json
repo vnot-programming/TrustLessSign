@@ -4,13 +4,15 @@
   "description": "Chrome Extension for TrustlessSign Offline PDF Cryptographic Signature",
   "main": "background/service-worker.js",
   "scripts": {
-    "build": "esbuild background/service-worker.js --bundle --minify --outfile=background/service-worker.bundle.js"
+    "build": "esbuild background/service-worker.js --bundle --minify --outfile=background/service-worker.bundle.js",
+    "build:crx": "node ../docs/scripts/build-crx.js"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "^1.18.4",
     "node-forge": "^1.3.1"
   },
   "devDependencies": {
+    "crx": "^5.0.1",
     "esbuild": "^0.20.0"
   }
 }
