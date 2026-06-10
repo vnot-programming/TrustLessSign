@@ -16,15 +16,21 @@ safari-extension/**/key.pem
 
 # Web Monolith Subfolder Ignores
 web/.env
-web/node_modules/
+node_modules/
+**/node_modules/
 web/vendor/
 web/public/build/
 web/public/hot/
 web/public/storage/
 web/storage/*.key
 web/storage/pail/
-web/.phpunit.cache
+web/app/.phpunit.cache
 web/.phpunit.result.cache
+
+# Chrome/Safari Extension Build Artifacts
+chrome-extension/background/service-worker.bundle.js
+safari-extension/Resources/background/service-worker.bundle.js
+
 
 # IDEs
 .idea/

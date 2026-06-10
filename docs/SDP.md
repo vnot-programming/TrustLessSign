@@ -111,3 +111,10 @@
 - **File yang diubah/dibuat:** [popup.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/popup/popup.js), [popup.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/safari-extension/Resources/popup.js), [package.json](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/package.json), [manifest.json](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/manifest.json)
 - **Status saat ini:** Selesai (Bumped version to 1.0.2)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Fixed ReferenceError where subCategories was used without declaration in popup.js during document signing. Handled 401 Unauthorized by removing expired/invalid tokens from chrome.storage.local. Bumped version to 1.0.2 in both package.json and manifest.json. Rebuilt trustlesssign-v1.0.2.crx.
+
+- **Tanggal/Waktu:** 2026-06-10T14:25:00Z
+- **Tugas yang diselesaikan:** Fix IDE Git tracking issue by ignoring node_modules globally and adding extension build artifacts.
+- **File yang diubah/dibuat:** [.gitignore](file:///home/vnot/extra_disk/docker-temp/trustlesssign/.gitignore)
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ignored node_modules recursively using `node_modules/` and `**/node_modules/` in root `.gitignore`. Also ignored compiled `service-worker.bundle.js` for both Chrome and Safari extensions. This reduced IDE untracked files count from 3000++ to 1.
+
