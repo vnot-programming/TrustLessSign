@@ -170,6 +170,6 @@
 
 - **Tanggal/Waktu:** 2026-06-11T06:30:00Z
 - **Tugas yang diselesaikan:** Decouple CI/CD Pipeline (Monorepo Workflow)
-- **File yang diubah/dibuat:** `.github/workflows/deploy.yml`
+- **File yang diubah/dibuat:** `.github/workflows/deploy.yml`, `.agents/rules/dev-trustlesssign.md`
 - **Status saat ini:** Selesai
-- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah GitHub Actions agar mendukung Monorepo *Versioning*. Trigger sekarang berdasarkan `tags: web-v*` atau `ext-v*`. Proses `deploy_web` dan `deploy_extension` berjalan terpisah dengan pengecekan kondisional (`startsWith`) untuk menghindari eksekusi serentak yang tumpang tindih. Ekstensi tidak lagi me-reset *cache* Laravel, dan Web tidak lagi memicu kompresi `.crx`.
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah GitHub Actions agar mendukung Monorepo *Versioning*. Trigger sekarang berdasarkan `tags: web-v*` atau `ext-v*`. Proses `deploy_web` dan `deploy_extension` berjalan terpisah dengan pengecekan kondisional (`startsWith`) untuk menghindari eksekusi serentak yang tumpang tindih. Ekstensi tidak lagi me-reset *cache* Laravel, dan Web tidak lagi memicu kompresi `.crx`. Dokumen aturan pengembangan (`dev-trustlesssign.md`) juga telah diperbarui dengan panduan *Workflow Deployment CI/CD Monorepo* ini.
