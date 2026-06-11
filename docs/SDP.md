@@ -308,3 +308,15 @@
 - **File yang diubah/dibuat:** `web/resources/js/Pages/Verify.jsx`.
 - **Status saat ini:** Selesai (Version `web-v1.2.1`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan pada *endpoint* API yang diakses oleh komponen React `Verify.jsx`. Ia mencoba melakukan _fetch_ ke URL `/api/v1/verify/...` padahal pengaturan standar Laravel 11 (`bootstrap/app.php` & `api.php`) tidak menggunakan prefiks `v1`, melainkan hanya `/api/verify/...`. Prefiks `v1` telah dihapus dari kode _fetch_ sehingga QR Code yang dipindai tidak lagi memunculkan pesan _Not Valid (could not be found)_ di layar HP pengguna. Pastikan untuk meninjau _endpoint_ jika menambah fitur _React Component_ baru.
+
+- **Tanggal/Waktu:** 2026-06-11T15:53:00Z
+- **Tugas yang diselesaikan:** Fix *Mismatch* `verifyToken` antara QR Code dan Database.
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`, `web/resources/js/Pages/SignDocument.jsx`, `chrome-extension/background/service-worker.js`, `safari-extension/Resources/background.js`.
+- **Status saat ini:** Selesai (Version `web-v1.2.2`, `ext-v1.2.9`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan sebuah kecacatan arsitektur logika: Kode antarmuka (baik di *Web Dashboard* maupun di *Popup Ekstensi*) men-generate UUID `verifyToken` sendiri untuk digambar menjadi gambar QR Code. Namun, `verifyToken` ini tidak pernah diteruskan ke dalam objek *payload* menuju `service-worker.js`. Akibatnya, *service-worker* men-generate ulang UUID baru sebelum mendaftarkan metadata ke Laravel. Hal ini menyebabkan URL di QR Code tidak cocok dengan data di Database (selalu mereturn Not Found 404/400 Invalid). Solusinya: antarmuka sekarang melewatkan `verifyToken` aslinya melalui *payload*, dan *service-worker* akan menggunakannya alih-alih membuat UUID baru.
+
+- **Tanggal/Waktu:** 2026-06-11T16:10:00Z
+- **Tugas yang diselesaikan:** Ubah teks *tooltip hover* pada area kotak drag QR Code.
+- **File yang diubah/dibuat:** `web/resources/js/Pages/SignDocument.jsx`.
+- **Status saat ini:** Selesai (Version `web-v1.2.3`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Pengguna meminta untuk mengganti teks "QR Position: x:..., y:..." yang muncul saat _hover_ kotak QR pada antarmuka *Web Dashboard* menjadi kalimat "Drag to place the signature that appears on the Document". Perubahan telah dilakukan dan tag `web-v1.2.3` telah dirilis.

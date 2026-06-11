@@ -633,7 +633,7 @@ export default function SignDocument() {
                     >
                       <div ref={nodeRef} className="absolute top-0 left-0 w-24 h-24 border-2 border-accent-primary bg-accent-primary-soft flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55">
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                          QR Position: x:{Math.round(qrPosition.x)}, y:{Math.round(qrPosition.y)}
+                          Drag to place the signature that appears on the Document
                         </div>
                         <span className="text-accent-primary font-bold text-xs text-center pointer-events-none select-none">{t.qr_area}</span>
                       </div>
