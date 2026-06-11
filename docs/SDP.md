@@ -274,3 +274,8 @@
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `chrome-extension/background/service-worker.js`, `chrome-extension/signing/signer.js`, `safari-extension/Resources/popup.js`, `safari-extension/Resources/background.js`, `safari-extension/Resources/signing/signer.js`.
 - **Status saat ini:** Selesai (Version `ext-v1.2.3`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Fungsionalitas pembuatan sertifikat lewat Web Dashboard sekarang akan secara otomatis men-trigger Service Worker untuk memaketkan file `.tsign` dan melakukan upload via OAuth Google Drive secara seamless. Hati-hati ketika memanipulasi function di `popup.js`, perhatikan sisa-sisa statement sebelumnya.
+- **Tanggal/Waktu:** 2026-06-11T14:33:00Z
+- **Tugas yang diselesaikan:** Bug Fixes Ekstensi Tahap 2 (arrayBufferToBase64 undefined & Active Device Identity Logic).
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `chrome-extension/popup/popup.html`, `safari-extension/Resources/popup.js`, `safari-extension/Resources/popup.html`.
+- **Status saat ini:** Selesai (Version `ext-v1.2.4`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** File `signer.js` sekarang sudah direferensikan ke dalam `popup.html` agar fungsi `arrayBufferToBase64` tidak hilang. Logika otentikasi ekstensi juga telah diperbarui; sekarang ia akan membaca `trustless_cert_serial` dari *local storage* untuk mencocokkan mana sertifikat yang **benar-benar aktif dan ada secara fisik** di perangkat tersebut, lalu menampilkannya di UI popup beserta Nama Device-nya. Tombol import/export `popup.js` juga diperbaiki *key*-nya.

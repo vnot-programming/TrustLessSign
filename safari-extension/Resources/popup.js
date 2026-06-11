@@ -620,7 +620,32 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (res && res.status === 'success') {
             keysStatus.classList.remove('hidden', 'alert-danger');
             keysStatus.classList.add('alert-success');
-            keysStatus.textContent = "Success! Certificate generated and registered.";
+            
+            let successMsg = `<strong>Success!</strong> Certificate generated and registered.`;
+            if (res.driveSuccess) {
+              successMsg += `<br>✅ Auto-backed up to your Google Drive.`;
+            }
+
+            if (res.tsignBase64) {
+              successMsg += `<br><button id="btnDownloadTsign" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-primary); color: var(--accent-primary);">⬇️ Download Backup (.tsign)</button>`;
+            }
+
+            keysStatus.innerHTML = successMsg;
+
+            if (res.tsignBase64) {
+              document.getElementById('btnDownloadTsign').addEventListener('click', () => {
+                const blob = base64ToBlob(res.tsignBase64, 'application/octet-stream');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = res.fileName || 'trustlesssign_backup.tsign';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              });
+            }
+
             checkAuth();
           } else {
             showKeysError(res?.message || "Failed to generate certificate.");

@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [deviceName, setDeviceName]     = useState('');
   const [loading, setLoading]           = useState(false);
   const [success, setSuccess]           = useState(false);
+  const [backupData, setBackupData]     = useState(null);
   const [errorMsg, setErrorMsg]         = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, outdated: false });
   const [extensionModalOpen, setExtensionModalOpen]     = useState(false);
@@ -178,10 +179,19 @@ export default function Dashboard() {
           if (response && response.status === 'success') {
             setSuccess(true);
             setLoading(false);
-            setTimeout(() => {
-              setModalOpen(false);
-              router.reload(); // Refresh props to show active certificate
-            }, 2000);
+            if (response.tsignBase64) {
+              setBackupData({
+                driveSuccess: response.driveSuccess,
+                tsignBase64: response.tsignBase64,
+                fileName: response.fileName
+              });
+              // Don't auto-close modal so user can download the backup
+            } else {
+              setTimeout(() => {
+                setModalOpen(false);
+                router.reload(); // Refresh props to show active certificate
+              }, 2000);
+            }
           } else {
             setErrorMsg(response?.message || "Extension failed to generate certificate.");
             setLoading(false);
@@ -206,6 +216,25 @@ export default function Dashboard() {
       setErrorMsg(err.response?.data?.message || "Failed to initiate certificate generation.");
       setLoading(false);
     }
+  };
+
+  const handleDownloadLocal = () => {
+    if (!backupData || !backupData.tsignBase64) return;
+    const byteCharacters = atob(backupData.tsignBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = backupData.fileName || 'trustlesssign_backup.tsign';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   // Revoke a specific certificate by serial number
@@ -411,6 +440,28 @@ export default function Dashboard() {
                 <CheckCircle className="mx-auto text-accent-success" size={64} />
                 <h3 className="text-xl font-bold">{t.cert_issued}</h3>
                 <p className="text-sm text-text-secondary">{t.cert_issued_desc}</p>
+                {backupData?.driveSuccess && (
+                  <p className="text-sm text-accent-success font-medium">✅ Auto-backed up to your Google Drive.</p>
+                )}
+                {backupData?.tsignBase64 && (
+                  <div className="mt-6 space-y-3">
+                    <button
+                      onClick={handleDownloadLocal}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface-tertiary border border-border-strong text-text-primary rounded-md hover:bg-surface-elevated hover:border-accent-primary transition-all font-semibold"
+                    >
+                      ⬇️ Download Backup (.tsign)
+                    </button>
+                    <button
+                      onClick={() => {
+                        setModalOpen(false);
+                        router.reload();
+                      }}
+                      className="w-full text-text-tertiary hover:text-text-primary text-sm font-medium transition-colors py-2"
+                    >
+                      Close & Continue
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <>
