@@ -98,25 +98,25 @@ async function handleGenerateKey(payload, baseUrl) {
   let driveSuccess = false;
 
   try {
+    const identityObj = {
+      privateKey: encryptedPrivateKeyPem,
+      certificate: certificatePem,
+      serialNumber: serialNumber
+    };
+    
+    const tsignBuffer = await encryptIdentityToTsign(identityObj, password);
+    tsignBase64Local = arrayBufferToBase64(tsignBuffer);
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    fileNameLocal = `trustlesssign_identity_${ts}.tsign`;
+
     const token = await new Promise((resolve) => {
-      chrome.identity.getAuthToken({ interactive: true }, (t) => {
+      chrome.identity.getAuthToken({ interactive: false }, (t) => {
         if (chrome.runtime.lastError) resolve(null);
         else resolve(t);
       });
     });
 
     if (token) {
-      const identityObj = {
-        privateKey: encryptedPrivateKeyPem,
-        certificate: certificatePem,
-        serialNumber: serialNumber
-      };
-      
-      const tsignBuffer = await encryptIdentityToTsign(identityObj, password);
-      tsignBase64Local = arrayBufferToBase64(tsignBuffer);
-      const ts = new Date().toISOString().replace(/[:.]/g, '-');
-      fileNameLocal = `trustlesssign_identity_${ts}.tsign`;
-      
       const uploadResult = await uploadIdentityToDrive(fileNameLocal, tsignBase64Local, token);
       driveSuccess = true;
       driveUrlLocal = uploadResult.url;
