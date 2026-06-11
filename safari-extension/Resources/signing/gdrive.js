@@ -20,7 +20,8 @@ async function getOrCreateFolder(folderName, parentId, gdriveToken) {
   });
 
   if (!searchRes.ok) {
-    throw new Error('Failed to search for Google Drive folder');
+    const errText = await searchRes.text();
+    throw new Error(`Failed to search for Google Drive folder: ${errText}`);
   }
 
   const searchData = await searchRes.json();
