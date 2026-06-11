@@ -28,6 +28,7 @@ class User extends Authenticatable
         'line_id',
         'avatar',
         'gdrive_token',
+        'gdrive_refresh_token',
         'is_admin',
     ];
 
@@ -40,6 +41,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'gdrive_token',
+        'gdrive_refresh_token',
     ];
 
     /**
@@ -54,6 +56,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'gdrive_token' => 'encrypted',
+            'gdrive_refresh_token' => 'encrypted',
         ];
     }
 

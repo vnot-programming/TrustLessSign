@@ -849,17 +849,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, (res) => {
           clearInterval(uploadInterval);
 
-          if (res && res.status === 'success') {
+          if (res && (res.status === 'success' || res.status === 'warning')) {
             updateProgress('SUCCESS', 100);
             signedPdfBase64 = res.pdfBase64;
 
             setTimeout(() => {
               progressOverlay.style.display = 'none';
+              
+              if (res.status === 'warning') {
+                  const successTitle = document.querySelector('#sign-success-card h4');
+                  const successDesc = document.querySelector('#sign-success-card p');
+                  if (successTitle) {
+                      successTitle.textContent = "Saved Locally";
+                      successTitle.style.color = "var(--accent-warning)";
+                  }
+                  if (successDesc) {
+                      successDesc.textContent = res.message || "Google Drive upload failed. File saved locally.";
+                  }
+              }
+              
               signSuccessCard.classList.remove('hidden');
             }, 1200);
           } else {
             progressOverlay.style.display = 'none';
             console.error("Signing failed:", res?.message || "Document signing failed.");
+            showSignError(res?.message || "Document signing failed.");
           }
         });
 
