@@ -326,3 +326,9 @@
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.html`, `safari-extension/Resources/popup.html`.
 - **Status saat ini:** Selesai (Version `ext-v1.2.10`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Pengguna meminta ekstensi peramban memiliki fungsi *tooltip* instruksional "Drag to place the signature that appears on the Document" yang serupa dengan *Web Dashboard*. Pembaruan telah dilakukan dan dikomit dengan tag `ext-v1.2.10`.
+
+- **Tanggal/Waktu:** 2026-06-11T16:25:00Z
+- **Tugas yang diselesaikan:** Memperbaiki *bug* fatal (infinite loop) yang menyebabkan tab Web Dashboard *crash* dan *freeze* ketika ekstensi di-reload. Menangani *Extension Context Invalidated*.
+- **File yang diubah/dibuat:** `chrome-extension/content.js`, `safari-extension/Resources/content.js`.
+- **Status saat ini:** Selesai (Version `ext-v1.2.11`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan di mana *content script* terus-menerus membalas dirinya sendiri dengan *error message* secara *looping* jika *Extension Context Invalidated* terjadi. Kini *content script* hanya akan memproses `type` yang valid dari Dashboard dan menahan agar ping tidak *crash*. Karena perbaikan ini, jika pengguna me-reload ekstensi, Dashboard hanya akan memunculkan status "Not Installed" (sebagai perilaku Normal dan aman) yang dapat diatasi cukup dengan menekan tombol **F5 (Refresh)** pada tab Dashboard.
