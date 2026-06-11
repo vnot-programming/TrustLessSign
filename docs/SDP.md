@@ -214,3 +214,20 @@
 - **File yang diubah/dibuat:** `popup.js` (Chrome & Safari), `popup.html` (Chrome & Safari), `package.json` (Ext), `manifest.json`
 - **Status saat ini:** Selesai (Ext: 1.1.4)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah teks panjang tombol "Download Signed PDF" menjadi "Download" dan menyederhanakan teks "View in Drive" menjadi "View" dengan mempertahankan dukungan multibahasa (i18n). Menambahkan elemen `<span id="btn-view-drive-text">` untuk membungkus teks *View in Drive* agar pergantian bahasa tidak menghapus elemen SVG di sebelahnya. Menambahkan *key* translasi `btn_view_drive` di seluruh pustaka bahasa (EN, ID, TH). Mendorong perubahan melalui versi `ext-v1.1.4`.
+
+- **Tanggal/Waktu:** 2026-06-11T08:13:00Z
+- **Tugas yang diselesaikan:** Fix Detached Popup API Fetch Error
+- **File yang diubah/dibuat:** `background.js` (Safari), `service-worker.js` (Chrome), `package.json` (Ext), `manifest.json`
+- **Status saat ini:** Selesai (Ext: 1.1.5)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki bug "Failed to fetch" yang terjadi secara khusus saat user me-*detach* popup menjadi jendela mandiri/terpisah. Bug ini terjadi karena `sender.tab.url` pada jendela detached memiliki origin `chrome-extension://...` yang kemudian secara keliru dijadikan `baseUrl` oleh *background script*. Memperbaiki logika deteksi `baseUrl` di dalam *listener* pesan dengan menggunakan nilai `baseUrl` langsung dari `chrome.storage.local` dan memberikan *fallback* jika origin `chrome-extension` terdeteksi. Mendorong perubahan via versi `ext-v1.1.5`.
+
+- **Tanggal/Waktu:** 2026-06-11T08:33:00Z
+- **Tugas yang diselesaikan:** Extension Version Verification & UI Integration
+- **File yang diubah/dibuat:** `content.js` (Chrome & Safari), `HandleInertiaRequests.php`, `Dashboard.jsx`, `messages/*.json`, `package.json` (Web & Ext), `manifest.json`
+- **Status saat ini:** Selesai (Web: 1.1.2, Ext: 1.1.6)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengimplementasikan fitur pengecekan versi ekstensi langsung dari *Dashboard Web*. 
+  1. `content.js` diperbarui untuk membalas pesan `TRUSTLESS_PING_REQUEST` dengan mengirimkan versi dari `manifest`.
+  2. `HandleInertiaRequests.php` mengirimkan versi minimal (berasal dari `package.json` web dan ekstensi) ke UI.
+  3. `Dashboard.jsx` membandingkan (secara SemVer) versi ekstensi terinstal dengan `extensionMinVersion`.
+  4. Footer Dashboard diperbarui dengan indikator status versi secara *real-time*.
+  5. Fitur klik "Sign New Document" kini memiliki mekanisme *guard*: Jika ekstensi tidak terinstal atau *outdated*, user akan ditahan oleh modal pemberitahuan beserta tombol unduhan untuk *update*. Semua teks dilokalisasi. Tag dirilis `web-v1.1.2` dan `ext-v1.1.6`.

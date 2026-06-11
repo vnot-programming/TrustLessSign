@@ -15,9 +15,13 @@ window.addEventListener('message', (event) => {
   const data = event.data;
   if (!data || !data.type) return;
 
-  // Handle Ping
+  // Handle Ping — reply with installed=true and current extension version
   if (data.type === 'TRUSTLESS_PING_REQUEST') {
-    window.postMessage({ type: 'TRUSTLESS_PING_RESPONSE' }, '*');
+    const manifest = chrome.runtime.getManifest();
+    window.postMessage({
+      type: 'TRUSTLESS_PING_RESPONSE',
+      version: manifest.version_name || manifest.version || 'unknown'
+    }, '*');
     return;
   }
 

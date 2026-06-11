@@ -88,7 +88,15 @@
     "install_ext_title": "Extension Required",
     "install_ext_desc": "TrustlessSign extension is required to generate cryptographic certificates safely in your browser. This guarantees your private key never touches our servers.",
     "btn_chrome_store": "Install from Chrome Store",
-    "btn_manual_install": "Download .crx (Manual Install)"
+    "btn_manual_install": "Download .crx (Manual Install)",
+    "ext_checking": "Checking...",
+    "ext_status_ok": "Up-to-date",
+    "ext_status_outdated": "Outdated",
+    "ext_not_installed": "Not Installed",
+    "ext_outdated_hint": "⚠ Extension update required",
+    "ext_outdated_title": "Extension Outdated",
+    "ext_outdated_desc": "Your extension (v{{current}}) is outdated. Please update to v{{required}} or newer to continue signing documents.",
+    "btn_update_ext": "Update Extension"
   },
   "Welcome": {
     "badge": "Secure & Decentralized",

@@ -26,11 +26,21 @@ class HandleInertiaRequests extends Middleware
             $messages = json_decode(File::get($messagesPath), true);
         }
 
-        $packageJsonPath = base_path('package.json');
+        // Web version from web/package.json
+        $webPackageJsonPath = base_path('package.json');
         $versionName = '1.0.0-dev';
-        if (File::exists($packageJsonPath)) {
-            $packageData = json_decode(File::get($packageJsonPath), true);
+        if (File::exists($webPackageJsonPath)) {
+            $packageData = json_decode(File::get($webPackageJsonPath), true);
             $versionName = $packageData['version_name'] ?? $packageData['version'] ?? '1.0.0-dev';
+        }
+
+        // Extension minimum required version from chrome-extension/package.json
+        // (same as the latest released extension version — the web always tracks the latest)
+        $extPackageJsonPath = base_path('../chrome-extension/package.json');
+        $extensionMinVersion = '1.0.0';
+        if (File::exists($extPackageJsonPath)) {
+            $extPackageData = json_decode(File::get($extPackageJsonPath), true);
+            $extensionMinVersion = $extPackageData['version_name'] ?? $extPackageData['version'] ?? '1.0.0';
         }
 
         return array_merge(parent::share($request), [
@@ -40,6 +50,7 @@ class HandleInertiaRequests extends Middleware
             'locale' => $locale,
             'messages' => $messages,
             'versionName' => $versionName,
+            'extensionMinVersion' => $extensionMinVersion,
         ]);
     }
 }

@@ -6,7 +6,7 @@ import { LogOut, FileSignature, UploadCloud, ShieldCheck, AlertTriangle, Key, Lo
 import axios from 'axios';
 
 export default function Dashboard() {
-  const { auth, activeCertificate, messages, versionName } = usePage().props;
+  const { auth, activeCertificate, messages, versionName, extensionMinVersion } = usePage().props;
   const user = auth.user;
 
   // States
@@ -17,8 +17,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false });
+  const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, outdated: false });
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
+  const [extensionOutdatedOpen, setExtensionOutdatedOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   // Translation keys - Dashboard section
@@ -63,41 +64,57 @@ export default function Dashboard() {
     extension_alert: "TrustlessSign Extension is required. Please install the extension first.",
   };
 
-  // Check if extension is installed
+  // Compare semver strings — returns true if installed < required
+  const isVersionOutdated = (installed, required) => {
+    if (!installed || !required) return false;
+    // Strip any pre-release suffix like -dev, -beta for numeric comparison
+    const parse = (v) => v.replace(/[-+].*/,'').split('.').map(Number);
+    const a = parse(installed);
+    const b = parse(required);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+      const ai = a[i] || 0, bi = b[i] || 0;
+      if (ai < bi) return true;
+      if (ai > bi) return false;
+    }
+    return false;
+  };
+
+  // Check if extension is installed and compare version
   useEffect(() => {
     const checkExtension = () => {
-      if (window.__TRUSTLESS_SIGN_EXTENSION_INSTALLED__ === true || document.documentElement.dataset.trustlessSignInstalled === "true") {
-        setExtensionStatus({ checked: true, installed: true });
-      } else {
-        // Double check via quick message ping
-        const timeout = setTimeout(() => {
-          setExtensionStatus({ checked: true, installed: false });
-        }, 1000);
+      const timeout = setTimeout(() => {
+        setExtensionStatus({ checked: true, installed: false, version: null, outdated: false });
+      }, 1500);
 
-        const handlePingResponse = (e) => {
-          if (e.data && e.data.type === 'TRUSTLESS_PING_RESPONSE') {
-            setExtensionStatus({ checked: true, installed: true });
-            clearTimeout(timeout);
-            window.removeEventListener('message', handlePingResponse);
-          }
-        };
-
-        window.addEventListener('message', handlePingResponse);
-        window.postMessage({ type: 'TRUSTLESS_PING_REQUEST' }, '*');
-
-        return () => {
+      const handlePingResponse = (e) => {
+        if (e.data && e.data.type === 'TRUSTLESS_PING_RESPONSE') {
           clearTimeout(timeout);
           window.removeEventListener('message', handlePingResponse);
-        };
-      }
+          const extVersion = e.data.version || null;
+          const outdated = isVersionOutdated(extVersion, extensionMinVersion);
+          setExtensionStatus({ checked: true, installed: true, version: extVersion, outdated });
+        }
+      };
+
+      window.addEventListener('message', handlePingResponse);
+      window.postMessage({ type: 'TRUSTLESS_PING_REQUEST' }, '*');
+
+      return () => {
+        clearTimeout(timeout);
+        window.removeEventListener('message', handlePingResponse);
+      };
     };
 
     checkExtension();
-  }, []);
+  }, [extensionMinVersion]);
 
   const handleCertificateAction = () => {
     if (!extensionStatus.installed) {
       setExtensionModalOpen(true);
+      return;
+    }
+    if (extensionStatus.outdated) {
+      setExtensionOutdatedOpen(true);
       return;
     }
     setModalOpen(true);
@@ -106,6 +123,19 @@ export default function Dashboard() {
     setConfirmPassword('');
     setErrorMsg('');
     setSuccess(false);
+  };
+
+  const handleSignNewDoc = (e) => {
+    if (!extensionStatus.installed) {
+      e.preventDefault();
+      setExtensionModalOpen(true);
+      return;
+    }
+    if (extensionStatus.outdated) {
+      e.preventDefault();
+      setExtensionOutdatedOpen(true);
+    }
+    // else navigate naturally to /sign
   };
 
   const handleGenerateCertificate = async () => {
@@ -217,13 +247,28 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Link href="/sign" className="glass-panel p-6 flex flex-col items-center text-center gap-4 hover:border-accent-primary group transition-all">
-              <div className="w-16 h-16 rounded-full bg-accent-primary-soft flex items-center justify-center text-accent-primary group-hover:scale-110 transition-transform">
-                <FileSignature size={32} />
+            <Link
+              href="/sign"
+              onClick={handleSignNewDoc}
+              className={`glass-panel p-6 flex flex-col items-center text-center gap-4 group transition-all ${
+                extensionStatus.outdated
+                  ? 'border-accent-warning hover:border-accent-warning cursor-pointer'
+                  : 'hover:border-accent-primary cursor-pointer'
+              }`}
+            >
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${
+                extensionStatus.outdated
+                  ? 'bg-accent-warning-soft text-accent-warning'
+                  : 'bg-accent-primary-soft text-accent-primary'
+              }`}>
+                {extensionStatus.outdated ? <AlertTriangle size={32} /> : <FileSignature size={32} />}
               </div>
               <div>
                 <h3 className="font-bold text-lg">{t.sign_new_doc}</h3>
                 <p className="text-sm text-text-secondary mt-1">{t.sign_new_doc_desc}</p>
+                {extensionStatus.outdated && (
+                  <p className="text-xs text-accent-warning font-semibold mt-2">{t.ext_outdated_hint || '⚠ Extension update required'}</p>
+                )}
               </div>
             </Link>
             
@@ -239,9 +284,51 @@ export default function Dashboard() {
           </div>
         </main>
 
-        {/* Dashboard Footer */}
+        {/* Dashboard Footer — version status panel */}
         <footer className="p-4 mt-auto text-center text-sm font-medium text-text-tertiary">
-          <p>TrustlessSign Web - Version: {versionName}</p>
+          <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
+            {/* Web version — always ready */}
+            <span className="flex items-center gap-1.5">
+              TrustlessSign Web — {versionName}
+              <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-success-soft text-accent-success">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {t.ext_status_ok || 'Up-to-date'}
+              </span>
+            </span>
+
+            <span className="hidden sm:inline text-border-default">·</span>
+
+            {/* Extension version — dynamic */}
+            <span className="flex items-center gap-1.5">
+              TrustlessSign Extension
+              {!extensionStatus.checked && (
+                <span className="text-xs text-text-tertiary animate-pulse">{t.ext_checking || 'Checking...'}</span>
+              )}
+              {extensionStatus.checked && !extensionStatus.installed && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-surface-tertiary text-text-tertiary">
+                  {t.ext_not_installed || 'Not Installed'}
+                </span>
+              )}
+              {extensionStatus.checked && extensionStatus.installed && !extensionStatus.outdated && (
+                <>
+                  <span className="text-text-tertiary">— {extensionStatus.version}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-success-soft text-accent-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {t.ext_status_ok || 'Up-to-date'}
+                  </span>
+                </>
+              )}
+              {extensionStatus.checked && extensionStatus.installed && extensionStatus.outdated && (
+                <>
+                  <span className="text-text-tertiary">— {extensionStatus.version}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-warning-soft text-accent-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    {t.ext_status_outdated || 'Outdated'}
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
         </footer>
       </div>
 
@@ -368,6 +455,46 @@ export default function Dashboard() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+      {/* Extension Outdated Modal */}
+      {extensionOutdatedOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-panel max-w-md w-full p-6 space-y-6 bg-surface-elevated animate-fade-in relative z-55">
+            <div className="space-y-4 text-center">
+              <div className="w-16 h-16 rounded-full bg-accent-warning-soft text-accent-warning mx-auto flex items-center justify-center">
+                <AlertTriangle size={32} />
+              </div>
+              <h2 className="text-xl font-bold tracking-tight">{t.ext_outdated_title || 'Extension Outdated'}</h2>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {t.ext_outdated_desc
+                  ? t.ext_outdated_desc
+                      .replace('{{current}}', extensionStatus.version || '?')
+                      .replace('{{required}}', extensionMinVersion || '?')
+                  : `Your extension (v${extensionStatus.version}) is outdated. Please update to v${extensionMinVersion} or newer to continue.`
+                }
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 pt-2">
+              <a
+                href={`https://github.com/vnot-programming/TrustLessSign/releases`}
+                target="_blank" rel="noreferrer"
+                className="w-full px-4 py-3 bg-accent-warning text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold flex justify-center items-center text-center cursor-pointer"
+              >
+                {t.btn_update_ext || 'Update Extension'}
+              </a>
+            </div>
+
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={() => setExtensionOutdatedOpen(false)}
+                className="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors cursor-pointer"
+              >
+                {t.btn_cancel || 'CANCEL'}
+              </button>
+            </div>
           </div>
         </div>
       )}

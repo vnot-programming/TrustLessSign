@@ -88,7 +88,15 @@
     "install_ext_title": "Ekstensi Diperlukan",
     "install_ext_desc": "Ekstensi TrustlessSign diperlukan untuk membuat sertifikat kriptografi dengan aman di browser Anda. Ini menjamin private key Anda tidak pernah menyentuh server kami.",
     "btn_chrome_store": "Instal dari Chrome Store",
-    "btn_manual_install": "Unduh .crx (Instal Manual)"
+    "btn_manual_install": "Unduh .crx (Instal Manual)",
+    "ext_checking": "Memeriksa...",
+    "ext_status_ok": "Terkini",
+    "ext_status_outdated": "Usang",
+    "ext_not_installed": "Belum Terpasang",
+    "ext_outdated_hint": "⚠ Pembaruan ekstensi diperlukan",
+    "ext_outdated_title": "Ekstensi Usang",
+    "ext_outdated_desc": "Ekstensi Anda (v{{current}}) sudah usang. Perbarui ke v{{required}} atau lebih baru untuk melanjutkan penandatanganan dokumen.",
+    "btn_update_ext": "Perbarui Ekstensi"
   },
   "Welcome": {
     "badge": "Aman & Terdesentralisasi",

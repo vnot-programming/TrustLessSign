@@ -88,7 +88,15 @@
     "install_ext_title": "จำเป็นต้องใช้ส่วนขยาย",
     "install_ext_desc": "จำเป็นต้องใช้ส่วนขยาย TrustlessSign เพื่อสร้างใบรับรองเข้ารหัสอย่างปลอดภัยในเบราว์เซอร์ของคุณ สิ่งนี้รับประกันว่า private key ของคุณจะไม่แตะเซิร์ฟเวอร์ของเรา",
     "btn_chrome_store": "ติดตั้งจาก Chrome Store",
-    "btn_manual_install": "ดาวน์โหลด .crx (ติดตั้งด้วยตนเอง)"
+    "btn_manual_install": "ดาวน์โหลด .crx (ติดตั้งด้วยตนเอง)",
+    "ext_checking": "กำลังตรวจสอบ...",
+    "ext_status_ok": "ทันสมัย",
+    "ext_status_outdated": "ล้าสมัย",
+    "ext_not_installed": "ยังไม่ได้ติดตั้ง",
+    "ext_outdated_hint": "⚠ ต้องอัปเดตส่วนขยาย",
+    "ext_outdated_title": "ส่วนขยายล้าสมัย",
+    "ext_outdated_desc": "ส่วนขยายของคุณ (v{{current}}) ล้าสมัย กรุณาอัปเดตเป็น v{{required}} หรือใหม่กว่าเพื่อดำเนินการต่อ",
+    "btn_update_ext": "อัปเดตส่วนขยาย"
   },
   "Welcome": {
     "badge": "ปลอดภัยและไร้ศูนย์กลาง",
