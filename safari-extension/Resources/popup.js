@@ -869,8 +869,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               }
 
               const btnViewDrive = document.getElementById('btn-view-drive');
-              if (res.drive_url) {
-                btnViewDrive.href = res.drive_url;
+              if (res.gdriveUrl) {
+                btnViewDrive.href = res.gdriveUrl;
                 btnViewDrive.classList.remove('hidden');
               } else {
                 btnViewDrive.classList.add('hidden');

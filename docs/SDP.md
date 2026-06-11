@@ -190,3 +190,15 @@
 - **File yang diubah/dibuat:** `signer.js` (Chrome & Safari), `package.json`, `manifest.json`
 - **Status saat ini:** Selesai (Extension Version: 1.0.11)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah *injection* properti PDF `Subject` dari *string* JSON mentah menjadi teks yang bisa dibaca manusia. Format prioritas: Menampilkan `reason` jika ada, dan menggunakan *fallback* berupa `[Author] Signed at [YYYY/MM/DD]` jika alasan kosong.
+
+- **Tanggal/Waktu:** 2026-06-11T07:22:00Z
+- **Tugas yang diselesaikan:** Implement Google Drive Refresh Token (Opsi B) & Fallback UI (Opsi A) & Fix PDF Gap
+- **File yang diubah/dibuat:** `User.php`, `SocialiteController.php`, `api.php`, `popup.html`, `popup.js`, `service-worker.js`, `Dashboard.jsx`, `SignDocument.jsx`
+- **Status saat ini:** Selesai (Extension Version: 1.1.1)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengimplementasikan alur auto-refresh Google Drive token di sisi backend untuk mencegah token kadaluarsa (401). Mengimplementasikan UI fallback bertuliskan "Saved Locally" apabila unggahan GDrive gagal baik di ekstensi maupun dashboard Web. Menghapus jarak abu-abu pada canvas PDF dengan menggunakan `width: 100%; height: auto;` di `popup.html` Ekstensi. Semua perubahan ekstensi telah di-*commit* dengan tag `ext-v1.1.1` dan memicu CI/CD.
+
+- **Tanggal/Waktu:** 2026-06-11T07:35:00Z
+- **Tugas yang diselesaikan:** Add "View on Drive" to Extension & Implement Timestamp Prefix
+- **File yang diubah/dibuat:** `SignDocument.jsx`, `popup.js` (Chrome & Safari), `popup.html` (Chrome & Safari), `package.json` (Web & Ext), `manifest.json`
+- **Status saat ini:** Selesai (Web: 1.1.1, Ext: 1.1.2)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan tombol "View on Drive" pada Extension UI (muncul jika `drive_url` tersedia). Menambahkan prefix `signed_web_YYYY.MM.DD_HH-mm-ss-` dan `signed_ext_YYYY.MM.DD_HH-mm-ss-` pada proses penamaan file baik di GDrive maupun lokal untuk membedakan sumber sign dan mencegah duplikasi nama. Tags `web-v1.1.1` dan `ext-v1.1.2` telah dipush ke repository.

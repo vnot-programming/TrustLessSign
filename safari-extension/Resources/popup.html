@@ -622,17 +622,19 @@
         <div id="sign-success-card" class="glass-card alert-success hidden text-center space-y-2">
           <h4 style="font-weight: 700;">Dokumen Berhasil Disahkan!</h4>
           <p style="font-size: 0.7rem; color: var(--text-secondary);">Your document has been signed cryptographically.</p>
-          <button id="btn-download-signed" class="btn-primary" style="margin-top: 8px;">
-            Download Signed PDF
-          </button>
-          <a id="btn-view-drive" href="#" target="_blank" class="btn-secondary hidden" style="margin-top: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-              <polyline points="15 3 21 3 21 9"></polyline>
-              <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-            View on Drive
-          </a>
+          <div style="display: flex; gap: 8px; margin-top: 12px; width: 100%;">
+            <button id="btn-download-signed" class="btn-primary" style="flex: 1; margin-top: 0;">
+              Download Signed PDF
+            </button>
+            <a id="btn-view-drive" href="#" target="_blank" class="btn-secondary hidden" style="flex: 1; margin-top: 0; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              View in Drive
+            </a>
+          </div>
         </div>
       </div>
 
