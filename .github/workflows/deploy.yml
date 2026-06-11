@@ -93,42 +93,102 @@ jobs:
 
       - name: 🪟 Sync Desktop-PC via Tailscale SSH
         run: |
-          echo "🪟 Syncing Desktop-PC (100.106.132.107) via Git..."
-          ssh \
-            -o StrictHostKeyChecking=accept-new \
-            -o ConnectTimeout=20 \
-            -i ~/.ssh/id_ed25519 \
-            Server@100.106.132.107 \
-            'cd /d "D:\~dev\~iseng\TrustLessSign" && git restore . && git pull origin main && echo [Desktop-PC] Sync complete && git log --oneline -1'
+          echo "🪟 Checking if Desktop-PC (100.106.132.107) is online..."
+          if nc -z -w 3 100.106.132.107 22; then
+            echo "🟢 Desktop-PC is online. Syncing via Git..."
+            ssh \
+              -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=20 \
+              -i ~/.ssh/id_ed25519 \
+              Server@100.106.132.107 \
+              'cd /d "D:\~dev\~iseng\TrustLessSign" && git restore . && git pull origin main && echo [Desktop-PC] Sync complete && git log --oneline -1'
+          else
+            echo "⚠️ Desktop-PC is offline. Skipping Git sync."
+          fi
 
-      - name: 📂 Sync Ignored Files via SCP
+      - name: 🍏 Sync Macbook Air via Tailscale SSH
         run: |
-          echo "📂 Copying directories and keys to Desktop-PC via SCP..."
-          
-          # Create target directories on Windows target
-          ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 Server@100.106.132.107 \
-            "mkdir \"D:\~dev\~iseng\TrustLessSign\docs\scripts\" \"D:\~dev\~iseng\TrustLessSign\pki-keys\" \"D:\~dev\~iseng\TrustLessSign\secrets\" 2>nul || ver >nul"
+          echo "🍏 Checking if Macbook Air (100.105.121.8) is online..."
+          if nc -z -w 3 100.105.121.8 22; then
+            echo "🟢 Macbook Air is online. Syncing via Git..."
+            ssh \
+              -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=20 \
+              -i ~/.ssh/id_ed25519 \
+              fflaksana@100.105.121.8 \
+              'cd ~/Documents/~dev/iseng/TrustLessSign && git restore . && git pull origin main && echo "Macbook Air Sync complete" && git log --oneline -1'
+          else
+            echo "⚠️ Macbook Air is offline. Skipping Git sync."
+          fi
 
-          # SCP directories content
-          scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
-            ${{ env.PROJECT_PATH }}/docs/scripts/* \
-            Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\docs\scripts/" || true
+      - name: 📂 Sync Ignored Files to Desktop-PC via SCP
+        run: |
+          echo "📂 Checking if Desktop-PC (100.106.132.107) is online..."
+          if nc -z -w 3 100.106.132.107 22; then
+            echo "🟢 Desktop-PC is online. Copying directories and keys via SCP..."
+            
+            # Create target directories on Windows target
+            ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 Server@100.106.132.107 \
+              "mkdir \"D:\~dev\~iseng\TrustLessSign\docs\scripts\" \"D:\~dev\~iseng\TrustLessSign\pki-keys\" \"D:\~dev\~iseng\TrustLessSign\secrets\" 2>nul || ver >nul"
 
-          scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
-            ${{ env.PROJECT_PATH }}/pki-keys/* \
-            Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\pki-keys/" || true
+            # SCP directories content
+            scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+              ${{ env.PROJECT_PATH }}/docs/scripts/* \
+              Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\docs\scripts/" || true
 
-          scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
-            ${{ env.PROJECT_PATH }}/secrets/* \
-            Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\secrets/" || true
+            scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+              ${{ env.PROJECT_PATH }}/pki-keys/* \
+              Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\pki-keys/" || true
 
-          # SCP individual files
-          for file in docs/catatan.md docs/CI-CD.md docs/TrustlessSign_implementation_plan-v5.md docs/TrustlessSign_implementation_plan-v6.md; do
-            if [ -f "${{ env.PROJECT_PATH }}/$file" ]; then
-              scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
-                "${{ env.PROJECT_PATH }}/$file" \
-                Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign/$file"
-            fi
-          done
+            scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+              ${{ env.PROJECT_PATH }}/secrets/* \
+              Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign\secrets/" || true
+
+            # SCP individual files
+            for file in docs/catatan.md docs/CI-CD.md docs/TrustlessSign_implementation_plan-v5.md docs/TrustlessSign_implementation_plan-v6.md; do
+              if [ -f "${{ env.PROJECT_PATH }}/$file" ]; then
+                scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+                  "${{ env.PROJECT_PATH }}/$file" \
+                  Server@100.106.132.107:"D:\~dev\~iseng\TrustLessSign/$file"
+              fi
+            done
+          else
+            echo "⚠️ Desktop-PC is offline. Skipping SCP sync."
+          fi
+
+      - name: 📂 Sync Ignored Files to Macbook Air via SCP
+        run: |
+          echo "📂 Checking if Macbook Air (100.105.121.8) is online..."
+          if nc -z -w 3 100.105.121.8 22; then
+            echo "🟢 Macbook Air is online. Copying directories and keys via SCP..."
+            
+            # Create target directories on macOS target
+            ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 fflaksana@100.105.121.8 \
+              "mkdir -p ~/Documents/~dev/iseng/TrustLessSign/docs/scripts ~/Documents/~dev/iseng/TrustLessSign/pki-keys ~/Documents/~dev/iseng/TrustLessSign/secrets"
+
+            # SCP directories content
+            scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+              ${{ env.PROJECT_PATH }}/docs/scripts/* \
+              fflaksana@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/docs/scripts/ || true
+
+            scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+              ${{ env.PROJECT_PATH }}/pki-keys/* \
+              fflaksana@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/pki-keys/ || true
+
+            scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+              ${{ env.PROJECT_PATH }}/secrets/* \
+              fflaksana@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/secrets/ || true
+
+            # SCP individual files
+            for file in docs/catatan.md docs/CI-CD.md docs/TrustlessSign_implementation_plan-v5.md docs/TrustlessSign_implementation_plan-v6.md; do
+              if [ -f "${{ env.PROJECT_PATH }}/$file" ]; then
+                scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
+                  "${{ env.PROJECT_PATH }}/$file" \
+                  fflaksana@100.105.121.8:"~/Documents/~dev/iseng/TrustLessSign/$file"
+              fi
+            done
+          else
+            echo "⚠️ Macbook Air is offline. Skipping SCP sync."
+          fi
 
           echo "✅ Extension Packaging & Sync complete at $(date '+%Y-%m-%d %H:%M:%S UTC')"

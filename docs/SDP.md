@@ -231,3 +231,10 @@
   3. `Dashboard.jsx` membandingkan (secara SemVer) versi ekstensi terinstal dengan `extensionMinVersion`.
   4. Footer Dashboard diperbarui dengan indikator status versi secara *real-time*.
   5. Fitur klik "Sign New Document" kini memiliki mekanisme *guard*: Jika ekstensi tidak terinstal atau *outdated*, user akan ditahan oleh modal pemberitahuan beserta tombol unduhan untuk *update*. Semua teks dilokalisasi. Tag dirilis `web-v1.1.2` dan `ext-v1.1.6`.
+
+- **Tanggal/Waktu:** 2026-06-11T12:05:00Z
+- **Tugas yang diselesaikan:** Add Macbook Air Tailscale SSH & SCP sync with online detection fallback to CI/CD pipeline
+- **File yang diubah/dibuat:** `.github/workflows/deploy.yml`, `docs/SDP.md`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Pengecekan status online Desktop-PC dan Macbook Air dilakukan dengan perintah `nc -z -w 3 <IP> 22` agar jika salah satu target offline/tidak aktif, proses sync dilewati (fallback) dan pipeline tidak error. Sync Ignored Files via SCP ke Macbook Air juga sudah ditambahkan dengan target folder `/Users/fflaksana/Documents/~dev/iseng/TrustLessSign` (`~/Documents/~dev/iseng/TrustLessSign`).
+
