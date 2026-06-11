@@ -106,6 +106,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       cert_desc: "Please generate a secure cryptographic key below.",
       btn_regenerate: "Re-generate / Replace Certificate",
       btn_generate: "Generate Certificate",
+      device_name: "Device Name (Optional)",
+      placeholder_device: "e.g. MacBook Air, PC Kantor...",
       pwd_min: "Master Password (Min 8 characters)",
       pwd_confirm: "Confirm Master Password",
       btn_gen_cert: "Generate New Certificate",
@@ -144,6 +146,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       cert_desc: "Silakan buat kunci kriptografi aman di bawah ini.",
       btn_regenerate: "Buat Ulang / Ganti Sertifikat",
       btn_generate: "Buat Sertifikat",
+      device_name: "Nama Perangkat (Opsional)",
+      placeholder_device: "cth. MacBook Air, PC Kantor...",
       pwd_min: "Kata Sandi Utama (Min 8 karakter)",
       pwd_confirm: "Konfirmasi Kata Sandi Utama",
       btn_gen_cert: "Buat Sertifikat Baru",
@@ -182,6 +186,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       cert_desc: "โปรดสร้างคีย์เข้ารหัสที่ปลอดภัยด้านล่าง",
       btn_regenerate: "สร้างใหม่ / แทนที่ใบรับรอง",
       btn_generate: "สร้างใบรับรอง",
+      device_name: "ชื่ออุปกรณ์ (ไม่บังคับ)",
+      placeholder_device: "เช่น MacBook Air, PC Kantor...",
       pwd_min: "รหัสผ่านหลัก (อย่างน้อย 8 ตัวอักษร)",
       pwd_confirm: "ยืนยันรหัสผ่านหลัก",
       btn_gen_cert: "สร้างใบรับรองใหม่",
@@ -259,12 +265,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (viewDriveText) viewDriveText.textContent = trans.btn_view_drive;
 
     // Keys & Cert Tab Content
-    const keygenPwdLabel = contentKeys.querySelector('div.form-group:nth-of-type(1) label');
+    const keygenDeviceLabel = contentKeys.querySelector('div.form-group:nth-of-type(1) label');
+    if (keygenDeviceLabel) keygenDeviceLabel.textContent = trans.device_name || "Device Name (Optional)";
+    const keygenDeviceInput = document.getElementById('keygen-device-name');
+    if (keygenDeviceInput) keygenDeviceInput.setAttribute('placeholder', trans.placeholder_device || "e.g. MacBook Air, PC Kantor...");
+
+    const keygenPwdLabel = contentKeys.querySelector('div.form-group:nth-of-type(2) label');
     if (keygenPwdLabel) keygenPwdLabel.textContent = trans.pwd_min;
     const keygenPwdInput = document.getElementById('keygen-password');
     if (keygenPwdInput) keygenPwdInput.setAttribute('placeholder', trans.placeholder_keygen_pwd);
 
-    const keygenConfirmLabel = contentKeys.querySelector('div.form-group:nth-of-type(2) label');
+    const keygenConfirmLabel = contentKeys.querySelector('div.form-group:nth-of-type(3) label');
     if (keygenConfirmLabel) keygenConfirmLabel.textContent = trans.pwd_confirm;
     const keygenConfirmInput = document.getElementById('keygen-confirm');
     if (keygenConfirmInput) keygenConfirmInput.setAttribute('placeholder', trans.placeholder_keygen_confirm);
