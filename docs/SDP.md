@@ -60,12 +60,17 @@
   - Ran PHPUnit feature tests to verify API endpoints, registration, and revocation (all 47 assertions passing successfully).
   - Re-compiled frontend assets via Vite production build cleanly.
   - **STATUS**: Selesai.
-  - **Catatan untuk AI selanjutnya (Handoff Note)**: Proyek siap dipindahkan dari temporary disk ke lokasi persisten (`/home/vnot/docker`) setelah pengguna mengonfirmasi persetujuan akhir. Semuanya sudah diuji dan berjalan normal.
-  - **2026-06-10 07:30**:
-    - Configured and registered the self-hosted GitHub Actions runner on the VPS for the repository.
-    - Updated `.github/workflows/deploy.yml` to run `./vendor/bin/phpunit` instead of `php artisan test` because the `test` artisan command is not defined in this Laravel setup.
-    - Successfully pushed the fixes and triggered the automated CI/CD pipeline.
-    - **STATUS**: Selesai (CI/CD active and verified).
+  - **Tanggal/Waktu:** 2026-06-11T07:05:00Z
+- **Tugas yang diselesaikan:** Implement Google Drive Token Auto-Refresh & Fallback UX
+- **File yang diubah/dibuat:** `create_users_table.php`, `User.php`, `SocialiteController.php`, `api.php`, `service-worker.js`, `popup.js`, `SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Migrasi penambahan kolom `gdrive_refresh_token` telah dieksekusi. Fitur ini menambahkan opsi untuk `fallback` jika refresh gagal (Local Save). Pengaturan Google Console diserahkan pada User.
+
+- **2026-06-10 07:30**:
+  - Configured and registered the self-hosted GitHub Actions runner on the VPS for the repository.
+  - Updated `.github/workflows/deploy.yml` to run `./vendor/bin/phpunit` instead of `php artisan test` because the `test` artisan command is not defined in this Laravel setup.
+  - Successfully pushed the fixes and triggered the automated CI/CD pipeline.
+  - **STATUS**: Selesai (CI/CD active and verified).
   - **2026-06-10 07:38**:
     - Resolved Content Security Policy (CSP) violations in Manifest V3 chrome and safari extensions by downloading and bundling `pdf.min.js` and `pdf.worker.min.js` locally in `assets/`.
     - Fixed `ReferenceError: window is not defined` in background service worker context by mocking `self.window = self` before importing minified libraries.

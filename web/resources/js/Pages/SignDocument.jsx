@@ -258,7 +258,7 @@ export default function SignDocument() {
           window.removeEventListener('message', handleExtensionResponse);
           
           const result = evt.data.payload;
-          if (result && result.status === 'success') {
+          if (result && (result.status === 'success' || result.status === 'warning')) {
             // Upload completed successfully
             setSigningStatus({
               isActive: true,
@@ -274,7 +274,9 @@ export default function SignDocument() {
                 hash: result.hash,
                 gdriveUrl: result.gdriveUrl,
                 verifyUrl: verifyUrl,
-                pdfBase64: result.pdfBase64
+                pdfBase64: result.pdfBase64,
+                isWarning: result.status === 'warning',
+                warningMessage: result.message
               });
             }, 1500);
 
@@ -424,12 +426,16 @@ export default function SignDocument() {
           {signResult ? (
             // SIGN SUCCESS SCREEN
             <div className="glass-panel p-8 max-w-xl mx-auto space-y-6 text-center animate-fade-in">
-              <div className="w-20 h-20 bg-accent-success-soft text-accent-success rounded-full flex items-center justify-center mx-auto shadow-lg">
-                <CheckCircle2 size={48} />
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg ${signResult.isWarning ? 'bg-accent-warning-soft text-accent-warning' : 'bg-accent-success-soft text-accent-success'}`}>
+                {signResult.isWarning ? <AlertCircle size={48} /> : <CheckCircle2 size={48} />}
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-text-primary">{t.success_title}</h2>
-                <p className="text-sm text-text-secondary">{t.success_desc}</p>
+                <h2 className={`text-2xl font-bold ${signResult.isWarning ? 'text-accent-warning' : 'text-text-primary'}`}>
+                  {signResult.isWarning ? 'Saved Locally' : t.success_title}
+                </h2>
+                <p className="text-sm text-text-secondary">
+                  {signResult.isWarning ? (signResult.warningMessage || 'Google Drive session expired. Document saved locally.') : t.success_desc}
+                </p>
               </div>
 
               <div className="p-4 bg-surface-primary rounded-lg text-left space-y-3 border border-border-subtle text-xs">

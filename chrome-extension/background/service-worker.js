@@ -169,10 +169,62 @@ async function handleSignDocument(payload, baseUrl) {
 
   // 7. Handle GDrive Upload using gdrive helper if token is present
   let gdriveUrl = null;
-  if (gdriveToken) {
-    try {
-      gdriveUrl = await uploadToGDrive(filename, signedPdfStr, gdriveToken);
+  let isLocalFallback = false;
+  let localFallbackMessage = '';
 
+  if (gdriveToken) {
+    let currentGdriveToken = gdriveToken;
+    let uploadSuccess = false;
+
+    try {
+      gdriveUrl = await uploadToGDrive(filename, signedPdfStr, currentGdriveToken);
+      uploadSuccess = true;
+    } catch (gdriveErr) {
+      console.error('Google Drive Upload error:', gdriveErr);
+      
+      // Check if it's an authentication error
+      if (gdriveErr.message && (gdriveErr.message.includes('401') || gdriveErr.message.includes('Invalid Credentials') || gdriveErr.message.includes('UNAUTHENTICATED'))) {
+        try {
+          // Attempt to refresh the token via backend
+          const refreshRes = await fetch(`${baseUrl}/api/gdrive/refresh`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            if (refreshData.status === 'success' && refreshData.gdrive_token) {
+              currentGdriveToken = refreshData.gdrive_token;
+              
+              // Update local storage so future calls use the new token
+              await new Promise((resolve) => {
+                chrome.storage.local.set({ gdriveToken: currentGdriveToken }, resolve);
+              });
+              
+              // Retry upload
+              gdriveUrl = await uploadToGDrive(filename, signedPdfStr, currentGdriveToken);
+              uploadSuccess = true;
+            } else {
+              throw new Error('Refresh endpoint did not return a token.');
+            }
+          } else {
+            throw new Error('Failed to refresh token from backend.');
+          }
+        } catch (refreshErr) {
+          console.error('Failed to auto-refresh Google Drive token:', refreshErr);
+          isLocalFallback = true;
+          localFallbackMessage = 'Google Drive session expired and could not be refreshed. File saved locally.';
+        }
+      } else {
+        isLocalFallback = true;
+        localFallbackMessage = 'Google Drive upload failed. File saved locally.';
+      }
+    }
+
+    if (uploadSuccess) {
       // Update register on backend with drive URL and is_saved_to_drive = true
       await fetch(`${baseUrl}/api/documents/register`, {
         method: 'POST',
@@ -194,10 +246,6 @@ async function handleSignDocument(payload, baseUrl) {
           notes: notes || null
         })
       });
-
-    } catch (gdriveErr) {
-      console.error('Google Drive Upload error:', gdriveErr);
-      // Fallback: remains registered as is_saved_to_drive = false, return the file locally
     }
   }
 
@@ -205,7 +253,8 @@ async function handleSignDocument(payload, baseUrl) {
   const signedPdfBase64 = forge.util.encode64(signedPdfStr);
 
   return {
-    status: 'success',
+    status: isLocalFallback ? 'warning' : 'success',
+    message: isLocalFallback ? localFallbackMessage : 'Success',
     verifyToken: verifyToken,
     hash: hash,
     gdriveUrl: gdriveUrl,

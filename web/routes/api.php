@@ -45,6 +45,8 @@ Route::middleware('auth:sanctum')->group(function () {
         );
     });
 
+    Route::post('/gdrive/refresh', [App\Http\Controllers\SocialiteController::class, 'refreshGdriveToken']);
+
     // Admin-only endpoints (Admin authorization checked in controller methods)
     Route::post('/pki/bootstrap', [CertificateController::class, 'bootstrapCA']);
     Route::post('/certificates/revoke/{serial}', [CertificateController::class, 'revoke']);
