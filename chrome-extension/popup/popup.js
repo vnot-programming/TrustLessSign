@@ -1042,7 +1042,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             reason_final: reasonFinal,
             notes: reasonNotesText.value,
             password: password,
-            qrPngBase64: qrPng
+            qrPngBase64: qrPng,
+            verifyToken: verifyToken
           }
         }, (res) => {
           clearInterval(uploadInterval);

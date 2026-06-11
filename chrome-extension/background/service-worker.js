@@ -181,7 +181,7 @@ async function handleSignDocument(payload, baseUrl) {
   }
 
   // 3. Generate verify_token & metadata block
-  const verifyToken = crypto.randomUUID();
+  const verifyToken = payload.verifyToken || crypto.randomUUID();
   const metadata = {
     certificate_serial: certSerial,
     verify_token: verifyToken,

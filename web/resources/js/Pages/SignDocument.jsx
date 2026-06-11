@@ -346,7 +346,8 @@ export default function SignDocument() {
           notes: notes,
           password: password,
           qrPngBase64: qrPngBase64,
-          author: user.name
+          author: user.name,
+          verifyToken: verifyToken
         }
       }, '*');
 

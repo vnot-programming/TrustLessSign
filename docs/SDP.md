@@ -302,3 +302,9 @@
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`.
 - **Status saat ini:** Selesai (Version `ext-v1.2.8`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Tombol notifikasi sukses yang disisipkan melalui Javascript di Ekstensi sebelumnya memiliki atribut `style` *inline* warna hijau cerah (`var(--accent-success)` atau `var(--accent-primary)`) yang memiliki kontras sangat buruk saat diletakkan di atas *background* elemen kotak `.alert-success` yang berwarna cerah. Kode Javascript (`popup.js`) di Chrome dan Safari telah direvisi dengan menghapus *style inline* tersebut, dan digantikan dengan _class_ standar bawaan tema aplikasi, yaitu `.btn-primary` dan `.btn-secondary`.
+
+- **Tanggal/Waktu:** 2026-06-11T15:40:00Z
+- **Tugas yang diselesaikan:** Fix 404 Error pada Halaman Verifikasi QR Code.
+- **File yang diubah/dibuat:** `web/resources/js/Pages/Verify.jsx`.
+- **Status saat ini:** Selesai (Version `web-v1.2.1`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan pada *endpoint* API yang diakses oleh komponen React `Verify.jsx`. Ia mencoba melakukan _fetch_ ke URL `/api/v1/verify/...` padahal pengaturan standar Laravel 11 (`bootstrap/app.php` & `api.php`) tidak menggunakan prefiks `v1`, melainkan hanya `/api/verify/...`. Prefiks `v1` telah dihapus dari kode _fetch_ sehingga QR Code yang dipindai tidak lagi memunculkan pesan _Not Valid (could not be found)_ di layar HP pengguna. Pastikan untuk meninjau _endpoint_ jika menambah fitur _React Component_ baru.
