@@ -161,3 +161,9 @@
 - **File yang diubah/dibuat:** `Dashboard.jsx`, `HandleInertiaRequests.php`, `.agents/rules/dev-trustlesssign.md`
 - **Status saat ini:** Selesai (Web Version: 1.0.1)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan *footer* penanda versi di halaman Dashboard (mengambil variabel dinamis `version_name` langsung dari file `web/package.json` menggunakan backend Laravel/Inertia). Selain itu, merevisi aturan internal `dev-trustlesssign.md` untuk menerapkan standar *Monorepo Versioning* di mana Web (Laravel) dan Ekstensi Browser diperlakukan sebagai entitas versi yang terpisah (Decoupled).
+
+- **Tanggal/Waktu:** 2026-06-11T06:25:00Z
+- **Tugas yang diselesaikan:** Update Extension Footer Design to Professional Format
+- **File yang diubah/dibuat:** `popup.html` (Chrome & Safari), `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Extension Version: 1.0.9)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menyeragamkan bahasa dan desain Footer Ekstensi (*popup.html*) agar memiliki gaya profesional yang setara dengan Footer Dashboard web. Teks kasual diganti menjadi `"TrustlessSign Extension - Version [X.X.X]"`.
