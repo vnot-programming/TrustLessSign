@@ -91,7 +91,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn_sign: "Sign & Seal PDF",
       success_title: "Document Signed Successfully!",
       success_desc: "Your document has been signed cryptographically.",
-      btn_download: "Download Signed PDF",
+      btn_download: "Download",
+      btn_view_drive: "View",
       cert_checking: "Checking Cert...",
       cert_active: "CERTIFICATE ACTIVE",
       cert_none: "NO CERTIFICATE FOUND",
@@ -128,7 +129,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn_sign: "Tanda Tangani & Segel PDF",
       success_title: "Dokumen Berhasil Disahkan!",
       success_desc: "Dokumen Anda telah ditandatangani secara kriptografis.",
-      btn_download: "Unduh PDF Bertanda Tangan",
+      btn_download: "Unduh",
+      btn_view_drive: "Lihat",
       cert_checking: "Memeriksa Sertifikat...",
       cert_active: "SERTIFIKAT AKTIF",
       cert_none: "BELUM ADA SERTIFIKAT",
@@ -165,7 +167,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn_sign: "ลงนามและประทับตรา PDF",
       success_title: "ลงนามเอกสารสำเร็จแล้ว!",
       success_desc: "เอกสารของคุณได้รับการลงนามทางเข้ารหัสลับแล้ว",
-      btn_download: "ดาวน์โหลด PDF ที่ลงนามแล้ว",
+      btn_download: "ดาวน์โหลด",
+      btn_view_drive: "ดู",
       cert_checking: "กำลังตรวจสอบใบรับรอง...",
       cert_active: "ใบรับรองใช้งานได้",
       cert_none: "ไม่พบใบรับรอง",
@@ -246,6 +249,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (successDesc) successDesc.textContent = trans.success_desc;
     const downloadSignedBtn = document.getElementById('btn-download-signed');
     if (downloadSignedBtn) downloadSignedBtn.textContent = trans.btn_download;
+    const viewDriveText = document.getElementById('btn-view-drive-text');
+    if (viewDriveText) viewDriveText.textContent = trans.btn_view_drive;
 
     // Keys & Cert Tab Content
     const keygenPwdLabel = contentKeys.querySelector('div.form-group:nth-of-type(1) label');

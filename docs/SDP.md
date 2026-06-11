@@ -202,3 +202,9 @@
 - **File yang diubah/dibuat:** `SignDocument.jsx`, `popup.js` (Chrome & Safari), `popup.html` (Chrome & Safari), `package.json` (Web & Ext), `manifest.json`
 - **Status saat ini:** Selesai (Web: 1.1.1, Ext: 1.1.2)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan tombol "View on Drive" pada Extension UI (muncul jika `drive_url` tersedia). Menambahkan prefix `signed_web_YYYY.MM.DD_HH-mm-ss-` dan `signed_ext_YYYY.MM.DD_HH-mm-ss-` pada proses penamaan file baik di GDrive maupun lokal untuk membedakan sumber sign dan mencegah duplikasi nama. Tags `web-v1.1.1` dan `ext-v1.1.2` telah dipush ke repository.
+
+- **Tanggal/Waktu:** 2026-06-11T07:58:00Z
+- **Tugas yang diselesaikan:** Fix View on Drive layout and gdriveUrl property
+- **File yang diubah/dibuat:** `popup.js` (Chrome & Safari), `popup.html` (Chrome & Safari), `package.json` (Ext), `manifest.json`
+- **Status saat ini:** Selesai (Ext: 1.1.3)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki peletakan layout "Download" dan "View in Drive" menjadi *side-by-side* menggunakan CSS flexbox (karena sebelumnya menumpuk). Memperbaiki *bug* properti *response object* dari *background script* (di mana sebelumnya frontend mengekspektasikan `res.drive_url` padahal object tersebut bernama `res.gdriveUrl`) sehingga tombol tidak pernah dimunculkan. Menambahkan tag `ext-v1.1.3`.
