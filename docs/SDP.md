@@ -208,3 +208,9 @@
 - **File yang diubah/dibuat:** `popup.js` (Chrome & Safari), `popup.html` (Chrome & Safari), `package.json` (Ext), `manifest.json`
 - **Status saat ini:** Selesai (Ext: 1.1.3)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki peletakan layout "Download" dan "View in Drive" menjadi *side-by-side* menggunakan CSS flexbox (karena sebelumnya menumpuk). Memperbaiki *bug* properti *response object* dari *background script* (di mana sebelumnya frontend mengekspektasikan `res.drive_url` padahal object tersebut bernama `res.gdriveUrl`) sehingga tombol tidak pernah dimunculkan. Menambahkan tag `ext-v1.1.3`.
+
+- **Tanggal/Waktu:** 2026-06-11T08:04:00Z
+- **Tugas yang diselesaikan:** Shorten button text and apply i18n
+- **File yang diubah/dibuat:** `popup.js` (Chrome & Safari), `popup.html` (Chrome & Safari), `package.json` (Ext), `manifest.json`
+- **Status saat ini:** Selesai (Ext: 1.1.4)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah teks panjang tombol "Download Signed PDF" menjadi "Download" dan menyederhanakan teks "View in Drive" menjadi "View" dengan mempertahankan dukungan multibahasa (i18n). Menambahkan elemen `<span id="btn-view-drive-text">` untuk membungkus teks *View in Drive* agar pergantian bahasa tidak menghapus elemen SVG di sebelahnya. Menambahkan *key* translasi `btn_view_drive` di seluruh pustaka bahasa (EN, ID, TH). Mendorong perubahan melalui versi `ext-v1.1.4`.

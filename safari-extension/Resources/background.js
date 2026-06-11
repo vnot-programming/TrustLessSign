@@ -5,21 +5,30 @@ importScripts('assets/forge.min.js', 'assets/pdf-lib.min.js', 'signing/signer.js
 
 // Listen for messages from popup or content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const baseUrl = sender?.tab?.url ? new URL(sender.tab.url).origin : "https://tsign.vnot.my.id";
+  chrome.storage.local.get(['baseUrl'], (storage) => {
+    let baseUrl = storage.baseUrl;
+    if (!baseUrl) {
+      if (sender?.tab?.url && !sender.tab.url.startsWith('safari-web-extension://') && !sender.tab.url.startsWith('chrome-extension://')) {
+        baseUrl = new URL(sender.tab.url).origin;
+      } else {
+        baseUrl = "https://tsign.vnot.my.id";
+      }
+    }
 
-  if (request.type === 'GENERATE_KEY') {
-    handleGenerateKey(request.payload, baseUrl)
-      .then(res => sendResponse(res))
-      .catch(err => sendResponse({ status: 'error', message: err.message }));
-    return true; // Keep channel open for async response
-  }
+    if (request.type === 'GENERATE_KEY') {
+      handleGenerateKey(request.payload, baseUrl)
+        .then(res => sendResponse(res))
+        .catch(err => sendResponse({ status: 'error', message: err.message }));
+    }
 
-  if (request.type === 'SIGN_DOCUMENT') {
-    handleSignDocument(request.payload, baseUrl)
-      .then(res => sendResponse(res))
-      .catch(err => sendResponse({ status: 'error', message: err.message }));
-    return true;
-  }
+    if (request.type === 'SIGN_DOCUMENT') {
+      handleSignDocument(request.payload, baseUrl)
+        .then(res => sendResponse(res))
+        .catch(err => sendResponse({ status: 'error', message: err.message }));
+    }
+  });
+
+  return true; // Keep channel open for async response
 });
 
 /**
