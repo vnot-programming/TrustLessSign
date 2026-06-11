@@ -79,7 +79,7 @@ jobs:
             -o ConnectTimeout=20 \
             -i ~/.ssh/id_ed25519 \
             Server@100.106.132.107 \
-            'cd /d "D:\~dev\~iseng\TrustLessSign" && git pull origin main && echo [Desktop-PC] Sync complete && git log --oneline -1'
+            'cd /d "D:\~dev\~iseng\TrustLessSign" && git restore . && git pull origin main && echo [Desktop-PC] Sync complete && git log --oneline -1'
 
       - name: 📂 Sync Ignored Files via SCP
         run: |
