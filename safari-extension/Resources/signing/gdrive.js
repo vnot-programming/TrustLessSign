@@ -122,5 +122,5 @@ async function uploadToGDrive(filename, signedPdfStr, gdriveToken) {
     })
   });
 
-  return `https://drive.google.com/uc?export=download&id=${fileId}`;
+  return `https://drive.google.com/file/d/${fileId}/view`;
 }

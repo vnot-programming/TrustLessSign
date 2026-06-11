@@ -144,4 +144,8 @@
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Halaman UI React (SignDocument.jsx) melakukan _fetch_ ke endpoint `/certificates/me` secara langsung tanpa _Bearer token_, namun rute tersebut belum didefinisikan di dalam `web.php` (hanya ada di `api.php`). Hal ini menyebabkan _error 404_ sehingga status sertifikat di-set `false`. Telah ditambahkan _route_ `/certificates/me` yang membaca sertifikat aktif pengguna berdasarkan sesi web saat itu juga.
 
-
+- **Tanggal/Waktu:** 2026-06-11T05:15:00Z
+- **Tugas yang diselesaikan:** Fix Google Drive "View on Drive" link format
+- **File yang diubah/dibuat:** `gdrive.js` (Chrome & Safari), `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Bumped version to 1.0.7)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Tautan Google Drive pada UI hasil penandatanganan mengarah ke tautan unduhan langsung (`uc?export=download&id=...`). Pengguna menginginkan tautan tersebut berfungsi sebagai "View" (pratinjau) (`file/d/.../view`). Kode *return URL* pada file `gdrive.js` telah diganti agar sesuai dengan format tautan peninjauan GDrive.
