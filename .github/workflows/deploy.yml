@@ -1,26 +1,27 @@
-name: 🚀 CI/CD — TrustlessSign
+name: 🚀 CI/CD — TrustlessSign (Monorepo)
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    tags:
+      - 'web-v*'   # Trigger khusus untuk rilis Web
+      - 'ext-v*'   # Trigger khusus untuk rilis Extension
+  # (Opsional) Uncomment di bawah ini jika Anda tetap ingin menjalankan PHPUnit saat Pull Request
+  # pull_request:
+  #   branches: [main]
 
 env:
   PROJECT_PATH:  /home/vnot/extra_disk/docker-temp/trustlesssign
   APP_CONTAINER: trustlesssign-app
 
-# ──────────────────────────────────────────────────────────────────
-# Semua job berjalan di self-hosted runner (VPS ini sendiri).
-# Tidak perlu SSH dari GitHub ke VPS — runner sudah ada di dalam VPS.
-# ──────────────────────────────────────────────────────────────────
 jobs:
   # ════════════════════════════════════════════════════════════════
-  # JOB 1 — Automated Tests (PHPUnit via docker exec lokal)
+  # JOB 1 — Automated Tests (Khusus Web Laravel)
   # ════════════════════════════════════════════════════════════════
-  test:
-    name: 🧪 Run Tests
+  test_web:
+    name: 🧪 Run Web Tests (PHPUnit)
     runs-on: self-hosted
+    # Hanya jalankan jika tag berawalan 'web-v'
+    if: startsWith(github.ref, 'refs/tags/web-v')
 
     steps:
       - name: Checkout code
@@ -34,23 +35,24 @@ jobs:
           echo "✅ Tests passed."
 
   # ════════════════════════════════════════════════════════════════
-  # JOB 2 — Deploy (VPS lokal + sync Desktop-PC via Tailscale)
-  # Tidak ada SSH ke VPS — runner sudah di dalam VPS.
+  # JOB 2 — Deploy Web (Backend Laravel & Dashboard UI)
   # ════════════════════════════════════════════════════════════════
-  deploy:
-    name: 🚀 Deploy
-    needs: test
+  deploy_web:
+    name: 🚀 Deploy Web
+    needs: test_web
     runs-on: self-hosted
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Hanya jalankan jika tag berawalan 'web-v'
+    if: startsWith(github.ref, 'refs/tags/web-v')
 
     steps:
-      - name: 📦 Pull latest code di VPS
+      - name: 📦 Pull latest code di VPS (Web)
         run: |
-          echo "📦 Pulling latest code..."
+          echo "📦 Pulling latest web code..."
           cd ${{ env.PROJECT_PATH }}
+          git fetch origin
           git pull origin main
 
-      - name: 🔨 Build frontend assets (npm run build)
+      - name: 🔨 Build frontend assets (Web/Vite)
         run: |
           echo "🔨 Building frontend assets..."
           docker exec ${{ env.APP_CONTAINER }} \
@@ -63,6 +65,24 @@ jobs:
           docker exec ${{ env.APP_CONTAINER }} php artisan view:clear
           docker exec ${{ env.APP_CONTAINER }} php artisan route:clear
           docker exec ${{ env.APP_CONTAINER }} php artisan config:clear
+          echo "✅ Web Deployment complete!"
+
+  # ════════════════════════════════════════════════════════════════
+  # JOB 3 — Deploy Extension (Build .crx & Sync via Tailscale)
+  # ════════════════════════════════════════════════════════════════
+  deploy_extension:
+    name: 🧩 Deploy Extension & Sync Desktop
+    runs-on: self-hosted
+    # Hanya jalankan jika tag berawalan 'ext-v'
+    if: startsWith(github.ref, 'refs/tags/ext-v')
+
+    steps:
+      - name: 📦 Pull latest code di VPS (Ekstensi)
+        run: |
+          echo "📦 Pulling latest extension code..."
+          cd ${{ env.PROJECT_PATH }}
+          git fetch origin
+          git pull origin main
 
       - name: 📦 Build Chrome Extension (.crx)
         run: |
@@ -111,4 +131,4 @@ jobs:
             fi
           done
 
-          echo "✅ Deployment complete at $(date '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "✅ Extension Packaging & Sync complete at $(date '+%Y-%m-%d %H:%M:%S UTC')"

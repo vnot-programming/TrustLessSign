@@ -167,3 +167,9 @@
 - **File yang diubah/dibuat:** `popup.html` (Chrome & Safari), `package.json`, `manifest.json`
 - **Status saat ini:** Selesai (Extension Version: 1.0.9)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menyeragamkan bahasa dan desain Footer Ekstensi (*popup.html*) agar memiliki gaya profesional yang setara dengan Footer Dashboard web. Teks kasual diganti menjadi `"TrustlessSign Extension - Version [X.X.X]"`.
+
+- **Tanggal/Waktu:** 2026-06-11T06:30:00Z
+- **Tugas yang diselesaikan:** Decouple CI/CD Pipeline (Monorepo Workflow)
+- **File yang diubah/dibuat:** `.github/workflows/deploy.yml`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah GitHub Actions agar mendukung Monorepo *Versioning*. Trigger sekarang berdasarkan `tags: web-v*` atau `ext-v*`. Proses `deploy_web` dan `deploy_extension` berjalan terpisah dengan pengecekan kondisional (`startsWith`) untuk menghindari eksekusi serentak yang tumpang tindih. Ekstensi tidak lagi me-reset *cache* Laravel, dan Web tidak lagi memicu kompresi `.crx`.
