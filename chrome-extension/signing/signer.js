@@ -77,7 +77,16 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
 
   pdfDoc.setTitle(metadata.original_filename);
   pdfDoc.setAuthor(metadata.author || 'TrustlessSign User');
-  pdfDoc.setSubject(JSON.stringify(metadata));
+  
+  let subjectText = metadata.reason;
+  if (!subjectText) {
+    const d = new Date(metadata.signed_at || Date.now());
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    subjectText = `${metadata.author || 'TrustlessSign User'} Signed at ${yyyy}/${mm}/${dd}`;
+  }
+  pdfDoc.setSubject(subjectText);
   pdfDoc.setKeywords(['TrustlessSign', 'Digital Signature', 'Zero-Trust']);
   pdfDoc.setCreator('TrustlessSign Zero-Trust Seal');
   pdfDoc.setProducer('TrustlessSign Crypto-Engine (Web3)');

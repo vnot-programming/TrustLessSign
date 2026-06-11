@@ -179,3 +179,9 @@
 - **File yang diubah/dibuat:** `popup.html`, `popup.js` (Chrome), `package.json`, `manifest.json`
 - **Status saat ini:** Selesai (Extension Version: 1.0.10)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan kembali frasa `Jazakumullah Khairan 🙏` ke *footer* ekstensi sesuai permintaan pengguna, sekaligus memperbarui pemanggilan versi agar mengambil `version_name` (mis. "1.0.10-dev") alih-alih `version` numerik mentah di `popup.js`.
+
+- **Tanggal/Waktu:** 2026-06-11T06:45:00Z
+- **Tugas yang diselesaikan:** Format PDF Subject Metadata as Human-Readable Text
+- **File yang diubah/dibuat:** `signer.js` (Chrome & Safari), `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Extension Version: 1.0.11)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah *injection* properti PDF `Subject` dari *string* JSON mentah menjadi teks yang bisa dibaca manusia. Format prioritas: Menampilkan `reason` jika ada, dan menggunakan *fallback* berupa `[Author] Signed at [YYYY/MM/DD]` jika alasan kosong.
