@@ -332,7 +332,8 @@ export default function SignDocument() {
           reason_final: reason_final,
           notes: notes,
           password: password,
-          qrPngBase64: qrPngBase64
+          qrPngBase64: qrPngBase64,
+          author: user.name
         }
       }, '*');
 

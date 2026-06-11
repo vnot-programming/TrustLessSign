@@ -125,6 +125,7 @@ async function handleSignDocument(payload, baseUrl) {
     certificate_serial: certSerial,
     verify_token: verifyToken,
     original_filename: filename,
+    author: payload.author || 'TrustlessSign User',
     reason: reason_final || 'Digital Verification',
     signed_at: new Date().toISOString()
   };

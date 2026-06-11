@@ -75,7 +75,12 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
     height: qrSize
   });
 
+  pdfDoc.setTitle(metadata.original_filename);
+  pdfDoc.setAuthor(metadata.author || 'TrustlessSign User');
   pdfDoc.setSubject(JSON.stringify(metadata));
+  pdfDoc.setKeywords(['TrustlessSign', 'Digital Signature', 'Zero-Trust']);
+  pdfDoc.setCreator('TrustlessSign Zero-Trust Seal');
+  pdfDoc.setProducer('TrustlessSign Crypto-Engine (Web3)');
   const signedPdfBytes = await pdfDoc.save();
 
   // Compute SHA-256 of final signed PDF

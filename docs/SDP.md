@@ -149,3 +149,9 @@
 - **File yang diubah/dibuat:** `gdrive.js` (Chrome & Safari), `package.json`, `manifest.json`
 - **Status saat ini:** Selesai (Bumped version to 1.0.7)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Tautan Google Drive pada UI hasil penandatanganan mengarah ke tautan unduhan langsung (`uc?export=download&id=...`). Pengguna menginginkan tautan tersebut berfungsi sebagai "View" (pratinjau) (`file/d/.../view`). Kode *return URL* pada file `gdrive.js` telah diganti agar sesuai dengan format tautan peninjauan GDrive.
+
+- **Tanggal/Waktu:** 2026-06-11T05:35:00Z
+- **Tugas yang diselesaikan:** Set standard PDF Metadata (Title, Author, Keywords) automatically
+- **File yang diubah/dibuat:** `signer.js` & `service-worker.js` (Chrome & Safari), `SignDocument.jsx`, `manifest.json`
+- **Status saat ini:** Selesai (Bumped version to 1.0.8)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan injeksi Metadata Standar PDF via *pdf-lib* (`setTitle`, `setAuthor`, `setKeywords`, `setCreator`, `setProducer`) menggunakan data nama file dan nama pengguna (Author) yang diumpan dari Web UI (`user.name`). Metadata `BaseUrl` tidak diinjeksikan karena tautan GDrive belum ada pada saat proses stempel/hash kriptografi PDF dilakukan. JSON parameter *verify_token* tetap dipertahankan utuh pada kolom `Subject` untuk kebutuhan verifikasi masa depan.
