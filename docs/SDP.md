@@ -290,3 +290,9 @@
 - **File yang diubah/dibuat:** `chrome-extension/signing/gdrive.js`, `safari-extension/Resources/signing/gdrive.js`, `chrome-extension/background/service-worker.js`, `safari-extension/Resources/background.js`, `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`, `web/resources/js/Pages/Dashboard.jsx`.
 - **Status saat ini:** Selesai (Version `ext-v1.2.6`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Miskonsepsi dari UI sebelumnya: Pengguna tidak ingin mengunduh `.tsign` secara fisik ketika file tersebut sudah dicadangkan ke Google Drive. Fungsi `uploadIdentityToDrive` diubah agar me-return *Object* yang memuat `url` (tautan pratinjau Drive). UI Dashboard dan Ekstensi diubah sehingga menampilkan tombol *Open Google Drive Backup* jika `gdriveUrl` atau `driveUrl` tersedia. Jika dicadangkan tanpa izin GDrive (fallback lokal), barulah tombol mengunduh file secara lokal muncul. Tombol backup manual juga ditambahkan tautan GDrive ini.
+
+- **Tanggal/Waktu:** 2026-06-11T15:23:00Z
+- **Tugas yang diselesaikan:** Fix Bug Tombol Download `.tsign` Hilang Saat Token GDrive Kosong.
+- **File yang diubah/dibuat:** `chrome-extension/background/service-worker.js`, `safari-extension/Resources/background.js`.
+- **Status saat ini:** Selesai (Version `ext-v1.2.7`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan sebuah *edge case* di mana blok `try-catch` saat men-generate file `.tsign` secara tidak sengaja terbungkus di dalam blok pengecekan eksistensi token `if (token) { ... }`. Hal ini menyebabkan Ekstensi tidak membuat file `.tsign` sama sekali jika pengguna belum login GDrive, sehingga tombol "Download Local Backup" tidak muncul pada halaman Web Dashboard maupun Ekstensi. Logika `encryptIdentityToTsign` sekarang telah digeser ke luar kondisi `token` sehingga file *blob* cadangan `.tsign` tetap ter-*generate* dan di-*return* secara independen meskipun Auto-Upload GDrive dibatalkan karena tidak ada sesi OAuth.

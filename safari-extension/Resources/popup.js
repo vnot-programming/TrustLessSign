@@ -624,9 +624,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             let successMsg = `<strong>Success!</strong> Certificate generated and registered.`;
             if (res.driveSuccess && res.driveUrl) {
               successMsg += `<br>✅ Auto-backed up to your Google Drive.`;
-              successMsg += `<br><button id="btnOpenDriveTsign" data-url="${res.driveUrl}" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-success); color: var(--accent-success);">📂 Open Google Drive Backup</button>`;
+              successMsg += `<div style="margin-top: 12px;"><button id="btnOpenDriveTsign" data-url="${res.driveUrl}" class="btn-primary" style="width: 100%;">📂 Open Google Drive Backup</button></div>`;
             } else if (res.tsignBase64) {
-              successMsg += `<br><button id="btnDownloadTsign" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-primary); color: var(--accent-primary);">⬇️ Download Local Backup (.tsign)</button>`;
+              successMsg += `<div style="margin-top: 12px;"><button id="btnDownloadTsign" class="btn-secondary" style="width: 100%;">⬇️ Download Local Backup (.tsign)</button></div>`;
             }
 
             keysStatus.innerHTML = successMsg;
@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 keysStatus.classList.add('alert-success');
                 keysStatus.innerHTML = `✔ Identity backed up to Google Drive: ${fileName}`;
                 if (res.gdriveUrl) {
-                  keysStatus.innerHTML += `<br><button id="btnOpenManualDrive" data-url="${res.gdriveUrl}" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-success); color: var(--accent-success);">📂 Open in Google Drive</button>`;
+                  keysStatus.innerHTML += `<div style="margin-top: 12px;"><button id="btnOpenManualDrive" data-url="${res.gdriveUrl}" class="btn-primary" style="width: 100%;">📂 Open in Google Drive</button></div>`;
                   setTimeout(() => {
                     const btn = document.getElementById('btnOpenManualDrive');
                     if (btn) btn.addEventListener('click', (e) => {
