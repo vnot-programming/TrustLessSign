@@ -1,14 +1,14 @@
-// background.js for TrustlessSign Safari Extension
+// service-worker.js for TrustlessSign Extension (Manifest V3)
 self.window = self;
 
-importScripts('assets/forge.min.js', 'assets/pdf-lib.min.js', 'signing/signer.js', 'signing/gdrive.js');
+importScripts('../assets/forge.min.js', '../assets/pdf-lib.min.js', '../signing/signer.js', '../signing/gdrive.js');
 
 // Listen for messages from popup or content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   chrome.storage.local.get(['baseUrl'], (storage) => {
     let baseUrl = storage.baseUrl;
     if (!baseUrl) {
-      if (sender?.tab?.url && !sender.tab.url.startsWith('safari-web-extension://') && !sender.tab.url.startsWith('chrome-extension://')) {
+      if (sender?.tab?.url && !sender.tab.url.startsWith('chrome-extension://')) {
         baseUrl = new URL(sender.tab.url).origin;
       } else {
         baseUrl = "https://tsign.vnot.my.id";
@@ -26,6 +26,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         .then(res => sendResponse(res))
         .catch(err => sendResponse({ status: 'error', message: err.message }));
     }
+
+    if (request.type === 'UPLOAD_IDENTITY') {
+      handleUploadIdentity(request.payload)
+        .then(res => sendResponse(res))
+        .catch(err => sendResponse({ status: 'error', message: err.message }));
+    }
   });
 
   return true; // Keep channel open for async response
@@ -35,7 +41,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  * Generate keypair, encrypt private key with password, issue certificate from backend, and store them.
  */
 async function handleGenerateKey(payload, baseUrl) {
-  const { password, email, apiToken } = payload;
+  const { password, email, apiToken, deviceName, deviceIdentifier } = payload;
 
   if (!password || password.length < 8) {
     throw new Error('Password must be at least 8 characters.');
@@ -50,7 +56,7 @@ async function handleGenerateKey(payload, baseUrl) {
   // 3. Create CSR using signer helper
   const csrPem = generateCSR(keypair, email);
 
-  // 4. Request certificate from Laravel CA backend
+  // 4. Request certificate from Laravel CA backend — send device info for multi-device tracking
   const response = await fetch(`${baseUrl}/api/certificates/issue`, {
     method: 'POST',
     headers: {
@@ -58,7 +64,11 @@ async function handleGenerateKey(payload, baseUrl) {
       'Authorization': `Bearer ${apiToken}`,
       'Accept': 'application/json'
     },
-    body: JSON.stringify({ csr_pem: csrPem })
+    body: JSON.stringify({
+      csr_pem:           csrPem,
+      device_name:       deviceName       || 'Unknown Device',
+      device_identifier: deviceIdentifier || null,
+    })
   });
 
   const resData = await response.json();
@@ -67,14 +77,14 @@ async function handleGenerateKey(payload, baseUrl) {
   }
 
   const certificatePem = resData.certificate.cert_pem;
-  const serialNumber = resData.certificate.serial_number;
+  const serialNumber   = resData.certificate.serial_number;
 
   // 5. Store private key and certificate in chrome.storage.local
   await new Promise((resolve, reject) => {
     chrome.storage.local.set({
       'trustless_private_key_enc': encryptedPrivateKeyPem,
-      'trustless_certificate': certificatePem,
-      'trustless_cert_serial': serialNumber
+      'trustless_certificate':     certificatePem,
+      'trustless_cert_serial':     serialNumber
     }, () => {
       if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
       else resolve();
@@ -178,10 +188,62 @@ async function handleSignDocument(payload, baseUrl) {
 
   // 7. Handle GDrive Upload using gdrive helper if token is present
   let gdriveUrl = null;
-  if (gdriveToken) {
-    try {
-      gdriveUrl = await uploadToGDrive(filename, signedPdfStr, gdriveToken);
+  let isLocalFallback = false;
+  let localFallbackMessage = '';
 
+  if (gdriveToken) {
+    let currentGdriveToken = gdriveToken;
+    let uploadSuccess = false;
+
+    try {
+      gdriveUrl = await uploadToGDrive(filename, signedPdfStr, currentGdriveToken);
+      uploadSuccess = true;
+    } catch (gdriveErr) {
+      console.error('Google Drive Upload error:', gdriveErr);
+      
+      // Check if it's an authentication error
+      if (gdriveErr.message && (gdriveErr.message.includes('401') || gdriveErr.message.includes('Invalid Credentials') || gdriveErr.message.includes('UNAUTHENTICATED'))) {
+        try {
+          // Attempt to refresh the token via backend
+          const refreshRes = await fetch(`${baseUrl}/api/gdrive/refresh`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            if (refreshData.status === 'success' && refreshData.gdrive_token) {
+              currentGdriveToken = refreshData.gdrive_token;
+              
+              // Update local storage so future calls use the new token
+              await new Promise((resolve) => {
+                chrome.storage.local.set({ gdriveToken: currentGdriveToken }, resolve);
+              });
+              
+              // Retry upload
+              gdriveUrl = await uploadToGDrive(filename, signedPdfStr, currentGdriveToken);
+              uploadSuccess = true;
+            } else {
+              throw new Error('Refresh endpoint did not return a token.');
+            }
+          } else {
+            throw new Error('Failed to refresh token from backend.');
+          }
+        } catch (refreshErr) {
+          console.error('Failed to auto-refresh Google Drive token:', refreshErr);
+          isLocalFallback = true;
+          localFallbackMessage = 'Google Drive session expired and could not be refreshed. File saved locally.';
+        }
+      } else {
+        isLocalFallback = true;
+        localFallbackMessage = 'Google Drive upload failed. File saved locally.';
+      }
+    }
+
+    if (uploadSuccess) {
       // Update register on backend with drive URL and is_saved_to_drive = true
       await fetch(`${baseUrl}/api/documents/register`, {
         method: 'POST',
@@ -203,10 +265,6 @@ async function handleSignDocument(payload, baseUrl) {
           notes: notes || null
         })
       });
-
-    } catch (gdriveErr) {
-      console.error('Google Drive Upload error:', gdriveErr);
-      // Fallback: remains registered as is_saved_to_drive = false, return the file locally
     }
   }
 
@@ -214,10 +272,29 @@ async function handleSignDocument(payload, baseUrl) {
   const signedPdfBase64 = forge.util.encode64(signedPdfStr);
 
   return {
-    status: 'success',
+    status: isLocalFallback ? 'warning' : 'success',
+    message: isLocalFallback ? localFallbackMessage : 'Success',
     verifyToken: verifyToken,
     hash: hash,
     gdriveUrl: gdriveUrl,
     pdfBase64: signedPdfBase64
   };
 }
+
+/**
+ * Upload encrypted .tsign identity backup to Google Drive (TrustLessSign/Certificated/)
+ */
+async function handleUploadIdentity(payload) {
+  const { tsignBase64, fileName, gdriveToken } = payload;
+
+  if (!gdriveToken) {
+    throw new Error('No Google Drive token found. Please re-authenticate.');
+  }
+  if (!tsignBase64 || !fileName) {
+    throw new Error('Missing .tsign data or filename.');
+  }
+
+  const uploadedName = await uploadIdentityToDrive(fileName, tsignBase64, gdriveToken);
+  return { status: 'success', fileName: uploadedName };
+}
+

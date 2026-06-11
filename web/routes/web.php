@@ -22,13 +22,17 @@ Route::get('/verify/{token}', function ($token) {
 // Authenticated UI Routes
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard', function () {
-        $certificate = \App\Models\Certificate::where('user_id', auth()->id())
+        $certificates = \App\Models\Certificate::where('user_id', auth()->id())
             ->where('is_revoked', false)
             ->where('expires_at', '>', now())
-            ->first();
+            ->orderBy('issued_at', 'desc')
+            ->get();
 
         return Inertia::render('Dashboard', [
-            'activeCertificate' => $certificate
+            // Kirimkan semua sertifikat aktif (multi-device)
+            'activeCertificates' => $certificates,
+            // Backward compatibility: sertifikat terbaru
+            'activeCertificate'  => $certificates->first(),
         ]);
     })->name('dashboard');
     
@@ -51,20 +55,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::get('/certificates/me', function (\Illuminate\Http\Request $request) {
-        $cert = \App\Models\Certificate::where('user_id', $request->user()->id)
+        $certs = \App\Models\Certificate::where('user_id', $request->user()->id)
             ->where('is_revoked', false)
             ->where('expires_at', '>', now())
             ->orderBy('issued_at', 'desc')
-            ->first();
+            ->get();
 
-        if (!$cert) {
-            return response()->json(['message' => 'No active certificate found.', 'has_certificate' => false], 200);
+        if ($certs->isEmpty()) {
+            return response()->json(['message' => 'No active certificate found.', 'has_certificate' => false, 'certificates' => []], 200);
         }
 
-        $certArray = $cert->toArray();
-        $certArray['has_certificate'] = true;
-        return response()->json($certArray, 200);
+        return response()->json(['has_certificate' => true, 'certificates' => $certs], 200);
     });
+
+    // User self-service: cabut sertifikat milik sendiri berdasarkan serial
+    Route::post('/certificates/{serial}/revoke', [\App\Http\Controllers\CertificateController::class, 'revokeOwn']);
 
     Route::post('/logout', function (\Illuminate\Http\Request $request) {
         \Illuminate\Support\Facades\Auth::guard('web')->logout();

@@ -406,8 +406,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         let activeCert = null;
         if (meRes.ok) {
           const data = await meRes.json();
-          if (data.has_certificate !== false) {
-            activeCert = data;
+          // API kini mengembalikan array sertifikat (multi-device)
+          if (data.has_certificate && data.certificates && data.certificates.length > 0) {
+            // Gunakan sertifikat pertama (terbaru) untuk status display
+            activeCert = data.certificates[0];
           }
         }
         window.userHasCert = !!activeCert;
@@ -555,7 +557,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 5. Generate Certificate handler
   btnGenerateCert.addEventListener('click', async () => {
     const password = keygenPasswordInput.value;
-    const confirm = keygenConfirmInput.value;
+    const confirm  = keygenConfirmInput.value;
+    const deviceName = document.getElementById('keygen-device-name')?.value?.trim() || '';
     keysStatus.classList.add('hidden');
 
     if (password.length < 8) {
@@ -571,8 +574,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnGenerateCert.disabled = true;
     btnGenerateCert.textContent = "Generating...";
 
+    // Generate a stable device identifier (fingerprint) from browser+user context
+    const deviceIdentifier = await generateDeviceIdentifier();
+
     chrome.storage.local.get(['sanctumToken', 'baseUrl'], async (storage) => {
-      const token = storage.sanctumToken;
+      const token   = storage.sanctumToken;
       const baseUrl = storage.baseUrl;
 
       try {
@@ -580,9 +586,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         chrome.runtime.sendMessage({
           type: 'GENERATE_KEY',
           payload: {
-            password: password,
-            email: userEmail.textContent,
-            apiToken: token
+            password:         password,
+            email:            userEmail.textContent,
+            apiToken:         token,
+            deviceName:       deviceName || 'This Device',
+            deviceIdentifier: deviceIdentifier,
           }
         }, (res) => {
           btnGenerateCert.disabled = false;
@@ -609,6 +617,125 @@ document.addEventListener('DOMContentLoaded', async () => {
     keysStatus.classList.add('alert-danger');
     keysStatus.textContent = msg;
   };
+
+  // ─── IDENTITY BACKUP: Export .tsign to Google Drive ───────────────────────
+  const btnBackupDrive    = document.getElementById('btn-backup-drive');
+  const btnImportIdentity = document.getElementById('btn-import-identity');
+  const importFileInput   = document.getElementById('import-tsign-file');
+
+  if (btnBackupDrive) {
+    btnBackupDrive.addEventListener('click', async () => {
+      chrome.storage.local.get(['privateKey', 'publicKey', 'cert', 'masterPasswordHash', 'gdriveToken'], async (storage) => {
+        if (!storage.privateKey || !storage.cert) {
+          showKeysError('No identity found on this device. Generate a certificate first.');
+          return;
+        }
+
+        const password = prompt('Enter your Master Password to backup identity:');
+        if (!password || password.length < 8) {
+          showKeysError('Invalid Master Password.');
+          return;
+        }
+
+        btnBackupDrive.disabled  = true;
+        btnBackupDrive.textContent = 'Encrypting...';
+
+        try {
+          const tsignBlob = await encryptIdentityToTsign({
+            privateKey:         storage.privateKey,
+            publicKey:          storage.publicKey,
+            cert:               storage.cert,
+            masterPasswordHash: storage.masterPasswordHash,
+          }, password);
+
+          // Upload to Google Drive folder TrustLessSign/Certificated/
+          if (storage.gdriveToken) {
+            const now       = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const fileName  = `trustlesssign_identity_${timestamp}.tsign`;
+
+            chrome.runtime.sendMessage({
+              type:    'UPLOAD_IDENTITY',
+              payload: { tsignBase64: btoa(String.fromCharCode(...new Uint8Array(tsignBlob))), fileName, gdriveToken: storage.gdriveToken }
+            }, (res) => {
+              if (res && res.status === 'success') {
+                keysStatus.classList.remove('hidden', 'alert-danger');
+                keysStatus.classList.add('alert-success');
+                keysStatus.textContent = `✔ Identity backed up to Google Drive: ${fileName}`;
+              } else {
+                showKeysError('Failed to upload to Drive: ' + (res?.message || 'Unknown error'));
+              }
+            });
+          } else {
+            // Fallback: trigger local download if no Drive token
+            const url = URL.createObjectURL(new Blob([tsignBlob], { type: 'application/octet-stream' }));
+            const now = new Date();
+            const ts  = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            chrome.downloads.download({ url, filename: `trustlesssign_identity_${ts}.tsign`, saveAs: true });
+            keysStatus.classList.remove('hidden', 'alert-danger');
+            keysStatus.classList.add('alert-success');
+            keysStatus.textContent = 'Identity downloaded locally (no Drive token found).';
+          }
+        } catch (err) {
+          showKeysError('Backup failed: ' + err.message);
+        } finally {
+          btnBackupDrive.disabled   = false;
+          btnBackupDrive.textContent = 'Backup to Drive (.tsign)';
+        }
+      });
+    });
+  }
+
+  // ─── IDENTITY IMPORT: Decrypt .tsign and restore to storage ───────────────
+  if (btnImportIdentity) {
+    btnImportIdentity.addEventListener('click', () => {
+      importFileInput.click();
+    });
+  }
+
+  if (importFileInput) {
+    importFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file || !file.name.endsWith('.tsign')) {
+        showKeysError('Please select a valid .tsign file.');
+        return;
+      }
+
+      const password = prompt('Enter the Master Password used when this identity was created:');
+      if (!password || password.length < 8) {
+        showKeysError('Invalid Master Password.');
+        return;
+      }
+
+      btnImportIdentity.disabled   = true;
+      btnImportIdentity.textContent = 'Importing...';
+
+      try {
+        const arrayBuf = await file.arrayBuffer();
+        const identity = await decryptIdentityFromTsign(arrayBuf, password);
+
+        // Restore identity to chrome.storage.local
+        chrome.storage.local.set({
+          privateKey:         identity.privateKey,
+          publicKey:          identity.publicKey,
+          cert:               identity.cert,
+          masterPasswordHash: identity.masterPasswordHash,
+        }, () => {
+          keysStatus.classList.remove('hidden', 'alert-danger');
+          keysStatus.classList.add('alert-success');
+          keysStatus.textContent = '✔ Identity imported successfully! You can now sign documents.';
+          // Refresh cert status
+          checkAuth();
+        });
+      } catch (err) {
+        showKeysError('Import failed: ' + err.message + ' (Wrong password or corrupted file?)');
+      } finally {
+        btnImportIdentity.disabled   = false;
+        btnImportIdentity.textContent = 'Import Identity (.tsign)';
+        importFileInput.value = '';
+      }
+    });
+  }
 
   // Determine language based on browser UI locale
   const getLangCode = () => {
@@ -1062,4 +1189,91 @@ function arrayBufferToBase64(buffer) {
     binary += String.fromCharCode(bytes[i]);
   }
   return btoa(binary);
+}
+
+// ─── .TSIGN PROPRIETARY FORMAT CRYPTO ─────────────────────────────────────────
+// Format: [4-byte magic header] + [12-byte IV] + [32-byte salt] + [ciphertext]
+// Magic: "TSGN" (0x54 0x53 0x47 0x4E) — identifies TrustlessSign Identity file
+// App-Level Salt ensures the file is only decryptable by TrustlessSign ecosystem
+const TSIGN_MAGIC    = new Uint8Array([0x54, 0x53, 0x47, 0x4E]); // "TSGN"
+const TSIGN_APP_SALT = 'TrustLessSign_Identity_v1_DO_NOT_MODIFY';
+
+async function deriveKeyFromPassword(password, salt) {
+  const enc        = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(password + TSIGN_APP_SALT), // password + app-level salt
+    { name: 'PBKDF2' },
+    false,
+    ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: salt, iterations: 310000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptIdentityToTsign(identityObj, password) {
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const salt = crypto.getRandomValues(new Uint8Array(32));
+  const key  = await deriveKeyFromPassword(password, salt);
+
+  const enc       = new TextEncoder();
+  const plaintext = enc.encode(JSON.stringify(identityObj));
+
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext);
+
+  // Assemble: MAGIC(4) + IV(12) + SALT(32) + CIPHERTEXT
+  const result = new Uint8Array(4 + 12 + 32 + ciphertext.byteLength);
+  result.set(TSIGN_MAGIC, 0);
+  result.set(iv,          4);
+  result.set(salt,        16);
+  result.set(new Uint8Array(ciphertext), 48);
+  return result.buffer;
+}
+
+async function decryptIdentityFromTsign(arrayBuffer, password) {
+  const data  = new Uint8Array(arrayBuffer);
+  const magic = data.slice(0, 4);
+
+  // Validate magic header — reject files not created by TrustlessSign
+  if (magic[0] !== 0x54 || magic[1] !== 0x53 || magic[2] !== 0x47 || magic[3] !== 0x4E) {
+    throw new Error('Invalid .tsign file. Not a TrustlessSign Identity file.');
+  }
+
+  const iv         = data.slice(4, 16);
+  const salt       = data.slice(16, 48);
+  const ciphertext = data.slice(48);
+
+  const key = await deriveKeyFromPassword(password, salt);
+
+  let plaintext;
+  try {
+    plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+  } catch (e) {
+    throw new Error('Decryption failed. Wrong password or file is corrupted.');
+  }
+
+  const dec = new TextDecoder();
+  return JSON.parse(dec.decode(plaintext));
+}
+
+// ─── DEVICE IDENTIFIER ─────────────────────────────────────────────────────────
+// Generates a stable, non-tracking pseudo-fingerprint from browser context
+async function generateDeviceIdentifier() {
+  const rawData = [
+    navigator.userAgent,
+    navigator.language,
+    screen.colorDepth,
+    screen.width + 'x' + screen.height,
+    new Date().getTimezoneOffset(),
+  ].join('|');
+
+  const enc    = new TextEncoder();
+  const hash   = await crypto.subtle.digest('SHA-256', enc.encode(rawData));
+  const bytes  = new Uint8Array(hash);
+  return Array.from(bytes.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join('');
 }

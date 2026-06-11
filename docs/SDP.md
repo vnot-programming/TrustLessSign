@@ -238,3 +238,34 @@
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Pengecekan status online Desktop-PC dan Macbook Air dilakukan dengan perintah `nc -z -w 3 <IP> 22` agar jika salah satu target offline/tidak aktif, proses sync dilewati (fallback) dan pipeline tidak error. Sync Ignored Files via SCP ke Macbook Air juga sudah ditambahkan dengan target folder `/Users/my/Documents/~dev/iseng/TrustLessSign` (`~/Documents/~dev/iseng/TrustLessSign`).
 
+- **Tanggal/Waktu:** 2026-06-11T12:24:00Z
+- **Tugas yang diselesaikan:** Fix `Cannot read properties of undefined (reading 'getManifest')` on invalidated extension context
+- **File yang diubah/dibuat:** `content.js` (Chrome & Safari), `package.json`, `manifest.json` (Chrome & Safari)
+- **Status saat ini:** Selesai (Ext: 1.1.8)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki Uncaught TypeError saat extension context terinvalidasi (karena instalasi baru atau reload, namun tab dashboard masih terbuka). Logika pengecekan `chrome.runtime` dipindah ke awal listener di `content.js` dan segera mengembalikan error ke window untuk di-handle oleh React. Selain itu, menjelaskan ke user bahwa "No cryptographic key found" pada device baru bukanlah sebuah *error*, melainkan fitur inti Trustless architecture di mana private key baru harus di-generate per-device. Rilis tag `ext-v1.1.8`.
+
+---
+
+- **Tanggal/Waktu:** 2026-06-11T13:04:00Z
+- **Tugas yang diselesaikan:** Implementasi **Hybrid Multi-Certificate Architecture** — Multi-Device + Google Drive Identity Backup (`.tsign`)
+- **File yang diubah/dibuat:**
+  - `web/database/migrations/2026_06_11_195402_add_device_name_to_certificates_table.php` — **[NEW]** Migrasi non-destruktif: menambah kolom `device_name` dan `device_identifier`
+  - `web/app/Models/Certificate.php` — Tambah `device_name`, `device_identifier` ke `$fillable`
+  - `web/app/Http/Controllers/CertificateController.php` — **[REFACTORED]** `myCertificate()` kini mengembalikan **array** sertifikat aktif. `issue()` menerima `device_name` & `device_identifier`. Menambah `revokeOwn()` untuk user self-service revocation per serial. Auto-revoke dihapus.
+  - `web/routes/web.php` — Dashboard mengirim `activeCertificates` (array). `/certificates/me` mengembalikan array. Route baru: `POST /certificates/{serial}/revoke`
+  - `chrome-extension/background/service-worker.js` — `handleGenerateKey()` meneruskan `device_name` & `device_identifier` ke backend. Tambah handler `UPLOAD_IDENTITY` → `handleUploadIdentity()`.
+  - `chrome-extension/signing/gdrive.js` — Tambah fungsi `uploadIdentityToDrive()` yang menyimpan `.tsign` ke folder `TrustLessSign/Certificated/` di Google Drive user.
+  - `chrome-extension/popup/popup.html` — Tambah input `device_name` di form keygen. Tambah tombol "Backup to Drive (.tsign)" dan "Import Identity (.tsign)".
+  - `chrome-extension/popup/popup.js` — Update `checkAuth()` untuk parsing response array. Update `btnGenerateCert` meneruskan `deviceName`. Tambah handler backup & import `.tsign`. Tambah fungsi crypto: `encryptIdentityToTsign()`, `decryptIdentityFromTsign()`, `deriveKeyFromPassword()` (PBKDF2+AES-GCM+App-Salt), `generateDeviceIdentifier()`.
+  - `safari-extension/Resources/*` — **Sync** dari Chrome extension.
+  - `web/resources/js/Pages/Dashboard.jsx` — Consume `activeCertificates` array. Tampilkan daftar perangkat aktif (device list). Input `deviceName` di modal. Ubah warna tombol dari danger→primary (add device, bukan replace).
+  - `chrome-extension/background/service-worker.bundle.js` — Rebuild.
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):**
+  - **Database**: Migrasi sudah dijalankan (`php artisan migrate --force`). Kolom `device_name` (nullable string) dan `device_identifier` (nullable string) sudah ada di tabel `certificates`.
+  - **Zero-Trust**: Private key TIDAK pernah dikirim ke server. Enkripsi `.tsign` dilakukan 100% client-side menggunakan WebCrypto API (PBKDF2+AES-GCM) dengan App-Level Salt `TrustLessSign_Identity_v1_DO_NOT_MODIFY`. Format file memiliki magic header `TSGN` (4 byte) untuk validasi.
+  - **Multi-Device**: User dapat memiliki banyak sertifikat aktif (satu per device). Sertifikat lama TIDAK dicabut saat menambah device baru.
+  - **Revocation**: User dapat mencabut sertifikat per-serial melalui route baru `POST /certificates/{serial}/revoke`. Admin masih bisa menggunakan route admin lama.
+  - **Google Drive**: File `.tsign` disimpan di `TrustLessSign/Certificated/<timestamp>.tsign`.
+  - **NEXT STEP**: Frontend web (Vite build) perlu di-rebuild oleh user. Perintah: `docker exec trustlesssign-app sh -c "cd /var/www/html && npm run build"`. Kemudian tag dan push: `git tag ext-v1.2.0 && git push origin main --tags`.
+

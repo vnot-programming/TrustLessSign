@@ -6,23 +6,29 @@ import { LogOut, FileSignature, UploadCloud, ShieldCheck, AlertTriangle, Key, Lo
 import axios from 'axios';
 
 export default function Dashboard() {
-  const { auth, activeCertificate, messages, versionName, extensionMinVersion } = usePage().props;
+  const { auth, activeCertificate, activeCertificates, messages, versionName, extensionMinVersion } = usePage().props;
   const user = auth.user;
+  // Multi-device: activeCertificates is the array, activeCertificate is the first (newest) for backward compat
+  const certs = activeCertificates || (activeCertificate ? [activeCertificate] : []);
+  const hasCerts = certs.length > 0;
 
   // States
-  const [modalOpen, setModalOpen] = useState(false);
-  const [confirmText, setConfirmText] = useState('');
-  const [password, setPassword] = useState('');
+  const [modalOpen, setModalOpen]   = useState(false);
+  const [confirmText, setConfirmText]   = useState('');
+  const [password, setPassword]         = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [deviceName, setDeviceName]     = useState('');
+  const [loading, setLoading]           = useState(false);
+  const [success, setSuccess]           = useState(false);
+  const [errorMsg, setErrorMsg]         = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, outdated: false });
-  const [extensionModalOpen, setExtensionModalOpen] = useState(false);
+  const [extensionModalOpen, setExtensionModalOpen]     = useState(false);
   const [extensionOutdatedOpen, setExtensionOutdatedOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword]     = useState(false);
+  const [revokeTarget, setRevokeTarget]     = useState(null); // { serial_number, device_name }
+  const [revokeLoading, setRevokeLoading]   = useState(false);
+  const [revokeError, setRevokeError]       = useState('');
 
-  // Translation keys - Dashboard section
   const t = messages?.Dashboard || {
     welcome_back: "Welcome Back",
     sign_new_doc: "Sign New Document",
@@ -32,36 +38,42 @@ export default function Dashboard() {
     cert_active: "Certificate Active",
     cert_none: "No Active Certificate",
     cert_none_desc: "Generate a certificate to sign documents offline with cryptographic certainty.",
-    btn_regenerate: "Re-generate / Replace Certificate",
+    btn_add_device: "Add New Device Certificate",
     btn_generate: "Generate Certificate",
+    btn_regenerate: "Add New Device Certificate",
     logout: "Logout",
-    warning_title: "⚠️ CRITICAL SECURITY WARNING!",
-    warning_desc: "You already have an active certificate registered in the system.",
-    warning_continue: "If you continue to create/replace with a new certificate:",
-    warning_item1: "Your old certificate will automatically be",
-    warning_item1_strong: "REVOKED",
-    warning_item2: "ALL PDF documents you have previously signed will become",
-    warning_item2_strong: "INVALID",
-    warning_item2_suffix: "when others verify them.",
-    warning_item3: "The status of old documents will change to",
-    warning_item3_strong: '"CERTIFICATE REVOKED"',
-    warning_confirm: "Are you sure you want to continue?",
+    warning_title: "ℹ️ Adding New Device Certificate",
+    warning_desc: "You already have an active certificate on another device.",
+    warning_continue: "With multi-device architecture:",
+    warning_item1: "Old certificates will remain",
+    warning_item1_strong: "ACTIVE",
+    warning_item2: "Documents signed on other devices remain",
+    warning_item2_strong: "VALID",
+    warning_item2_suffix: "and verifiable.",
+    warning_item3: "Each device has its own independent",
+    warning_item3_strong: '"CERTIFICATE"',
+    warning_confirm: "Generate a new certificate for this device?",
     confirm_label: 'Type "I UNDERSTAND" to continue',
     confirm_placeholder: "I UNDERSTAND",
     confirm_keyword: "I UNDERSTAND",
-    create_new_key: "Create New Key",
+    create_new_key: "Add This Device",
     generate_secure_key: "Generate Secure Key",
+    device_name_label: "Device Name (Optional)",
+    device_name_placeholder: "e.g. Work Laptop, Home PC...",
     new_cert_password: "New Certificate Password (Min 8 Characters)",
     new_password_placeholder: "Enter new password...",
     confirm_password_label: "Confirm New Password",
     confirm_password_placeholder: "Confirm new password...",
     password_min_length: "Password must be at least 8 characters",
     btn_cancel: "CANCEL",
-    btn_yes_replace: "YES, REPLACE CERTIFICATE",
+    btn_yes_replace: "ADD DEVICE CERTIFICATE",
     btn_generate_cert: "GENERATE CERTIFICATE",
     cert_issued: "Certificate Issued!",
     cert_issued_desc: "Your certificate and secure key have been generated and saved locally.",
     extension_alert: "TrustlessSign Extension is required. Please install the extension first.",
+    devices_title: "Active Devices",
+    device_serial: "Serial",
+    device_expires: "Expires",
   };
 
   // Compare semver strings — returns true if installed < required
@@ -121,6 +133,7 @@ export default function Dashboard() {
     setConfirmText('');
     setPassword('');
     setConfirmPassword('');
+    setDeviceName('');
     setErrorMsg('');
     setSuccess(false);
   };
@@ -181,9 +194,10 @@ export default function Dashboard() {
       window.postMessage({
         type: 'TRUSTLESS_GENERATE_KEY_REQUEST',
         payload: {
-          password: password,
-          email: user.email,
-          apiToken: token
+          password:   password,
+          deviceName: deviceName || 'Dashboard',
+          email:      user.email,
+          apiToken:   token
         }
       }, '*');
 
@@ -191,6 +205,24 @@ export default function Dashboard() {
       console.error(err);
       setErrorMsg(err.response?.data?.message || "Failed to initiate certificate generation.");
       setLoading(false);
+    }
+  };
+
+  // Revoke a specific certificate by serial number
+  const handleRevoke = async () => {
+    if (!revokeTarget) return;
+    setRevokeLoading(true);
+    setRevokeError('');
+    try {
+      await axios.post(`/certificates/${revokeTarget.serial_number}/revoke`, {
+        reason: 'Revoked by user from Dashboard'
+      });
+      setRevokeTarget(null);
+      router.reload();
+    } catch (err) {
+      setRevokeError(err.response?.data?.message || 'Failed to revoke certificate.');
+    } finally {
+      setRevokeLoading(false);
     }
   };
 
@@ -222,28 +254,66 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold mb-6">{t.welcome_back}</h1>
           
           {/* Certificate Management Section */}
-          <div className="glass-panel p-6 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${activeCertificate ? 'bg-accent-success-soft text-accent-success' : 'bg-accent-warning-soft text-accent-warning'}`}>
-                <ShieldCheck size={24} />
+          <div className="glass-panel p-6 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
+                  hasCerts ? 'bg-accent-success-soft text-accent-success' : 'bg-accent-warning-soft text-accent-warning'
+                }`}>
+                  <ShieldCheck size={24} />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-bold text-lg leading-none">
+                    {hasCerts ? t.cert_active : t.cert_none}
+                  </h3>
+                  <p className="text-sm text-text-secondary leading-normal">
+                    {hasCerts
+                      ? `${certs.length} active device${certs.length > 1 ? 's' : ''}`
+                      : t.cert_none_desc}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <h3 className="font-bold text-lg leading-none">
-                  {activeCertificate ? t.cert_active : t.cert_none}
-                </h3>
-                <p className="text-sm text-text-secondary leading-normal">
-                  {activeCertificate 
-                    ? `Serial: ${activeCertificate.serial_number} (Expires: ${new Date(activeCertificate.expires_at).toLocaleDateString()})` 
-                    : t.cert_none_desc}
-                </p>
-              </div>
+              <button
+                onClick={handleCertificateAction}
+                className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all focus:ring focus:outline-none cursor-pointer shrink-0 ${
+                  hasCerts
+                    ? 'bg-accent-primary text-white hover:bg-opacity-90'
+                    : 'bg-accent-success text-white hover:bg-opacity-90'
+                }`}
+              >
+                {hasCerts ? (t.btn_add_device || 'Add Device') : t.btn_generate}
+              </button>
             </div>
-            <button 
-              onClick={handleCertificateAction}
-              className={`px-6 py-3 rounded-lg font-bold text-sm transition-all focus:ring focus:outline-none cursor-pointer ${activeCertificate ? 'bg-accent-danger text-white hover:bg-opacity-90' : 'bg-accent-success text-white hover:bg-opacity-90'}`}
-            >
-              {activeCertificate ? t.btn_regenerate : t.btn_generate}
-            </button>
+
+            {/* Multi-device certificate list */}
+            {hasCerts && (
+              <div className="mt-3 space-y-2 border-t border-border-subtle pt-4">
+                <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">{t.devices_title || 'Active Devices'}</p>
+                {certs.map((cert, idx) => (
+                  <div key={cert.serial_number} className="flex items-center justify-between p-3 bg-surface-secondary rounded-lg border border-border-subtle text-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-accent-primary-soft text-accent-primary flex items-center justify-center text-xs font-bold">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-text-primary">
+                          {cert.device_name || 'Unknown Device'}
+                        </p>
+                        <p className="text-xs text-text-tertiary">
+                          {t.device_serial || 'Serial'}: {cert.serial_number?.slice(0, 12)}… · {t.device_expires || 'Expires'}: {new Date(cert.expires_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { setRevokeTarget(cert); setRevokeError(''); }}
+                      className="text-xs px-2.5 py-1 rounded-md border border-accent-danger text-accent-danger hover:bg-accent-danger hover:text-white transition-all font-semibold shrink-0"
+                    >
+                      {t.btn_revoke || 'Revoke'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -344,13 +414,12 @@ export default function Dashboard() {
               </div>
             ) : (
               <>
-                {activeCertificate && (
+                {hasCerts && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3 text-accent-danger">
-                      <AlertTriangle size={28} />
-                      <h2 className="text-xl font-bold tracking-tight">{t.warning_title}</h2>
+                    <div className="flex items-center gap-3 text-accent-primary">
+                      <Key size={20} />
+                      <h2 className="text-lg font-bold tracking-tight">{t.warning_title}</h2>
                     </div>
-                    
                     <div className="text-sm text-text-secondary space-y-2 leading-relaxed">
                       <p>{t.warning_desc}</p>
                       <p className="font-semibold text-text-primary">{t.warning_continue}</p>
@@ -361,13 +430,12 @@ export default function Dashboard() {
                       </ol>
                       <p className="font-semibold mt-4">{t.warning_confirm}</p>
                     </div>
-
                     <div className="space-y-2">
                       <label className="block text-xs font-semibold text-text-secondary">{t.confirm_label}</label>
-                      <input 
-                        type="text" 
-                        value={confirmText} 
-                        onChange={(e) => setConfirmText(e.target.value)} 
+                      <input
+                        type="text"
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
                         placeholder={t.confirm_placeholder}
                         className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
                       />
@@ -378,9 +446,22 @@ export default function Dashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-accent-primary">
                     <Key size={20} />
-                    <h3 className="font-bold text-lg">{activeCertificate ? t.create_new_key : t.generate_secure_key}</h3>
+                    <h3 className="font-bold text-lg">{hasCerts ? t.create_new_key : t.generate_secure_key}</h3>
                   </div>
 
+                  {/* Device Name */}
+                  <div className="space-y-1">
+                    <label className="block text-xs font-semibold text-text-secondary">{t.device_name_label || 'Device Name (Optional)'}</label>
+                    <input
+                      type="text"
+                      value={deviceName}
+                      onChange={(e) => setDeviceName(e.target.value)}
+                      placeholder={t.device_name_placeholder || 'e.g. Work Laptop, Home PC...'}
+                      className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Password */}
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-text-secondary">{t.new_cert_password}</label>
                     <div className="relative">
@@ -403,6 +484,7 @@ export default function Dashboard() {
                       <p className="text-xs text-accent-danger">{t.password_min_length}</p>
                     )}
                   </div>
+
 
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-text-secondary">{t.confirm_password_label}</label>
@@ -439,18 +521,18 @@ export default function Dashboard() {
                   >
                     {t.btn_cancel}
                   </button>
-                  <button 
+                  <button
                     disabled={
-                      (activeCertificate && confirmText !== t.confirm_keyword) || 
-                      password.length < 8 || 
-                      password !== confirmPassword || 
+                      (hasCerts && confirmText !== t.confirm_keyword) ||
+                      password.length < 8 ||
+                      password !== confirmPassword ||
                       loading
                     }
                     onClick={handleGenerateCertificate}
-                    className="px-4 py-2 bg-accent-danger text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                    className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {loading && <Loader2 className="animate-spin" size={16} />}
-                    {activeCertificate ? t.btn_yes_replace : t.btn_generate_cert}
+                    {hasCerts ? (t.btn_yes_replace || 'ADD DEVICE CERTIFICATE') : t.btn_generate_cert}
                   </button>
                 </div>
               </>
@@ -535,6 +617,44 @@ export default function Dashboard() {
                 className="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors cursor-pointer"
               >
                 {t.btn_cancel || "CANCEL"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revoke Certificate Confirmation Modal */}
+      {revokeTarget && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass-panel max-w-sm w-full p-6 space-y-4 bg-surface-elevated animate-fade-in">
+            <div className="flex items-center gap-3 text-accent-danger">
+              <AlertTriangle size={24} />
+              <h2 className="text-lg font-bold">{t.revoke_title || 'Revoke Certificate'}</h2>
+            </div>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              {t.revoke_desc || 'Are you sure you want to revoke the certificate for'}{' '}
+              <strong className="text-text-primary">{revokeTarget.device_name || 'this device'}</strong>?
+              {' '}{t.revoke_warning || 'Documents signed with this certificate will become unverifiable.'}
+            </p>
+            <p className="text-xs text-text-tertiary font-mono">Serial: {revokeTarget.serial_number}</p>
+            {revokeError && (
+              <p className="text-xs text-accent-danger bg-accent-danger-soft p-2 rounded border border-accent-danger">{revokeError}</p>
+            )}
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                disabled={revokeLoading}
+                onClick={() => setRevokeTarget(null)}
+                className="px-4 py-2 border border-border-default rounded-md text-sm font-semibold hover:bg-surface-secondary transition-colors cursor-pointer"
+              >
+                {t.btn_cancel || 'Cancel'}
+              </button>
+              <button
+                disabled={revokeLoading}
+                onClick={handleRevoke}
+                className="px-4 py-2 bg-accent-danger text-white rounded-md text-sm font-semibold hover:bg-opacity-90 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              >
+                {revokeLoading && <Loader2 className="animate-spin" size={16} />}
+                {t.btn_revoke_confirm || 'Yes, Revoke'}
               </button>
             </div>
           </div>

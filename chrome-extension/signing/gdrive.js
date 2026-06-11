@@ -125,3 +125,54 @@ async function uploadToGDrive(filename, signedPdfStr, gdriveToken) {
 
   return `https://drive.google.com/file/d/${fileId}/view`;
 }
+
+/**
+ * Upload an encrypted .tsign identity backup to Google Drive
+ * Stored in: TrustLessSign/Certificated/<fileName>
+ */
+async function uploadIdentityToDrive(fileName, tsignBase64, gdriveToken) {
+  // 1. Get or create root "TrustLessSign" folder
+  const rootFolderId = await getOrCreateFolder('TrustLessSign', null, gdriveToken);
+
+  // 2. Get or create "Certificated" subfolder
+  const certFolderId = await getOrCreateFolder('Certificated', rootFolderId, gdriveToken);
+
+  // 3. Upload .tsign as binary/octet-stream
+  const meta = {
+    name: fileName,
+    mimeType: 'application/octet-stream',
+    parents: [certFolderId]
+  };
+
+  const boundary     = '314159265358979323846tsign';
+  const delimiter    = `\r\n--${boundary}\r\n`;
+  const closeDelimiter = `\r\n--${boundary}--`;
+
+  let multipartBody = '';
+  multipartBody += delimiter;
+  multipartBody += 'Content-Type: application/json; charset=UTF-8\r\n\r\n';
+  multipartBody += JSON.stringify(meta);
+  multipartBody += delimiter;
+  multipartBody += 'Content-Type: application/octet-stream\r\n';
+  multipartBody += 'Content-Transfer-Encoding: base64\r\n\r\n';
+  multipartBody += tsignBase64;
+  multipartBody += closeDelimiter;
+
+  const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${gdriveToken}`,
+      'Content-Type': `multipart/related; boundary=${boundary}`
+    },
+    body: multipartBody
+  });
+
+  if (!uploadRes.ok) {
+    const errorText = await uploadRes.text();
+    throw new Error(`Identity backup upload failed: ${errorText}`);
+  }
+
+  const uploadData = await uploadRes.json();
+  return uploadData.name;
+}
+

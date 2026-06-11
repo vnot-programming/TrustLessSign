@@ -16,6 +16,8 @@ class Certificate extends Model
         'user_id',
         'serial_number',
         'subject_cn',
+        'device_name',
+        'device_identifier',
         'cert_pem',
         'issued_at',
         'expires_at',

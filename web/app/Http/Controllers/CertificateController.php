@@ -69,38 +69,35 @@ class CertificateController extends Controller
 
     /**
      * Issue User Certificate from CSR (Authenticated Extension)
+     * 
+     * Multi-Device Architecture: Sertifikat baru TIDAK menggantikan sertifikat lama.
+     * Setiap perangkat dapat memiliki sertifikat aktif secara bersamaan.
      */
     public function issue(Request $request)
     {
         $request->validate([
-            'csr_pem' => 'required|string',
+            'csr_pem'           => 'required|string',
+            'device_name'       => 'nullable|string|max:128',
+            'device_identifier' => 'nullable|string|max:64',
         ]);
 
         try {
-            // Automatically revoke existing active certificate if any
-            Certificate::where('user_id', $request->user()->id)
-                ->where('is_revoked', false)
-                ->where('expires_at', '>', now())
-                ->update([
-                    'is_revoked' => true,
-                    'revoked_at' => now(),
-                    'revoke_reason' => 'Replaced by user',
-                ]);
-
             // Issue using PKI service
             $certData = $this->caManager->issueUserCertificate($request->user()->id, $request->csr_pem);
 
             $cert = Certificate::create([
-                'user_id' => $request->user()->id,
-                'serial_number' => $certData['serial_number'],
-                'subject_cn' => $certData['subject_cn'],
-                'cert_pem' => $certData['cert_pem'],
-                'expires_at' => $certData['expires_at'],
-                'is_revoked' => false,
+                'user_id'           => $request->user()->id,
+                'serial_number'     => $certData['serial_number'],
+                'subject_cn'        => $certData['subject_cn'],
+                'device_name'       => $request->input('device_name'),
+                'device_identifier' => $request->input('device_identifier'),
+                'cert_pem'          => $certData['cert_pem'],
+                'expires_at'        => $certData['expires_at'],
+                'is_revoked'        => false,
             ]);
 
             return response()->json([
-                'message' => 'Certificate issued successfully.',
+                'message'     => 'Certificate issued successfully.',
                 'certificate' => $cert
             ], 201);
 
@@ -110,23 +107,29 @@ class CertificateController extends Controller
     }
 
     /**
-     * Get active certificate details of currently logged-in user (Authenticated Extension)
+     * Get ALL active certificates of currently logged-in user (Authenticated Extension)
+     * Returns an array — supports multi-device architecture.
      */
     public function myCertificate(Request $request)
     {
-        $cert = Certificate::where('user_id', $request->user()->id)
+        $certs = Certificate::where('user_id', $request->user()->id)
             ->where('is_revoked', false)
             ->where('expires_at', '>', now())
             ->orderBy('issued_at', 'desc')
-            ->first();
+            ->get();
 
-        if (!$cert) {
-            return response()->json(['message' => 'No active certificate found.', 'has_certificate' => false], 200);
+        if ($certs->isEmpty()) {
+            return response()->json([
+                'message'         => 'No active certificate found.',
+                'has_certificate' => false,
+                'certificates'    => []
+            ], 200);
         }
 
-        $certArray = $cert->toArray();
-        $certArray['has_certificate'] = true;
-        return response()->json($certArray, 200);
+        return response()->json([
+            'has_certificate' => true,
+            'certificates'    => $certs,
+        ], 200);
     }
 
     /**
@@ -139,20 +142,20 @@ class CertificateController extends Controller
         }
 
         $request->validate([
-            'common_name' => 'nullable|string|max:255',
-            'country' => 'nullable|string|size:2',
+            'common_name'  => 'nullable|string|max:255',
+            'country'      => 'nullable|string|size:2',
             'organization' => 'nullable|string|max:255',
         ]);
 
         try {
-            $commonName = $request->input('common_name', 'TrustlessSign Root CA');
-            $country = $request->input('country', 'ID');
+            $commonName   = $request->input('common_name', 'TrustlessSign Root CA');
+            $country      = $request->input('country', 'ID');
             $organization = $request->input('organization', 'TrustlessSign');
 
             $result = $this->caManager->bootstrapCA($commonName, $country, $organization);
 
             return response()->json([
-                'message' => 'Root CA bootstrapped successfully.',
+                'message'          => 'Root CA bootstrapped successfully.',
                 'root_certificate' => $result['cert']
             ]);
         } catch (Exception $e) {
@@ -161,7 +164,41 @@ class CertificateController extends Controller
     }
 
     /**
-     * Revoke User Certificate (Admin Only)
+     * Revoke a specific certificate by serial number (User Self-Service)
+     * Pengguna hanya bisa mencabut sertifikat milik dirinya sendiri.
+     */
+    public function revokeOwn(Request $request, $serial)
+    {
+        $request->validate([
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $cert = Certificate::where('serial_number', $serial)
+            ->where('user_id', $request->user()->id) // Pastikan milik user sendiri
+            ->first();
+
+        if (!$cert) {
+            return response()->json(['message' => 'Certificate not found or not owned by you.'], 404);
+        }
+
+        if ($cert->is_revoked) {
+            return response()->json(['message' => 'Certificate is already revoked.'], 400);
+        }
+
+        $cert->update([
+            'is_revoked'    => true,
+            'revoked_at'    => now(),
+            'revoke_reason' => $request->input('reason', 'Revoked by user'),
+        ]);
+
+        return response()->json([
+            'message'     => 'Certificate revoked successfully.',
+            'certificate' => $cert
+        ]);
+    }
+
+    /**
+     * Revoke any certificate by serial number (Admin Only)
      */
     public function revoke(Request $request, $serial)
     {
@@ -183,13 +220,13 @@ class CertificateController extends Controller
         }
 
         $cert->update([
-            'is_revoked' => true,
-            'revoked_at' => now(),
+            'is_revoked'    => true,
+            'revoked_at'    => now(),
             'revoke_reason' => $request->input('reason', 'Revoked by admin'),
         ]);
 
         return response()->json([
-            'message' => 'Certificate revoked successfully.',
+            'message'     => 'Certificate revoked successfully.',
             'certificate' => $cert
         ]);
     }

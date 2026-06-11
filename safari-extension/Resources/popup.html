@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <title>TrustlessSign</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="assets/pdf.min.js"></script>
-  <script src="assets/qrious.min.js"></script>
+  <script src="../assets/pdf.min.js"></script>
+  <script src="../assets/qrious.min.js"></script>
   <style>
     /* Bio-Digital Minimalism Design Tokens (HSL calibrated) */
     :root {
@@ -170,21 +170,22 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      height: 100%;
+    }
     body {
       width: 100%;
       height: 100%;
       font-family: 'Outfit', sans-serif;
       background-color: var(--surface-primary);
       color: var(--text-primary);
-      overflow-x: hidden;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
-
-    /* Set default popup size when in small view */
     body.popup-view {
-      width: 360px;
-      height: 520px;
+      width: 400px;
+      height: 600px;
     }
 
     header {
@@ -248,6 +249,29 @@
       border-radius: 10px;
       padding: 16px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-google {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      background-color: #ffffff;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-google:hover {
+      background-color: #f8f9fa;
+      box-shadow: 0 1px 2px 0 rgba(60,64,67,0.30), 0 1px 3px 1px rgba(60,64,67,0.15);
     }
 
     .btn-primary {
@@ -316,6 +340,30 @@
 
     .form-control:focus {
       border-color: var(--accent-primary);
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-wrapper .form-control {
+      padding-right: 40px;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .toggle-password:hover {
+      color: var(--text-primary);
     }
 
     /* Tabs Layout */
@@ -435,6 +483,54 @@
       display: inline-block;
       animation: spin 2s linear infinite;
     }
+    /* Footer */
+    .popup-footer {
+      margin: 0 16px 16px 16px;
+      padding: 12px;
+      text-align: center;
+      background-color: var(--surface-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 0.75rem;
+    }
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .footer-btn {
+      background: none;
+      border: 1px solid var(--border-subtle);
+      border-radius: 99px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-btn:hover {
+      border-color: var(--text-primary);
+      color: var(--text-primary);
+      background-color: var(--surface-elevated);
+    }
+    .footer-bottom-text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+    .heart {
+      color: #e25555;
+    }
   </style>
 </head>
 <body class="popup-view">
@@ -522,22 +618,26 @@
 
   <main>
     <!-- LOGIN VIEW -->
-    <div id="view-login" class="glass-card space-y-4">
+    <div id="view-login" class="glass-card space-y-4 hidden">
       <div class="text-center" style="margin-bottom: 16px;">
         <h3 style="font-weight: 700; font-size: 1.1rem; margin-bottom: 6px;">Sign In</h3>
         <p style="font-size: 0.75rem; color: var(--text-secondary);">Authentication is required to register signed documents.</p>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" style="display: none;">
         <label>Backend URL</label>
         <input type="text" id="login-url" class="form-control" value="https://tsign.vnot.my.id">
       </div>
 
-      <button id="btn-login-google" class="btn-primary">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><path d="M8 12h8"/>
+      <button id="btn-login-google" class="btn-google">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 18px; height: 18px; background-color: white; border-radius: 50%; padding: 2px;">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+          <path fill="none" d="M0 0h48v48H0z"></path>
         </svg>
-        Login via Google
+        Sign in with Google
       </button>
       
       <div id="login-status" style="margin-top: 12px; font-size: 0.75rem; color: var(--accent-danger); text-align: center;"></div>
@@ -606,7 +706,12 @@
         <!-- Master Password -->
         <div class="form-group">
           <label>Master Password</label>
-          <input type="password" id="sign-password" class="form-control" placeholder="Certificate password...">
+          <div class="password-wrapper">
+            <input type="password" id="sign-password" class="form-control" placeholder="Certificate password...">
+            <button type="button" class="toggle-password" data-target="sign-password" title="Show/Hide Password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
         </div>
 
         <button id="btn-sign-submit" class="btn-primary">
@@ -624,7 +729,7 @@
           <p style="font-size: 0.7rem; color: var(--text-secondary);">Your document has been signed cryptographically.</p>
           <div style="display: flex; gap: 8px; margin-top: 12px; width: 100%;">
             <button id="btn-download-signed" class="btn-primary" style="flex: 1; margin-top: 0;">
-              Download Signed PDF
+              Download
             </button>
             <a id="btn-view-drive" href="#" target="_blank" class="btn-secondary hidden" style="flex: 1; margin-top: 0; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -632,7 +737,7 @@
                 <polyline points="15 3 21 3 21 9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
               </svg>
-              <span id="btn-view-drive-text">View in Drive</span>
+              <span id="btn-view-drive-text">View</span>
             </a>
           </div>
         </div>
@@ -640,24 +745,55 @@
 
       <!-- TAB 2: KEYS CONTENT -->
       <div id="content-keys" class="tab-content space-y-4">
+        <!-- Cert Status Badge -->
         <div class="glass-card text-center space-y-2" style="background-color: var(--surface-secondary);">
           <div id="cert-status-badge" style="font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 12px; display: inline-block;">Checking Cert...</div>
           <p id="cert-expiry-text" style="font-size: 0.7rem; color: var(--text-secondary);"></p>
         </div>
 
+        <!-- Generate New Certificate Panel -->
         <div id="panel-keygen" class="space-y-3">
           <div class="form-group">
+            <label>Device Name (Optional)</label>
+            <input type="text" id="keygen-device-name" class="form-control" placeholder="e.g. MacBook Air, PC Kantor...">
+          </div>
+          <div class="form-group">
             <label>Master Password (Min 8 characters)</label>
-            <input type="password" id="keygen-password" class="form-control" placeholder="Enter key password...">
+            <div class="password-wrapper">
+              <input type="password" id="keygen-password" class="form-control" placeholder="Enter key password...">
+              <button type="button" class="toggle-password" data-target="keygen-password" title="Show/Hide Password">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
           </div>
           <div class="form-group">
             <label>Confirm Master Password</label>
-            <input type="password" id="keygen-confirm" class="form-control" placeholder="Confirm key password...">
+            <div class="password-wrapper">
+              <input type="password" id="keygen-confirm" class="form-control" placeholder="Confirm key password...">
+              <button type="button" class="toggle-password" data-target="keygen-confirm" title="Show/Hide Password">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
           </div>
           
           <button id="btn-generate-cert" class="btn-primary">
             Generate New Certificate
           </button>
+        </div>
+
+        <!-- Identity Backup & Import Actions -->
+        <div id="panel-identity-actions" class="space-y-2" style="border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-top: 4px;">
+          <p style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Identity Backup</p>
+          <button id="btn-backup-drive" class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Backup to Drive (.tsign)
+          </button>
+          <button id="btn-import-identity" class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import Identity (.tsign)
+          </button>
+          <!-- Hidden file input for .tsign import -->
+          <input type="file" id="import-tsign-file" accept=".tsign" class="hidden">
         </div>
         
         <div id="keys-status" class="alert alert-danger hidden"></div>
@@ -698,6 +834,21 @@
       </div>
     </div>
   </div>
+
+  <footer class="popup-footer">
+    <div class="footer-actions">
+      <button id="supportBtn" class="footer-btn footer-btn--support">
+        <span>☕</span> Support Development
+      </button>
+      <button id="privacyBtn" class="footer-btn footer-btn--privacy">
+        <span>🔒</span> Privacy Policy
+      </button>
+    </div>
+    <div class="footer-bottom-text" style="color: var(--text-tertiary); font-weight: 500; display: flex; flex-direction: column; gap: 4px;">
+      <span>TrustlessSign Extension - Version <span id="extensionVersion">1.0.0</span></span>
+      <span style="font-size: 0.75rem; font-weight: normal; margin-top: 2px;">Jazakumullah Khairan 🙏</span>
+    </div>
+  </footer>
 
   <script src="popup.js"></script>
 </body>
