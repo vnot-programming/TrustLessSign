@@ -173,6 +173,10 @@ async function uploadIdentityToDrive(fileName, tsignBase64, gdriveToken) {
   }
 
   const uploadData = await uploadRes.json();
-  return uploadData.name;
+  return {
+    name: uploadData.name,
+    id: uploadData.id,
+    url: `https://drive.google.com/file/d/${uploadData.id}/view`
+  };
 }
 

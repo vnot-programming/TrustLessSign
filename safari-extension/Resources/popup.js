@@ -622,17 +622,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             keysStatus.classList.add('alert-success');
             
             let successMsg = `<strong>Success!</strong> Certificate generated and registered.`;
-            if (res.driveSuccess) {
+            if (res.driveSuccess && res.driveUrl) {
               successMsg += `<br>✅ Auto-backed up to your Google Drive.`;
-            }
-
-            if (res.tsignBase64) {
-              successMsg += `<br><button id="btnDownloadTsign" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-primary); color: var(--accent-primary);">⬇️ Download Backup (.tsign)</button>`;
+              successMsg += `<br><button id="btnOpenDriveTsign" data-url="${res.driveUrl}" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-success); color: var(--accent-success);">📂 Open Google Drive Backup</button>`;
+            } else if (res.tsignBase64) {
+              successMsg += `<br><button id="btnDownloadTsign" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-primary); color: var(--accent-primary);">⬇️ Download Local Backup (.tsign)</button>`;
             }
 
             keysStatus.innerHTML = successMsg;
 
-            if (res.tsignBase64) {
+            if (res.driveSuccess && res.driveUrl) {
+              document.getElementById('btnOpenDriveTsign').addEventListener('click', (e) => {
+                window.open(e.target.getAttribute('data-url'), '_blank');
+              });
+            } else if (res.tsignBase64) {
               document.getElementById('btnDownloadTsign').addEventListener('click', () => {
                 const blob = base64ToBlob(res.tsignBase64, 'application/octet-stream');
                 const url = URL.createObjectURL(blob);
@@ -706,7 +709,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               if (res && res.status === 'success') {
                 keysStatus.classList.remove('hidden', 'alert-danger');
                 keysStatus.classList.add('alert-success');
-                keysStatus.textContent = `✔ Identity backed up to Google Drive: ${fileName}`;
+                keysStatus.innerHTML = `✔ Identity backed up to Google Drive: ${fileName}`;
+                if (res.gdriveUrl) {
+                  keysStatus.innerHTML += `<br><button id="btnOpenManualDrive" data-url="${res.gdriveUrl}" class="btn btn-sm btn-outline mt-2" style="width: 100%; border-color: var(--accent-success); color: var(--accent-success);">📂 Open in Google Drive</button>`;
+                  setTimeout(() => {
+                    const btn = document.getElementById('btnOpenManualDrive');
+                    if (btn) btn.addEventListener('click', (e) => {
+                      window.open(e.target.getAttribute('data-url'), '_blank');
+                    });
+                  }, 100);
+                }
               } else {
                 showKeysError('Failed to upload to Drive: ' + (res?.message || 'Unknown error'));
               }

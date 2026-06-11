@@ -94,6 +94,7 @@ async function handleGenerateKey(payload, baseUrl) {
   // 6. Automatically backup to Google Drive
   let tsignBase64Local = null;
   let fileNameLocal = null;
+  let driveUrlLocal = null;
   let driveSuccess = false;
 
   try {
@@ -116,8 +117,9 @@ async function handleGenerateKey(payload, baseUrl) {
       const ts = new Date().toISOString().replace(/[:.]/g, '-');
       fileNameLocal = `trustlesssign_identity_${ts}.tsign`;
       
-      await uploadIdentityToDrive(fileNameLocal, tsignBase64Local, token);
+      const uploadResult = await uploadIdentityToDrive(fileNameLocal, tsignBase64Local, token);
       driveSuccess = true;
+      driveUrlLocal = uploadResult.url;
       console.log('Successfully backed up identity to Google Drive.');
     }
   } catch (err) {
@@ -129,7 +131,8 @@ async function handleGenerateKey(payload, baseUrl) {
     serial: serialNumber,
     driveSuccess: driveSuccess,
     tsignBase64: tsignBase64Local,
-    fileName: fileNameLocal
+    fileName: fileNameLocal,
+    driveUrl: driveUrlLocal
   };
 }
 
@@ -333,7 +336,7 @@ async function handleUploadIdentity(payload) {
     throw new Error('Missing .tsign data or filename.');
   }
 
-  const uploadedName = await uploadIdentityToDrive(fileName, tsignBase64, gdriveToken);
-  return { status: 'success', fileName: uploadedName };
+  const uploadedData = await uploadIdentityToDrive(fileName, tsignBase64, gdriveToken);
+  return { status: 'success', fileName: uploadedData.name, gdriveUrl: uploadedData.url };
 }
 

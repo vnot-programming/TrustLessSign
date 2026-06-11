@@ -182,6 +182,7 @@ export default function Dashboard() {
             if (response.tsignBase64) {
               setBackupData({
                 driveSuccess: response.driveSuccess,
+                driveUrl: response.driveUrl,
                 tsignBase64: response.tsignBase64,
                 fileName: response.fileName
               });
@@ -443,14 +444,23 @@ export default function Dashboard() {
                 {backupData?.driveSuccess && (
                   <p className="text-sm text-accent-success font-medium">✅ Auto-backed up to your Google Drive.</p>
                 )}
-                {backupData?.tsignBase64 && (
+                {(backupData?.driveUrl || backupData?.tsignBase64) && (
                   <div className="mt-6 space-y-3">
-                    <button
-                      onClick={handleDownloadLocal}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface-tertiary border border-border-strong text-text-primary rounded-md hover:bg-surface-elevated hover:border-accent-primary transition-all font-semibold"
-                    >
-                      ⬇️ Download Backup (.tsign)
-                    </button>
+                    {backupData.driveUrl ? (
+                      <button
+                        onClick={() => window.open(backupData.driveUrl, '_blank')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface-tertiary border border-accent-success text-accent-success rounded-md hover:bg-surface-elevated transition-all font-semibold"
+                      >
+                        📂 Open Google Drive Backup
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleDownloadLocal}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-surface-tertiary border border-border-strong text-text-primary rounded-md hover:bg-surface-elevated hover:border-accent-primary transition-all font-semibold"
+                      >
+                        ⬇️ Download Local Backup (.tsign)
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setModalOpen(false);
