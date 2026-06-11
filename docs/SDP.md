@@ -296,3 +296,9 @@
 - **File yang diubah/dibuat:** `chrome-extension/background/service-worker.js`, `safari-extension/Resources/background.js`.
 - **Status saat ini:** Selesai (Version `ext-v1.2.7`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan sebuah *edge case* di mana blok `try-catch` saat men-generate file `.tsign` secara tidak sengaja terbungkus di dalam blok pengecekan eksistensi token `if (token) { ... }`. Hal ini menyebabkan Ekstensi tidak membuat file `.tsign` sama sekali jika pengguna belum login GDrive, sehingga tombol "Download Local Backup" tidak muncul pada halaman Web Dashboard maupun Ekstensi. Logika `encryptIdentityToTsign` sekarang telah digeser ke luar kondisi `token` sehingga file *blob* cadangan `.tsign` tetap ter-*generate* dan di-*return* secara independen meskipun Auto-Upload GDrive dibatalkan karena tidak ada sesi OAuth.
+
+- **Tanggal/Waktu:** 2026-06-11T15:30:00Z
+- **Tugas yang diselesaikan:** Fix Kontras Tombol pada Tampilan Ekstensi (Popup).
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`.
+- **Status saat ini:** Selesai (Version `ext-v1.2.8`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Tombol notifikasi sukses yang disisipkan melalui Javascript di Ekstensi sebelumnya memiliki atribut `style` *inline* warna hijau cerah (`var(--accent-success)` atau `var(--accent-primary)`) yang memiliki kontras sangat buruk saat diletakkan di atas *background* elemen kotak `.alert-success` yang berwarna cerah. Kode Javascript (`popup.js`) di Chrome dan Safari telah direvisi dengan menghapus *style inline* tersebut, dan digantikan dengan _class_ standar bawaan tema aplikasi, yaitu `.btn-primary` dan `.btn-secondary`.

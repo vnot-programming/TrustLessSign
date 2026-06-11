@@ -24,7 +24,7 @@ export default function Verify({ token }) {
   };
 
   useEffect(() => {
-    axios.get(`/api/v1/verify/${token}`)
+    axios.get(`/api/verify/${token}`)
       .then(res => {
         setData(res.data);
       })

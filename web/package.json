@@ -1,9 +1,9 @@
 {
     "name": "trustlesssign-web",
     "private": true,
-    "version": "1.2.0",
-    "version_name": "1.2.0",
-    "version_code": 120,
+    "version": "1.2.1",
+    "version_name": "1.2.1",
+    "version_code": 121,
     "type": "module",
     "scripts": {
         "build": "vite build",
