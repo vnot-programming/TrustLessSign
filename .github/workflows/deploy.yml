@@ -115,7 +115,7 @@ jobs:
               -o StrictHostKeyChecking=accept-new \
               -o ConnectTimeout=20 \
               -i ~/.ssh/id_ed25519 \
-              fflaksana@100.105.121.8 \
+              my@100.105.121.8 \
               'cd ~/Documents/~dev/iseng/TrustLessSign && git restore . && git pull origin main && echo "Macbook Air Sync complete" && git log --oneline -1'
           else
             echo "⚠️ Macbook Air is offline. Skipping Git sync."
@@ -163,28 +163,28 @@ jobs:
             echo "🟢 Macbook Air is online. Copying directories and keys via SCP..."
             
             # Create target directories on macOS target
-            ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 fflaksana@100.105.121.8 \
+            ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 my@100.105.121.8 \
               "mkdir -p ~/Documents/~dev/iseng/TrustLessSign/docs/scripts ~/Documents/~dev/iseng/TrustLessSign/pki-keys ~/Documents/~dev/iseng/TrustLessSign/secrets"
 
             # SCP directories content
             scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
               ${{ env.PROJECT_PATH }}/docs/scripts/* \
-              fflaksana@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/docs/scripts/ || true
+              my@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/docs/scripts/ || true
 
             scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
               ${{ env.PROJECT_PATH }}/pki-keys/* \
-              fflaksana@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/pki-keys/ || true
+              my@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/pki-keys/ || true
 
             scp -r -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
               ${{ env.PROJECT_PATH }}/secrets/* \
-              fflaksana@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/secrets/ || true
+              my@100.105.121.8:~/Documents/~dev/iseng/TrustLessSign/secrets/ || true
 
             # SCP individual files
             for file in docs/catatan.md docs/CI-CD.md docs/TrustlessSign_implementation_plan-v5.md docs/TrustlessSign_implementation_plan-v6.md; do
               if [ -f "${{ env.PROJECT_PATH }}/$file" ]; then
                 scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 -i ~/.ssh/id_ed25519 \
                   "${{ env.PROJECT_PATH }}/$file" \
-                  fflaksana@100.105.121.8:"~/Documents/~dev/iseng/TrustLessSign/$file"
+                  my@100.105.121.8:"~/Documents/~dev/iseng/TrustLessSign/$file"
               fi
             done
           else

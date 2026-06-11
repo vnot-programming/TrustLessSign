@@ -236,5 +236,5 @@
 - **Tugas yang diselesaikan:** Add Macbook Air Tailscale SSH & SCP sync with online detection fallback to CI/CD pipeline
 - **File yang diubah/dibuat:** `.github/workflows/deploy.yml`, `docs/SDP.md`
 - **Status saat ini:** Selesai
-- **Catatan untuk AI selanjutnya (Handoff Note):** Pengecekan status online Desktop-PC dan Macbook Air dilakukan dengan perintah `nc -z -w 3 <IP> 22` agar jika salah satu target offline/tidak aktif, proses sync dilewati (fallback) dan pipeline tidak error. Sync Ignored Files via SCP ke Macbook Air juga sudah ditambahkan dengan target folder `/Users/fflaksana/Documents/~dev/iseng/TrustLessSign` (`~/Documents/~dev/iseng/TrustLessSign`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Pengecekan status online Desktop-PC dan Macbook Air dilakukan dengan perintah `nc -z -w 3 <IP> 22` agar jika salah satu target offline/tidak aktif, proses sync dilewati (fallback) dan pipeline tidak error. Sync Ignored Files via SCP ke Macbook Air juga sudah ditambahkan dengan target folder `/Users/my/Documents/~dev/iseng/TrustLessSign` (`~/Documents/~dev/iseng/TrustLessSign`).
 
