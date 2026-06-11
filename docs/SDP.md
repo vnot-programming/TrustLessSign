@@ -126,3 +126,10 @@
 - **Status saat ini:** Selesai (Bumped version to 1.0.4)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Di dalam `popup.js`, pembacaan file PDF (`pdfjsLib.getDocument({ data: pdfUint8 })`) mendeteksi `ArrayBuffer` dan mentransfernya ke Web Worker PDF.js, menyebabkan ArrayBuffer asli ter-detach (size 0) sehingga gagal saat mencoba diconvert ke Base64 via `arrayBufferToBase64(currentFileBytes)`. Memperbaikinya dengan mem-passing `new Uint8Array(currentFileBytes.slice(0))` agar PDF.js mendapatkan salinan buffer (copy) dan bukan referensi aslinya. Sesuai instruksi pengguna, `showSignError()` di dalam blok `catch` ketika proses *signing* dihapus dan diganti dengan `console.error()` agar tidak membingungkan pengguna jika terjadi *runtime error* yang tidak terduga.
 
+- **Tanggal/Waktu:** 2026-06-11T04:45:00Z
+- **Tugas yang diselesaikan:** Fix missing QRious library in popup
+- **File yang diubah/dibuat:** `popup.html` (Chrome & Safari), `assets/qrious.min.js`, `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Bumped version to 1.0.5)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Library QRious sebelumnya tidak dilampirkan dalam file `popup.html` meski dipanggil di dalam `popup.js` sehingga menyebabkan *ReferenceError: QRious is not defined*. Telah diunduh library `qrious.min.js` ke dalam folder `assets/` dan ditambahkan ke dalam tag script pada `popup.html`.
+
+
