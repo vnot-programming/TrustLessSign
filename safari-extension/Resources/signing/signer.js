@@ -111,3 +111,78 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
     targetPageIdx: targetPageIdx
   };
 }
+
+// Helper: Convert ArrayBuffer to Base64 string
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+// ─── .TSIGN PROPRIETARY FORMAT CRYPTO ─────────────────────────────────────────
+const TSIGN_MAGIC    = new Uint8Array([0x54, 0x53, 0x47, 0x4E]); // "TSGN"
+const TSIGN_APP_SALT = 'TrustLessSign_Identity_v1_DO_NOT_MODIFY';
+
+async function deriveKeyFromPassword(password, salt) {
+  const enc        = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(password + TSIGN_APP_SALT),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: salt, iterations: 310000, hash: 'SHA-256' },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptIdentityToTsign(identityObj, password) {
+  const iv   = crypto.getRandomValues(new Uint8Array(12));
+  const salt = crypto.getRandomValues(new Uint8Array(32));
+  const key  = await deriveKeyFromPassword(password, salt);
+
+  const enc       = new TextEncoder();
+  const plaintext = enc.encode(JSON.stringify(identityObj));
+
+  const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plaintext);
+
+  const result = new Uint8Array(4 + 12 + 32 + ciphertext.byteLength);
+  result.set(TSIGN_MAGIC, 0);
+  result.set(iv,          4);
+  result.set(salt,        16);
+  result.set(new Uint8Array(ciphertext), 48);
+  return result.buffer;
+}
+
+async function decryptIdentityFromTsign(arrayBuffer, password) {
+  const data  = new Uint8Array(arrayBuffer);
+  if (data.length < 48) throw new Error('Invalid .tsign file: File too short.');
+  
+  const magic = data.slice(0, 4);
+  if (magic[0] !== TSIGN_MAGIC[0] || magic[1] !== TSIGN_MAGIC[1] || magic[2] !== TSIGN_MAGIC[2] || magic[3] !== TSIGN_MAGIC[3]) {
+    throw new Error('Invalid .tsign file. Not a TrustlessSign Identity file.');
+  }
+
+  const iv         = data.slice(4, 16);
+  const salt       = data.slice(16, 48);
+  const ciphertext = data.slice(48);
+
+  const key = await deriveKeyFromPassword(password, salt);
+
+  try {
+    const plaintextBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+    const dec = new TextDecoder();
+    return JSON.parse(dec.decode(plaintextBuffer));
+  } catch (err) {
+    throw new Error('Decryption failed. Incorrect Master Password or corrupted file.');
+  }
+}

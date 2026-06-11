@@ -91,6 +91,34 @@ async function handleGenerateKey(payload, baseUrl) {
     });
   });
 
+  // 6. Automatically backup to Google Drive
+  try {
+    const token = await new Promise((resolve) => {
+      chrome.identity.getAuthToken({ interactive: true }, (t) => {
+        if (chrome.runtime.lastError) resolve(null);
+        else resolve(t);
+      });
+    });
+
+    if (token) {
+      const identityObj = {
+        privateKey: encryptedPrivateKeyPem,
+        certificate: certificatePem,
+        serialNumber: serialNumber
+      };
+      
+      const tsignBuffer = await encryptIdentityToTsign(identityObj, password);
+      const tsignBase64 = arrayBufferToBase64(tsignBuffer);
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `trustlesssign_identity_${ts}.tsign`;
+      
+      await uploadIdentityToDrive(fileName, tsignBase64, token);
+      console.log('Successfully backed up identity to Google Drive.');
+    }
+  } catch (err) {
+    console.warn('Failed to auto-backup identity to GDrive:', err);
+  }
+
   return { status: 'success', serial: serialNumber };
 }
 
