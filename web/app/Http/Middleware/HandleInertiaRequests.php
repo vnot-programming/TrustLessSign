@@ -26,12 +26,20 @@ class HandleInertiaRequests extends Middleware
             $messages = json_decode(File::get($messagesPath), true);
         }
 
+        $packageJsonPath = base_path('package.json');
+        $versionName = '1.0.0-dev';
+        if (File::exists($packageJsonPath)) {
+            $packageData = json_decode(File::get($packageJsonPath), true);
+            $versionName = $packageData['version_name'] ?? $packageData['version'] ?? '1.0.0-dev';
+        }
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
             ],
             'locale' => $locale,
             'messages' => $messages,
+            'versionName' => $versionName,
         ]);
     }
 }

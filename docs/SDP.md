@@ -155,3 +155,9 @@
 - **File yang diubah/dibuat:** `signer.js` & `service-worker.js` (Chrome & Safari), `SignDocument.jsx`, `manifest.json`
 - **Status saat ini:** Selesai (Bumped version to 1.0.8)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan injeksi Metadata Standar PDF via *pdf-lib* (`setTitle`, `setAuthor`, `setKeywords`, `setCreator`, `setProducer`) menggunakan data nama file dan nama pengguna (Author) yang diumpan dari Web UI (`user.name`). Metadata `BaseUrl` tidak diinjeksikan karena tautan GDrive belum ada pada saat proses stempel/hash kriptografi PDF dilakukan. JSON parameter *verify_token* tetap dipertahankan utuh pada kolom `Subject` untuk kebutuhan verifikasi masa depan.
+
+- **Tanggal/Waktu:** 2026-06-11T06:15:00Z
+- **Tugas yang diselesaikan:** Add Version Footer to Dashboard & Update Monorepo Versioning Rules
+- **File yang diubah/dibuat:** `Dashboard.jsx`, `HandleInertiaRequests.php`, `.agents/rules/dev-trustlesssign.md`
+- **Status saat ini:** Selesai (Web Version: 1.0.1)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan *footer* penanda versi di halaman Dashboard (mengambil variabel dinamis `version_name` langsung dari file `web/package.json` menggunakan backend Laravel/Inertia). Selain itu, merevisi aturan internal `dev-trustlesssign.md` untuk menerapkan standar *Monorepo Versioning* di mana Web (Laravel) dan Ekstensi Browser diperlakukan sebagai entitas versi yang terpisah (Decoupled).

@@ -6,7 +6,7 @@ import { LogOut, FileSignature, UploadCloud, ShieldCheck, AlertTriangle, Key, Lo
 import axios from 'axios';
 
 export default function Dashboard() {
-  const { auth, activeCertificate, messages } = usePage().props;
+  const { auth, activeCertificate, messages, versionName } = usePage().props;
   const user = auth.user;
 
   // States
@@ -238,6 +238,11 @@ export default function Dashboard() {
             </div>
           </div>
         </main>
+
+        {/* Dashboard Footer */}
+        <footer className="p-4 mt-auto text-center text-sm font-medium text-text-tertiary">
+          <p>TrustlessSign Web - Version: {versionName}</p>
+        </footer>
       </div>
 
       {/* Certificate Modal */}
