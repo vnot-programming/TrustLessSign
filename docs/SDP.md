@@ -269,3 +269,8 @@
   - **Google Drive**: File `.tsign` disimpan di `TrustLessSign/Certificated/<timestamp>.tsign`.
   - **NEXT STEP**: Frontend web (Vite build) perlu di-rebuild oleh user. Perintah: `docker exec trustlesssign-app sh -c "cd /var/www/html && npm run build"`. Kemudian tag dan push: `git tag ext-v1.2.0 && git push origin main --tags`.
 
+- **Tanggal/Waktu:** 2026-06-11T14:20:00Z
+- **Tugas yang diselesaikan:** Bug Fixes Ekstensi (UI Label Overwriting, Missing Auto-Backup ke GDrive, dan Stray Return Statement).
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `chrome-extension/background/service-worker.js`, `chrome-extension/signing/signer.js`, `safari-extension/Resources/popup.js`, `safari-extension/Resources/background.js`, `safari-extension/Resources/signing/signer.js`.
+- **Status saat ini:** Selesai (Version `ext-v1.2.3`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Fungsionalitas pembuatan sertifikat lewat Web Dashboard sekarang akan secara otomatis men-trigger Service Worker untuk memaketkan file `.tsign` dan melakukan upload via OAuth Google Drive secara seamless. Hati-hati ketika memanipulasi function di `popup.js`, perhatikan sisa-sisa statement sebelumnya.

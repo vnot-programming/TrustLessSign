@@ -378,9 +378,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Check Auth Status
   const checkAuth = async () => {
-    chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl'], async (storage) => {
+    chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl', 'trustless_cert_serial'], async (storage) => {
       const token = storage.sanctumToken;
       const baseUrl = storage.baseUrl || loginUrlInput.value;
+      const localSerial = storage.trustless_cert_serial;
 
       if (!token) {
         showLoginView();
@@ -419,8 +420,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           const data = await meRes.json();
           // API kini mengembalikan array sertifikat (multi-device)
           if (data.has_certificate && data.certificates && data.certificates.length > 0) {
-            // Gunakan sertifikat pertama (terbaru) untuk status display
-            activeCert = data.certificates[0];
+            // Find the certificate that matches the local serial number
+            if (localSerial) {
+              activeCert = data.certificates.find(c => c.serial_number === localSerial);
+            }
+            // Fallback to first if local serial doesn't match any (e.g., revoked) or not set
+            if (!activeCert) {
+               // We actually shouldn't fallback to first if it's not our device!
+               // Let's only set it if it matches local, otherwise the extension has no active cert.
+               // However, to keep it backward compatible, if we don't have local serial but they have certs, let's just show no cert, they must import.
+               // So no fallback! 
+            }
           }
         }
         window.userHasCert = !!activeCert;
@@ -553,7 +563,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         certStatusBadge.textContent = trans.cert_active;
         certStatusBadge.style.backgroundColor = "var(--accent-primary-soft)";
         certStatusBadge.style.color = "var(--accent-primary)";
-        certExpiryText.textContent = `${trans.cert_expires}: ${new Date(activeCert.expires_at).toLocaleDateString()}`;
+        certExpiryText.innerHTML = `<strong>Device:</strong> ${activeCert.device_name || 'Unknown Device'}<br>${trans.cert_expires}: ${new Date(activeCert.expires_at).toLocaleDateString()}`;
         btnGenerateCert.textContent = trans.btn_regenerate;
       } else {
         certStatusBadge.textContent = trans.cert_none;
@@ -636,8 +646,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnBackupDrive) {
     btnBackupDrive.addEventListener('click', async () => {
-      chrome.storage.local.get(['privateKey', 'publicKey', 'cert', 'masterPasswordHash', 'gdriveToken'], async (storage) => {
-        if (!storage.privateKey || !storage.cert) {
+      chrome.storage.local.get(['trustless_private_key_enc', 'trustless_certificate', 'trustless_cert_serial', 'gdriveToken'], async (storage) => {
+        if (!storage.trustless_private_key_enc || !storage.trustless_certificate) {
           showKeysError('No identity found on this device. Generate a certificate first.');
           return;
         }
@@ -653,10 +663,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
           const tsignBlob = await encryptIdentityToTsign({
-            privateKey:         storage.privateKey,
-            publicKey:          storage.publicKey,
-            cert:               storage.cert,
-            masterPasswordHash: storage.masterPasswordHash,
+            privateKey:   storage.trustless_private_key_enc,
+            certificate:  storage.trustless_certificate,
+            serialNumber: storage.trustless_cert_serial
           }, password);
 
           // Upload to Google Drive folder TrustLessSign/Certificated/
@@ -727,10 +736,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Restore identity to chrome.storage.local
         chrome.storage.local.set({
-          privateKey:         identity.privateKey,
-          publicKey:          identity.publicKey,
-          cert:               identity.cert,
-          masterPasswordHash: identity.masterPasswordHash,
+          'trustless_private_key_enc': identity.privateKey,
+          'trustless_certificate':     identity.certificate,
+          'trustless_cert_serial':     identity.serialNumber
         }, () => {
           keysStatus.classList.remove('hidden', 'alert-danger');
           keysStatus.classList.add('alert-success');
