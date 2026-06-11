@@ -975,7 +975,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const manifest = chrome.runtime.getManifest();
     if (extensionVersion) {
-      extensionVersion.textContent = manifest.version;
+      extensionVersion.textContent = manifest.version_name || manifest.version;
     }
   } catch (e) {
     console.error('Error fetching manifest:', e);

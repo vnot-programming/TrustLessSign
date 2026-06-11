@@ -173,3 +173,9 @@
 - **File yang diubah/dibuat:** `.github/workflows/deploy.yml`, `.agents/rules/dev-trustlesssign.md`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah GitHub Actions agar mendukung Monorepo *Versioning*. Trigger sekarang berdasarkan `tags: web-v*` atau `ext-v*`. Proses `deploy_web` dan `deploy_extension` berjalan terpisah dengan pengecekan kondisional (`startsWith`) untuk menghindari eksekusi serentak yang tumpang tindih. Ekstensi tidak lagi me-reset *cache* Laravel, dan Web tidak lagi memicu kompresi `.crx`. Dokumen aturan pengembangan (`dev-trustlesssign.md`) juga telah diperbarui dengan panduan *Workflow Deployment CI/CD Monorepo* ini.
+
+- **Tanggal/Waktu:** 2026-06-11T06:35:00Z
+- **Tugas yang diselesaikan:** Tweak Extension Footer to include Jazakumullah text & version_name
+- **File yang diubah/dibuat:** `popup.html`, `popup.js` (Chrome), `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Extension Version: 1.0.10)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan kembali frasa `Jazakumullah Khairan 🙏` ke *footer* ekstensi sesuai permintaan pengguna, sekaligus memperbarui pemanggilan versi agar mengambil `version_name` (mis. "1.0.10-dev") alih-alih `version` numerik mentah di `popup.js`.
