@@ -132,4 +132,11 @@
 - **Status saat ini:** Selesai (Bumped version to 1.0.5)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Library QRious sebelumnya tidak dilampirkan dalam file `popup.html` meski dipanggil di dalam `popup.js` sehingga menyebabkan *ReferenceError: QRious is not defined*. Telah diunduh library `qrious.min.js` ke dalam folder `assets/` dan ditambahkan ke dalam tag script pada `popup.html`.
 
+- **Tanggal/Waktu:** 2026-06-11T04:55:00Z
+- **Tugas yang diselesaikan:** Organize GDrive uploads into specific subfolders & verify filename integrity
+- **File yang diubah/dibuat:** `gdrive.js` (Chrome & Safari), `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Bumped version to 1.0.6)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menjawab kekhawatiran user terkait perbedaan nama file unduhan (lokal) dan unggahan (GDrive), nama file tidak memengaruhi validitas *cryptographic signature* (karena yang di-hash adalah konten byte PDF-nya). File tetap sah secara kriptografi terlepas dari apa namanya. Selain itu, menambahkan mekanisme otomatis di dalam `gdrive.js` untuk membuat hierarki folder dinamis `TrustLessSign/{Bulan}.{Tahun}` di Google Drive pengguna menggunakan `getOrCreateFolder()` API agar dokumen lebih rapi.
+
+
 
