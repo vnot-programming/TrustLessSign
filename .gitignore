@@ -8,12 +8,6 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 
-# Cryptographic Keys (Root CA & Certificates)
-pki-keys/
-secrets/
-chrome-extension/key.pem
-safari-extension/**/key.pem
-
 # Web Monolith Subfolder Ignores
 web/.env
 node_modules/
@@ -45,3 +39,9 @@ docs/scripts/
 docs/TrustlessSign_implementation_plan-v5.md
 docs/TrustlessSign_implementation_plan-v6.md
 docs/catatan.md
+
+# Cryptographic Keys (Root CA & Certificates)
+pki-keys/
+secrets/
+chrome-extension/key.pem
+safari-extension/**/key.pem

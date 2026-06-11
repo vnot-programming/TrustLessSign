@@ -89,6 +89,7 @@
     - Integrated `content.js` bridge inside `safari-extension` and configured `content_scripts` in Safari `manifest.json`.
     - Compiled all production assets successfully with Vite inside the Docker container.
     - **STATUS**: Selesai. Ready for deployment review.
+    
 - **Tanggal/Waktu:** 2026-06-10T08:33Z
 - **Tugas yang diselesaikan:** Fix blank "Reason Category" & "Signature Reason" dropdowns
 - **File yang diubah/dibuat:** `web/database/seeders/DatabaseSeeder.php`
@@ -118,3 +119,10 @@
 - **File yang diubah/dibuat:** `CertificateController.php`, `popup.js` (Chrome & Safari), `SignDocument.jsx`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mencegah backend melempar 404 (Console error) saat user belum punya sertifikat dengan return `200 OK` (dengan flag `has_certificate`). Mengatasi bug `uploadInterval is not defined` di Chrome/Safari Extension akibat scope variable di blok catch. Menambahkan validasi keberadaan sertifikat pada Extension UI dan Web UI sehingga tombol "Sign & Seal" otomatis didisable dan memunculkan peringatan apabila user belum men-generate Secure Key.
+
+- **Tanggal/Waktu:** 2026-06-11T04:41:00Z
+- **Tugas yang diselesaikan:** Fix ArrayBuffer detachment & Suppress UI errors for debugging
+- **File yang diubah/dibuat:** `popup.js` (Chrome & Safari), `package.json`, `manifest.json`
+- **Status saat ini:** Selesai (Bumped version to 1.0.4)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Di dalam `popup.js`, pembacaan file PDF (`pdfjsLib.getDocument({ data: pdfUint8 })`) mendeteksi `ArrayBuffer` dan mentransfernya ke Web Worker PDF.js, menyebabkan ArrayBuffer asli ter-detach (size 0) sehingga gagal saat mencoba diconvert ke Base64 via `arrayBufferToBase64(currentFileBytes)`. Memperbaikinya dengan mem-passing `new Uint8Array(currentFileBytes.slice(0))` agar PDF.js mendapatkan salinan buffer (copy) dan bukan referensi aslinya. Sesuai instruksi pengguna, `showSignError()` di dalam blok `catch` ketika proses *signing* dihapus dan diganti dengan `console.error()` agar tidak membingungkan pengguna jika terjadi *runtime error* yang tidak terduga.
+

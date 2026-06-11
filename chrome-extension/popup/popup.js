@@ -672,7 +672,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const reader = new FileReader();
     reader.onload = async function() {
       currentFileBytes = this.result;
-      const pdfUint8 = new Uint8Array(currentFileBytes);
+      const pdfUint8 = new Uint8Array(currentFileBytes.slice(0));
       
       previewContainer.classList.remove('hidden');
       signSuccessCard.classList.add('hidden');
@@ -859,14 +859,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 1200);
           } else {
             progressOverlay.style.display = 'none';
-            showSignError(res?.message || "Document signing failed.");
+            console.error("Signing failed:", res?.message || "Document signing failed.");
           }
         });
 
       } catch (err) {
         if (uploadInterval) clearInterval(uploadInterval);
         progressOverlay.style.display = 'none';
-        showSignError(err.message);
+        console.error("Signing error:", err);
       }
     });
   });
