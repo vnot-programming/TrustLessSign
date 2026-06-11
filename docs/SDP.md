@@ -138,5 +138,10 @@
 - **Status saat ini:** Selesai (Bumped version to 1.0.6)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menjawab kekhawatiran user terkait perbedaan nama file unduhan (lokal) dan unggahan (GDrive), nama file tidak memengaruhi validitas *cryptographic signature* (karena yang di-hash adalah konten byte PDF-nya). File tetap sah secara kriptografi terlepas dari apa namanya. Selain itu, menambahkan mekanisme otomatis di dalam `gdrive.js` untuk membuat hierarki folder dinamis `TrustLessSign/{Bulan}.{Tahun}` di Google Drive pengguna menggunakan `getOrCreateFolder()` API agar dokumen lebih rapi.
 
+- **Tanggal/Waktu:** 2026-06-11T05:05:00Z
+- **Tugas yang diselesaikan:** Fix "No Certificate Found" error on Web App `/sign` page
+- **File yang diubah/dibuat:** `web/routes/web.php`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Halaman UI React (SignDocument.jsx) melakukan _fetch_ ke endpoint `/certificates/me` secara langsung tanpa _Bearer token_, namun rute tersebut belum didefinisikan di dalam `web.php` (hanya ada di `api.php`). Hal ini menyebabkan _error 404_ sehingga status sertifikat di-set `false`. Telah ditambahkan _route_ `/certificates/me` yang membaca sertifikat aktif pengguna berdasarkan sesi web saat itu juga.
 
 

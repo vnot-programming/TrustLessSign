@@ -50,6 +50,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
         );
     });
 
+    Route::get('/certificates/me', function (\Illuminate\Http\Request $request) {
+        $cert = \App\Models\Certificate::where('user_id', $request->user()->id)
+            ->where('is_revoked', false)
+            ->where('expires_at', '>', now())
+            ->orderBy('issued_at', 'desc')
+            ->first();
+
+        if (!$cert) {
+            return response()->json(['message' => 'No active certificate found.', 'has_certificate' => false], 200);
+        }
+
+        $certArray = $cert->toArray();
+        $certArray['has_certificate'] = true;
+        return response()->json($certArray, 200);
+    });
+
     Route::post('/logout', function (\Illuminate\Http\Request $request) {
         \Illuminate\Support\Facades\Auth::guard('web')->logout();
         $request->session()->invalidate();
