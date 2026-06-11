@@ -43,6 +43,7 @@ export default function SignDocument() {
     message: ''
   });
   const [signResult, setSignResult] = useState(null);
+  const [finalFileName, setFinalFileName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   // Translation fallbacks
@@ -317,11 +318,21 @@ export default function SignDocument() {
         }
       }, 400);
 
+      const now = new Date();
+      const timestamp = now.getFullYear() + '.' + 
+          String(now.getMonth() + 1).padStart(2, '0') + '.' + 
+          String(now.getDate()).padStart(2, '0') + '_' + 
+          String(now.getHours()).padStart(2, '0') + '-' + 
+          String(now.getMinutes()).padStart(2, '0') + '-' + 
+          String(now.getSeconds()).padStart(2, '0');
+      const prefixedFilename = `signed_web_${timestamp}-${file.name}`;
+      setFinalFileName(prefixedFilename);
+
       window.postMessage({
         type: 'TRUSTLESS_SIGN_REQUEST',
         payload: {
           pdfBase64: pdfBase64,
-          filename: file.name,
+          filename: prefixedFilename,
           gdriveToken: gdrive_token,
           apiToken: token,
           qrPosition: {
@@ -357,7 +368,7 @@ export default function SignDocument() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `signed_${file.name}`;
+    link.download = finalFileName || `signed_web_${file.name}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

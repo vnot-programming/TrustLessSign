@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let qrX = 10;
   let qrY = 10;
   let signedPdfBase64 = null;
+  let finalFileName = null;
   let reasonsCategories = [];
 
   // Translation dictionary
@@ -816,12 +817,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const relativeX = (qrX / canvasRect.width) * 600;
         const relativeY = (qrY / canvasRect.height) * 800; // standard approx
 
+        const now = new Date();
+        const timestamp = now.getFullYear() + '.' + 
+            String(now.getMonth() + 1).padStart(2, '0') + '.' + 
+            String(now.getDate()).padStart(2, '0') + '_' + 
+            String(now.getHours()).padStart(2, '0') + '-' + 
+            String(now.getMinutes()).padStart(2, '0') + '-' + 
+            String(now.getSeconds()).padStart(2, '0');
+        finalFileName = `signed_ext_${timestamp}-${file.name}`;
+
         // Call background worker to sign & upload
         chrome.runtime.sendMessage({
           type: 'SIGN_DOCUMENT',
           payload: {
             pdfBase64: fileBase64,
-            filename: file.name,
+            filename: finalFileName,
             gdriveToken: gdriveToken,
             apiToken: token,
             qrPosition: {
@@ -839,12 +849,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, (res) => {
           clearInterval(uploadInterval);
 
-          if (res && res.status === 'success') {
+          if (res && (res.status === 'success' || res.status === 'warning')) {
             updateProgress('SUCCESS', 100);
             signedPdfBase64 = res.pdfBase64;
 
             setTimeout(() => {
               progressOverlay.style.display = 'none';
+
+              if (res.status === 'warning') {
+                  const successTitle = document.querySelector('#sign-success-card h4');
+                  const successDesc = document.querySelector('#sign-success-card p');
+                  if (successTitle) {
+                      successTitle.textContent = "Saved Locally";
+                      successTitle.style.color = "var(--accent-warning)";
+                  }
+                  if (successDesc) {
+                      successDesc.textContent = res.message || "Google Drive upload failed. File saved locally.";
+                  }
+              }
+
+              const btnViewDrive = document.getElementById('btn-view-drive');
+              if (res.drive_url) {
+                btnViewDrive.href = res.drive_url;
+                btnViewDrive.classList.remove('hidden');
+              } else {
+                btnViewDrive.classList.add('hidden');
+              }
+
               signSuccessCard.classList.remove('hidden');
             }, 1200);
           } else {
@@ -949,9 +980,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // We can use chrome.downloads or data URL trigger
     const dataUrl = `data:application/pdf;base64,${signedPdfBase64}`;
+
     chrome.downloads.download({
       url: dataUrl,
-      filename: `signed_${file.name}`,
+      filename: finalFileName,
       saveAs: true
     });
   });
