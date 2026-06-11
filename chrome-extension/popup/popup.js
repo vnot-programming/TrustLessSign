@@ -1191,9 +1191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-  const dec = new TextDecoder();
-  return JSON.parse(dec.decode(plaintext));
-}
+
 
 // ─── DEVICE IDENTIFIER ─────────────────────────────────────────────────────────
 // Generates a stable, non-tracking pseudo-fingerprint from browser context
