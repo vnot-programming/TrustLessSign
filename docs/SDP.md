@@ -320,3 +320,9 @@
 - **File yang diubah/dibuat:** `web/resources/js/Pages/SignDocument.jsx`.
 - **Status saat ini:** Selesai (Version `web-v1.2.3`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Pengguna meminta untuk mengganti teks "QR Position: x:..., y:..." yang muncul saat _hover_ kotak QR pada antarmuka *Web Dashboard* menjadi kalimat "Drag to place the signature that appears on the Document". Perubahan telah dilakukan dan tag `web-v1.2.3` telah dirilis.
+
+- **Tanggal/Waktu:** 2026-06-11T16:17:00Z
+- **Tugas yang diselesaikan:** Menambahkan *tooltip hover* pada kotak drag QR Code di antarmuka Popup Ekstensi.
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.html`, `safari-extension/Resources/popup.html`.
+- **Status saat ini:** Selesai (Version `ext-v1.2.10`).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Pengguna meminta ekstensi peramban memiliki fungsi *tooltip* instruksional "Drag to place the signature that appears on the Document" yang serupa dengan *Web Dashboard*. Pembaruan telah dilakukan dan dikomit dengan tag `ext-v1.2.10`.
