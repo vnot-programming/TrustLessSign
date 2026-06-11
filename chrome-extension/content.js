@@ -15,22 +15,22 @@ window.addEventListener('message', (event) => {
   const data = event.data;
   if (!data || !data.type) return;
 
+  // Check if extension context was invalidated (e.g., extension reloaded without page refresh)
+  if (!chrome || !chrome.runtime || !chrome.runtime.getManifest || !chrome.runtime.sendMessage) {
+    console.error('Extension context invalidated. Page must be refreshed.');
+    window.postMessage({
+      type: 'TRUSTLESS_SIGN_ERROR',
+      payload: { error: 'EXTENSION_INVALIDATED', message: 'The extension was updated. Please refresh the page.' }
+    }, '*');
+    return;
+  }
+
   // Handle Ping — reply with installed=true and current extension version
   if (data.type === 'TRUSTLESS_PING_REQUEST') {
     const manifest = chrome.runtime.getManifest();
     window.postMessage({
       type: 'TRUSTLESS_PING_RESPONSE',
       version: manifest.version_name || manifest.version || 'unknown'
-    }, '*');
-    return;
-  }
-
-  // Check if extension context was invalidated (e.g., extension reloaded without page refresh)
-  if (!chrome.runtime || !chrome.runtime.sendMessage) {
-    console.error('Extension context invalidated. Page must be refreshed.');
-    window.postMessage({
-      type: 'TRUSTLESS_SIGN_ERROR',
-      payload: { error: 'EXTENSION_INVALIDATED', message: 'The extension was updated. Please refresh the page.' }
     }, '*');
     return;
   }
