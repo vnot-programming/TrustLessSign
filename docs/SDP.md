@@ -118,3 +118,8 @@
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ignored node_modules recursively using `node_modules/` and `**/node_modules/` in root `.gitignore`. Also ignored compiled `service-worker.bundle.js` for both Chrome and Safari extensions. This reduced IDE untracked files count from 3000++ to 1.
 
+- **Tanggal/Waktu:** 2026-06-11T04:25:00Z
+- **Tugas yang diselesaikan:** Fix `uploadInterval` error & add Certificate UI Validation
+- **File yang diubah/dibuat:** `CertificateController.php`, `popup.js` (Chrome & Safari), `SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mencegah backend melempar 404 (Console error) saat user belum punya sertifikat dengan return `200 OK` (dengan flag `has_certificate`). Mengatasi bug `uploadInterval is not defined` di Chrome/Safari Extension akibat scope variable di blok catch. Menambahkan validasi keberadaan sertifikat pada Extension UI dan Web UI sehingga tombol "Sign & Seal" otomatis didisable dan memunculkan peringatan apabila user belum men-generate Secure Key.

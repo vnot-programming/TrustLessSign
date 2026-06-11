@@ -390,8 +390,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let activeCert = null;
         if (meRes.ok) {
-          activeCert = await meRes.json();
+          const data = await meRes.json();
+          if (data.has_certificate !== false) {
+            activeCert = data;
+          }
         }
+        window.userHasCert = !!activeCert;
 
         // Auth successful: show dashboard and load components
         showMainView();
@@ -738,6 +742,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const password = signPasswordInput.value;
     signStatus.classList.add('hidden');
 
+    if (!window.userHasCert) {
+      showSignError('Please generate a certificate in the Keys & Cert tab first.');
+      return;
+    }
     if (!file) {
       showSignError('Please upload a PDF file.');
       return;
@@ -750,6 +758,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Toggle progress overlay
     updateProgress('DOWNLOADING', 15);
 
+    let uploadInterval;
     chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl'], async (storage) => {
       const token = storage.sanctumToken;
       const gdriveToken = storage.gdriveToken;
@@ -793,7 +802,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Start upload simulation
         updateProgress('UPLOADING', 55);
         let uploadPct = 55;
-        const uploadInterval = setInterval(() => {
+        uploadInterval = setInterval(() => {
           if (uploadPct < 90) {
             uploadPct += Math.floor(Math.random() * 8) + 2;
             updateProgress('UPLOADING', uploadPct);
@@ -845,7 +854,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
       } catch (err) {
-        clearInterval(uploadInterval);
+        if (uploadInterval) clearInterval(uploadInterval);
         progressOverlay.style.display = 'none';
         showSignError(err.message);
       }

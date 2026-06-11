@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TrustlessSign",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Safari Web Extension for TrustlessSign Offline PDF Cryptographic Signature",
   "permissions": [
     "storage",

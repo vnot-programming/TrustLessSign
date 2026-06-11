@@ -121,10 +121,12 @@ class CertificateController extends Controller
             ->first();
 
         if (!$cert) {
-            return response()->json(['message' => 'No active certificate found.'], 404);
+            return response()->json(['message' => 'No active certificate found.', 'has_certificate' => false], 200);
         }
 
-        return response()->json($cert);
+        $certArray = $cert->toArray();
+        $certArray['has_certificate'] = true;
+        return response()->json($certArray, 200);
     }
 
     /**

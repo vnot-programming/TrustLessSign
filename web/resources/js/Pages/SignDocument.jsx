@@ -35,6 +35,7 @@ export default function SignDocument() {
 
   // Status and result states
   const [extensionInstalled, setExtensionInstalled] = useState(false);
+  const [hasCert, setHasCert] = useState(null);
   const [signingStatus, setSigningStatus] = useState({
     isActive: false,
     stage: 'IDLE', // IDLE, DOWNLOADING, STAMPING, UPLOADING, SUCCESS, ERROR
@@ -143,6 +144,21 @@ export default function SignDocument() {
         }
       })
       .catch(err => console.error("Failed to load reason categories:", err));
+
+    // Check certificate
+    axios.get('/certificates/me')
+      .then(res => {
+        if (res.data.has_certificate === false) {
+          setHasCert(false);
+        } else {
+          setHasCert(true);
+        }
+      })
+      .catch(err => {
+        if (err.response && err.response.status === 404) {
+          setHasCert(false);
+        }
+      });
   }, []);
 
   const currentCategory = categories.find(c => c.id.toString() === selectedCategoryId);
@@ -394,6 +410,16 @@ export default function SignDocument() {
             </div>
           )}
 
+          {extensionInstalled && hasCert === false && (
+            <div className="bg-accent-danger-soft border border-accent-danger text-accent-danger p-4 rounded-lg flex items-center gap-3 mb-4">
+              <AlertCircle className="text-accent-danger" size={24} />
+              <div>
+                <h4 className="font-bold">No Certificate Found</h4>
+                <p className="text-sm">Please open the TrustlessSign Extension, go to "Keys & Cert" tab, and generate your certificate first.</p>
+              </div>
+            </div>
+          )}
+
           {signResult ? (
             // SIGN SUCCESS SCREEN
             <div className="glass-panel p-8 max-w-xl mx-auto space-y-6 text-center animate-fade-in">
@@ -554,7 +580,7 @@ export default function SignDocument() {
 
                   <button 
                     type="submit"
-                    disabled={!file || !extensionInstalled || !password}
+                    disabled={!file || !extensionInstalled || !password || hasCert === false}
                     className="w-full bg-text-primary text-surface-primary py-3 rounded-lg font-semibold disabled:opacity-50 transition-colors cursor-pointer hover:bg-opacity-90 shadow-sm"
                   >
                     {t.sign_and_seal}
