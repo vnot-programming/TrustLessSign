@@ -23,6 +23,7 @@ export default function Dashboard() {
   const [backupData, setBackupData]     = useState(null);
   const [errorMsg, setErrorMsg]         = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, outdated: false });
+  const [syncStatus, setSyncStatus] = useState(null); // { status: 'active' | 'mismatch' | 'no_extension_cert' | 'revoked' | 'error' | 'timeout', data: null }
   const [extensionModalOpen, setExtensionModalOpen]     = useState(false);
   const [extensionOutdatedOpen, setExtensionOutdatedOpen] = useState(false);
   const [showPassword, setShowPassword]     = useState(false);
@@ -121,6 +122,57 @@ export default function Dashboard() {
     checkExtension();
   }, [extensionMinVersion]);
 
+  // [NEW] Extension-First Sync Check
+  useEffect(() => {
+    if (!extensionStatus.installed) return;
+    
+    let isMounted = true;
+    const syncTimeout = setTimeout(() => {
+        if (isMounted) {
+            setSyncStatus({ status: 'timeout' });
+        }
+    }, 5000); // circuit breaker / fallback
+
+    const handleSerialResponse = async (e) => {
+        if (e.data && e.data.type === 'TRUSTLESS_GET_CERT_SERIAL_RESPONSE') {
+            clearTimeout(syncTimeout);
+            window.removeEventListener('message', handleSerialResponse);
+            if (!isMounted) return;
+
+            const { serial, hasCert } = e.data.payload;
+            if (!hasCert || !serial) {
+                setSyncStatus({ status: 'no_extension_cert' });
+                return;
+            }
+
+            try {
+                const syncRes = await axios.post('/certificates/sync-check', {
+                    serial_number: serial
+                });
+                
+                if (syncRes.data.active) {
+                    setSyncStatus({ status: 'active', data: syncRes.data });
+                } else if (syncRes.data.is_revoked || syncRes.data.expired) {
+                    setSyncStatus({ status: 'revoked', data: syncRes.data });
+                } else if (!syncRes.data.owned) {
+                    setSyncStatus({ status: 'mismatch', data: syncRes.data });
+                }
+            } catch (err) {
+                setSyncStatus({ status: 'error' });
+            }
+        }
+    };
+    
+    window.addEventListener('message', handleSerialResponse);
+    window.postMessage({ type: 'TRUSTLESS_GET_CERT_SERIAL_REQUEST' }, '*');
+    
+    return () => {
+        isMounted = false;
+        clearTimeout(syncTimeout);
+        window.removeEventListener('message', handleSerialResponse);
+    };
+  }, [extensionStatus.installed]);
+
   const handleCertificateAction = () => {
     if (!extensionStatus.installed) {
       setExtensionModalOpen(true);
@@ -148,6 +200,12 @@ export default function Dashboard() {
     if (extensionStatus.outdated) {
       e.preventDefault();
       setExtensionOutdatedOpen(true);
+      return;
+    }
+    if (syncStatus && syncStatus.status !== 'active') {
+      e.preventDefault();
+      alert('Sertifikat Anda tidak valid (mismatch/revoked). Silakan periksa peringatan di atas.');
+      return;
     }
     // else navigate naturally to /sign
   };
@@ -282,6 +340,33 @@ export default function Dashboard() {
 
         <main className="max-w-5xl mx-auto p-4 lg:p-8 mt-6">
           <h1 className="text-3xl font-bold mb-6">{t.welcome_back}</h1>
+          
+          {syncStatus && syncStatus.status !== 'active' && (
+            <div className={`mb-6 p-4 rounded-xl border ${
+              syncStatus.status === 'revoked' ? 'bg-accent-warning-soft border-accent-warning text-accent-warning' : 
+              'bg-accent-danger-soft border-accent-danger text-accent-danger'
+            }`}>
+              <div className="flex gap-3">
+                <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-lg mb-1">
+                    {syncStatus.status === 'revoked' && 'Sertifikat telah di-revoke'}
+                    {syncStatus.status === 'mismatch' && 'Sertifikat tidak dikenal (Mismatch)'}
+                    {syncStatus.status === 'no_extension_cert' && 'Tidak Ada Sertifikat di Ekstensi'}
+                    {syncStatus.status === 'timeout' && 'Gangguan Komunikasi Ekstensi'}
+                    {syncStatus.status === 'error' && 'Gangguan Server'}
+                  </h3>
+                  <p className="text-sm font-medium">
+                    {syncStatus.status === 'revoked' && 'Sertifikat di dalam browser ekstensi Anda telah dinonaktifkan (revoke). Silakan generate ulang sertifikat baru untuk dapat melakukan tanda tangan.'}
+                    {syncStatus.status === 'mismatch' && 'Sertifikat yang berada di dalam browser ekstensi tidak cocok dengan database server kami. Silakan generate ulang sertifikat atau lakukan impor sertifikat yang benar melalui ekstensi.'}
+                    {syncStatus.status === 'no_extension_cert' && 'Kami mendeteksi Anda belum memiliki sertifikat yang tersimpan di ekstensi. Silakan buat sertifikat baru.'}
+                    {syncStatus.status === 'timeout' && 'Gagal memeriksa status keamanan ekstensi Anda. Pastikan ekstensi TrustlessSign berjalan normal di browser.'}
+                    {syncStatus.status === 'error' && 'Terjadi gangguan saat memverifikasi keamanan sertifikat Anda ke server. Periksa koneksi Anda.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Certificate Management Section */}
           <div className="glass-panel p-6 mb-6">
@@ -481,15 +566,14 @@ export default function Dashboard() {
                       <Key size={20} />
                       <h2 className="text-lg font-bold tracking-tight">{t.warning_title}</h2>
                     </div>
-                    <div className="text-sm text-text-secondary space-y-2 leading-relaxed">
-                      <p>{t.warning_desc}</p>
-                      <p className="font-semibold text-text-primary">{t.warning_continue}</p>
-                      <ol className="list-decimal list-inside pl-1 space-y-1">
-                        <li>{t.warning_item1} <strong>{t.warning_item1_strong}</strong>.</li>
-                        <li>{t.warning_item2} <strong>{t.warning_item2_strong}</strong> {t.warning_item2_suffix}</li>
-                        <li>{t.warning_item3} <strong>{t.warning_item3_strong}</strong>.</li>
-                      </ol>
-                      <p className="font-semibold mt-4">{t.warning_confirm}</p>
+                    <div className="text-sm text-text-secondary space-y-2 leading-relaxed bg-accent-warning-soft p-4 rounded-lg border border-accent-warning text-accent-warning mb-4">
+                      <p className="font-bold">⚠️ PERINGATAN AUTO-REVOKE</p>
+                      <p className="font-medium">
+                        Membuat sertifikat baru akan <strong>menonaktifkan (revoke) semua sertifikat Anda yang sebelumnya</strong>.
+                      </p>
+                      <p className="font-medium">
+                        Akibatnya, dokumen-dokumen lama yang pernah Anda tandatangani akan menampilkan peringatan (warna oranye) saat diverifikasi, meskipun isi dokumennya tetap terbukti asli.
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <label className="block text-xs font-semibold text-text-secondary">{t.confirm_label}</label>

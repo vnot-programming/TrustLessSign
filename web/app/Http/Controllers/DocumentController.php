@@ -55,6 +55,23 @@ class DocumentController extends Controller
                 return response()->json(['message' => 'Unauthorized. Certificate does not belong to you.'], 403);
             }
 
+            // [Trustless — WAJIB] Tolak jika cert sudah di-revoke
+            // User HARUS generate cert baru via Extension untuk dapat sign kembali.
+            if ($cert->is_revoked) {
+                return response()->json([
+                    'message'    => 'Cannot sign. Certificate has been revoked. Open Dashboard and generate a new certificate via the Extension.',
+                    'error_code' => 'CERT_REVOKED',
+                ], 403);
+            }
+
+            // [Trustless — WAJIB] Tolak jika cert sudah expired
+            if ($cert->expires_at->isPast()) {
+                return response()->json([
+                    'message'    => 'Cannot sign. Certificate has expired. Open Dashboard and generate a new certificate via the Extension.',
+                    'error_code' => 'CERT_EXPIRED',
+                ], 403);
+            }
+
             // Check if document already exists by verify_token
             $existingDoc = Document::where('verify_token', $request->verify_token)->first();
 

@@ -958,10 +958,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateProgress('DOWNLOADING', 15);
 
     let uploadInterval;
-    chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl'], async (storage) => {
+    chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl', 'trustless_cert_serial'], async (storage) => {
       const token = storage.sanctumToken;
       const gdriveToken = storage.gdriveToken;
       const baseUrl = storage.baseUrl;
+      const localSerial = storage.trustless_cert_serial;
+
+      if (!localSerial) {
+        progressOverlay.classList.add('hidden');
+        showSignError('No certificate found in extension. Please generate or import a certificate first.');
+        return;
+      }
+
+      try {
+        // === [BARU] Pre-Sign Cert Validation (Trustless) ===
+        const syncRes = await fetch(`${baseUrl}/api/certificates/sync-check`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ serial_number: localSerial })
+        });
+        const syncData = await syncRes.json();
+
+        if (!syncData.active) {
+            progressOverlay.classList.add('hidden');
+            const msg = syncData.is_revoked
+                ? 'Your certificate has been revoked. Please generate a new certificate from the Dashboard.'
+                : 'Your certificate is no longer valid. Please check your Keys & Cert tab.';
+            showSignError(msg);
+            return;
+        }
+        // === [END] Pre-Sign Cert Validation ===
+      } catch (e) {
+        progressOverlay.classList.add('hidden');
+        showSignError('Could not verify certificate status with the server. Check your connection.');
+        return;
+      }
 
       try {
         // Read file to base64

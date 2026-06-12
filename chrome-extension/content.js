@@ -18,7 +18,8 @@ window.addEventListener('message', (event) => {
   const validRequests = [
     'TRUSTLESS_PING_REQUEST',
     'TRUSTLESS_GENERATE_KEY_REQUEST',
-    'TRUSTLESS_SIGN_REQUEST'
+    'TRUSTLESS_SIGN_REQUEST',
+    'TRUSTLESS_GET_CERT_SERIAL_REQUEST'
   ];
   if (!validRequests.includes(data.type)) return;
 
@@ -43,6 +44,28 @@ window.addEventListener('message', (event) => {
     } catch (err) {
       console.error('Extension context invalidated (ping failed):', err);
     }
+    return;
+  }
+
+  // Handle Get Certificate Serial Request from Web Dashboard
+  if (data.type === 'TRUSTLESS_GET_CERT_SERIAL_REQUEST') {
+    chrome.storage.local.get(
+      ['trustless_cert_serial', 'trustless_private_key_enc', 'trustless_certificate'],
+      (storage) => {
+        const hasCert = !!(
+          storage.trustless_cert_serial &&
+          storage.trustless_private_key_enc &&
+          storage.trustless_certificate
+        );
+        window.postMessage({
+          type: 'TRUSTLESS_GET_CERT_SERIAL_RESPONSE',
+          payload: {
+            serial: storage.trustless_cert_serial || null,
+            hasCert: hasCert,
+          }
+        }, '*');
+      }
+    );
     return;
   }
 

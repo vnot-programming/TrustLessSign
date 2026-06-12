@@ -57,8 +57,19 @@ class VerificationController extends Controller
             }
         }
 
+        // [Trustless] Menentukan status kriptografis dokumen.
+        $documentStatus = 'verified';
+        if (!$certValidation['valid']) {
+            $documentStatus = match($certStatus) {
+                'revoked' => 'signed_revoked_cert',
+                'expired' => 'signed_expired_cert',
+                default   => 'signed_invalid_cert',
+            };
+        }
+
         return response()->json([
-            'status' => 'success',
+            'status'          => 'success',       // HTTP level — dokumen ditemukan
+            'document_status' => $documentStatus, // Trustless level — status kriptografis
             'document' => [
                 'id' => $document->id,
                 'original_filename' => $document->original_filename,

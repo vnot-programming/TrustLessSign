@@ -332,3 +332,17 @@
 - **File yang diubah/dibuat:** `chrome-extension/content.js`, `safari-extension/Resources/content.js`.
 - **Status saat ini:** Selesai (Version `ext-v1.2.11`).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan di mana *content script* terus-menerus membalas dirinya sendiri dengan *error message* secara *looping* jika *Extension Context Invalidated* terjadi. Kini *content script* hanya akan memproses `type` yang valid dari Dashboard dan menahan agar ping tidak *crash*. Karena perbaikan ini, jika pengguna me-reload ekstensi, Dashboard hanya akan memunculkan status "Not Installed" (sebagai perilaku Normal dan aman) yang dapat diatasi cukup dengan menekan tombol **F5 (Refresh)** pada tab Dashboard.
+
+- **Tanggal/Waktu:** 2026-06-12T06:36:00Z
+- **Tugas yang diselesaikan:** Implementasi Final "Trustless Certificate Enforcement" sesuai Plan (Auto-revoke, Document Register Guard, Sync Check Dashboard, Extension pre-sign check, dan 3-Layer Verify Page UI dengan status oranye/merah).
+- **File yang diubah/dibuat:**
+  - `web/app/Http/Controllers/CertificateController.php`
+  - `web/app/Http/Controllers/DocumentController.php`
+  - `web/app/Http/Controllers/VerificationController.php`
+  - `web/routes/web.php`
+  - `chrome-extension/content.js`
+  - `chrome-extension/popup/popup.js`
+  - `web/resources/js/Pages/Dashboard.jsx`
+  - `web/resources/js/Pages/Verify.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Arsitektur keamanan Trustless sudah tertutup rapat. Web tidak lagi percaya begitu saja pada database tanpa cross-check ke extension. Saat generate sertifikat baru, sertifikat lama akan di-revoke secara otomatis oleh sistem, memicu peringatan (oranye) pada dokumen-dokumen lama saat diverifikasi. Ekstensi kini memiliki peran sebagai single source of truth untuk `sync-check` keamanan sebelum `Dashboard.jsx` atau `popup.js` mengizinkan user untuk melakukan proses penandatanganan dokumen baru. Halaman Verifikasi memilik 3-layer status (Hijau/Oranye/Merah) lengkap dengan catatan khusus untuk sertifikat kadaluarsa/revoke.

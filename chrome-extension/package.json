@@ -1,7 +1,7 @@
 {
   "name": "trustlesssign-chrome-extension",
-  "version": "1.2.11",
-  "description": "Chrome Extension for TrustlessSign Offline PDF Cryptographic Signature",
+  "version": "1.2.12",
+  "description": "Browser extension for cryptographic signing using TrustLessSign.",
   "main": "background/service-worker.js",
   "scripts": {
     "build": "esbuild background/service-worker.js --bundle --minify --outfile=background/service-worker.bundle.js",

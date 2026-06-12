@@ -71,6 +71,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User self-service: cabut sertifikat milik sendiri berdasarkan serial
     Route::post('/certificates/{serial}/revoke', [\App\Http\Controllers\CertificateController::class, 'revokeOwn']);
 
+    // [NEW] Extension-to-Server cert serial validation
+    Route::post('/certificates/sync-check', function (\Illuminate\Http\Request $request) {
+        $request->validate(['serial_number' => 'required|string']);
+
+        $cert = \App\Models\Certificate::where('serial_number', $request->serial_number)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$cert) {
+            return response()->json([
+                'owned'  => false,
+                'active' => false,
+                'reason' => 'Certificate not found or not owned by this account.',
+            ]);
+        }
+
+        $isActive = !$cert->is_revoked && $cert->expires_at->isFuture();
+
+        return response()->json([
+            'owned'       => true,
+            'active'      => $isActive,
+            'is_revoked'  => $cert->is_revoked,
+            'expired'     => $cert->expires_at->isPast(),
+            'device_name' => $cert->device_name,
+            'serial'      => $cert->serial_number,
+        ]);
+    });
+
     Route::post('/logout', function (\Illuminate\Http\Request $request) {
         \Illuminate\Support\Facades\Auth::guard('web')->logout();
         $request->session()->invalidate();
