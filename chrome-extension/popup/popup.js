@@ -440,8 +440,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateCertStatus(activeCert);
 
         if (!activeCert) {
-          alert("NO CERTIFICATE FOUND\nPlease import or generate a secure cryptographic key on Tab Keys & Cert.");
-          tabKeys.click();
+          const modal = document.getElementById('no-cert-modal');
+          const btnOk = document.getElementById('btn-no-cert-ok');
+          if (modal && btnOk) {
+            modal.classList.add('visible');
+            btnOk.onclick = () => {
+              modal.classList.remove('visible');
+              tabKeys.click();
+            };
+          }
         }
 
         loadReasons(baseUrl, token);

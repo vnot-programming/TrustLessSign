@@ -383,3 +383,16 @@
   - `safari-extension/Resources/manifest.json`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.2.17`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Sesuai permintaan, jika ekstensi peramban memuat status autentikasi namun gagal menemukan setidaknya satu sertifikat yang aktif untuk perangkat ini (`activeCert === undefined / null`), kini aplikasi akan memunculkan sebuah *alert box* bertuliskan `"NO CERTIFICATE FOUND\nPlease import or generate a secure cryptographic key on Tab Keys & Cert."`. Setelah pengguna menekan tombol "OK" pada alert box tersebut, ekstensi akan mengeksekusi `tabKeys.click()` yang langsung membawanya ke panel menu *Keys & Cert* secara otomatis. Ekstensi di-*bump* ke `1.2.17`.
+
+- **Tanggal/Waktu:** 2026-06-13T09:28:00Z
+- **Tugas yang diselesaikan:** Refactor "No Certificate" Alert menjadi Custom Modal berbasis Bio-Digital Minimalism
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.html`
+  - `chrome-extension/popup/popup.js`
+  - `safari-extension/Resources/popup.html`
+  - `safari-extension/Resources/popup.js`
+  - `chrome-extension/package.json`
+  - `chrome-extension/manifest.json`
+  - `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.2.18`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Penggunaan fungsi bawaan peramban `alert()` dibatalkan karena tidak mematuhi standar desain *Bio-Digital Minimalism 2026*. Sebagai gantinya, sebuah *custom modal overlay* (`#no-cert-modal`) telah diintegrasikan ke dalam antarmuka ekstensi (`popup.html`). Modal ini mengaplikasikan lapisan *backdrop-filter blur*, menggunakan ikon peringatan dengan palet *accent-danger* (sebagai *multi-visual indicator* pemenuhan standar A11y buta warna), dan mengadopsi animasi kemunculan berskala (*scale & opacity transition*). Setelah tombol "Acknowledge & Setup" diklik, modal akan ditutup secara halus dan aksi `tabKeys.click()` akan dieksekusi. Versi ekstensi dinaikkan menjadi `1.2.18`.
