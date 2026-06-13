@@ -25,7 +25,7 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 - **WebP**
 
 ### 2.2 Image Specifications
-- **Max File Size:** 5 MB
+- **Max File Size:** 25 MB
 - **Local Validation:** MIME types and sizes are checked locally via FileReader API before uploading.
 
 ### 2.3 Storage Architecture (Google Drive API)
@@ -65,7 +65,7 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 
 ### 3.2 Security Considerations
 - **No Backend Exposure:** Images never traverse the TrustLessSign Laravel server.
-- **Client-Side Validation:** Extension explicitly restricts inputs to `image/png, image/jpeg, image/webp` and `< 5MB`.
+- **Client-Side Validation:** Extension explicitly restricts inputs to `image/png, image/jpeg, image/webp` and `< 25MB`.
 - **Decentralized Storage:** Users retain full control over their visual signatures in their own Drive.
 
 ---

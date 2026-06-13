@@ -24,7 +24,7 @@
 ### Task 2.2: Visual Signature Gallery UI
 - [x] Integrate a grid layout gallery in `popup.html`
 - [x] Add Bio-Digital Minimalism fallback UI for Drive sync failures
-- [x] Handle file selection and validation (<5MB, valid image MIME types)
+- [x] Handle file selection and validation (<25MB, valid image MIME types)
 - [x] Synchronize state with `chrome.storage.local` (Default Signature ID)
 
 ---

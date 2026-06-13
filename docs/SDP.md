@@ -453,3 +453,13 @@
   - `docs/new/image-signature-task.md`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Tampilan peringatan (*fallback*) ketika ekstensi gagal memuat daftar *Visual Signatures* dari Google Drive telah diperbarui agar selaras dengan panduan *Bio-Digital Minimalism 2026*. Menampilkan ikon berpalet `accent-danger` dengan gaya terstruktur. Selain itu, dokumen `implementation_plan.md` dan `image-signature-task.md` telah ditulis ulang (*rewritten*) sepenuhnya. Dokumen tersebut kini menolak sama sekali gagasan penggunaan database backend dan mendelegasikan otoritas penuh pada arsitektur Trustless / Zero-Knowledge menggunakan API Google Drive.
+
+- **Tanggal/Waktu:** 2026-06-13T11:58:00Z
+- **Tugas yang diselesaikan:** Perbaikan teks Fallback "Failed to load signatures" dan Penambahan Batas Ukuran File (25MB)
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.js`
+  - `safari-extension/Resources/popup.js`
+  - `docs/new/image-signature-implementation_plan.md`
+  - `docs/new/image-signature-task.md`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Teks kesalahan pada UI Galeri *Visual Signatures* dikembalikan menjadi pesan lugas "Failed to load signatures" sambil tetap mempertahankan balutan desain *aesthetic* kotak peringatan `accent-danger-soft`. Selain itu, batas ambang ukuran gambar (*file size limit*) pada berkas perencanaan dan logika validasi ekstensi telah ditingkatkan dari `5MB` menjadi `25MB`.
