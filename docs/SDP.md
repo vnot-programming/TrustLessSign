@@ -346,3 +346,9 @@
   - `web/resources/js/Pages/Verify.jsx`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Arsitektur keamanan Trustless sudah tertutup rapat. Web tidak lagi percaya begitu saja pada database tanpa cross-check ke extension. Saat generate sertifikat baru, sertifikat lama akan di-revoke secara otomatis oleh sistem, memicu peringatan (oranye) pada dokumen-dokumen lama saat diverifikasi. Ekstensi kini memiliki peran sebagai single source of truth untuk `sync-check` keamanan sebelum `Dashboard.jsx` atau `popup.js` mengizinkan user untuk melakukan proses penandatanganan dokumen baru. Halaman Verifikasi memilik 3-layer status (Hijau/Oranye/Merah) lengkap dengan catatan khusus untuk sertifikat kadaluarsa/revoke.
+
+- **Tanggal/Waktu:** 2026-06-13T05:56:00Z
+- **Tugas yang diselesaikan:** Fix Bug — Banner "Sertifikat telah di-revoke" (oranye) tidak hilang setelah generate sertifikat baru
+- **File yang diubah/dibuat:** `web/resources/js/Pages/Dashboard.jsx`
+- **Status saat ini:** Selesai (Version `web-v1.2.4`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Root cause: setelah `handleGenerateCertificate` berhasil dan `router.reload()` dipanggil, state `syncStatus` (yang masih menyimpan `{ status: 'revoked' }` dari sertifikat lama) tidak di-reset. `router.reload()` me-remount komponen sehingga useEffect sync-check re-run otomatis — tidak perlu counter trigger tambahan. Fix: ditambahkan helper `handleCertActivated()` yang memanggil `setModalOpen(false)` + `setSyncStatus(null)` (menghapus banner lama secara instan sebagai feedback visual) + `router.reload()` (remount komponen, sync-check re-run fresh). Helper ini digunakan di dua callsite: auto-close (setTimeout 2 detik) dan tombol "Close & Continue" pada flow backup file.

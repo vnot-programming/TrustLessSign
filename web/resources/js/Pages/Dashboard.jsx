@@ -191,6 +191,15 @@ export default function Dashboard() {
     setSuccess(false);
   };
 
+  // Shared teardown setelah sertifikat baru berhasil di-generate.
+  // setSyncStatus(null) menghapus banner lama secara instan (feedback visual).
+  // router.reload() me-remount komponen — useEffect sync-check akan re-run otomatis.
+  const handleCertActivated = () => {
+    setModalOpen(false);
+    setSyncStatus(null);
+    router.reload();
+  };
+
   const handleSignNewDoc = (e) => {
     if (!extensionStatus.installed) {
       e.preventDefault();
@@ -247,8 +256,7 @@ export default function Dashboard() {
               // Don't auto-close modal so user can download the backup
             } else {
               setTimeout(() => {
-                setModalOpen(false);
-                router.reload(); // Refresh props to show active certificate
+                handleCertActivated(); // Reset banner + reload (useEffect sync-check re-run otomatis setelah remount)
               }, 2000);
             }
           } else {
@@ -546,15 +554,12 @@ export default function Dashboard() {
                         ⬇️ Download Local Backup (.tsign)
                       </button>
                     )}
-                    <button
-                      onClick={() => {
-                        setModalOpen(false);
-                        router.reload();
-                      }}
-                      className="w-full text-text-tertiary hover:text-text-primary text-sm font-medium transition-colors py-2"
-                    >
-                      Close & Continue
-                    </button>
+                     <button
+                       onClick={handleCertActivated}
+                       className="w-full text-text-tertiary hover:text-text-primary text-sm font-medium transition-colors py-2"
+                     >
+                       Close & Continue
+                     </button>
                   </div>
                 )}
               </div>
