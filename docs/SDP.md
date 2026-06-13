@@ -364,3 +364,11 @@
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`
 - **Status saat ini:** Selesai (Version Web `web-v1.2.7`, Ext `ext-v1.2.16`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** User melaporkan error ekstensi memunculkan status "Your certificate is no longer valid" secara sepihak dengan error Network 404 di endpoint `/api/certificates/sync-check`. Root cause: Route `sync-check` di backend Laravel didaftarkan di file `routes/web.php` tanpa prefix `/api`, sehingga URL aslinya adalah `/certificates/sync-check`. Namun, `popup.js` di chrome-extension memanggil endpoint tersebut dengan tambahan prefix `/api` sehingga mendapatkan error 404 dari Nginx. Fix: Prefix `/api` telah dihapus dari URL fetch di `popup.js`.
+
+- **Tanggal/Waktu:** 2026-06-13T08:38:00Z
+- **Tugas yang diselesaikan:** Fix Bug 419 (Page Expired) pada Sinkronisasi Ekstensi (`sync-check`)
+- **File yang diubah/dibuat:**
+  - `web/bootstrap/app.php`
+  - `web/package.json`
+- **Status saat ini:** Selesai (Version Web `web-v1.2.8`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** User melaporkan error 419 pada endpoint `tsign.vnot.my.id/certificates/sync-check`. Root cause: Endpoint tersebut didaftarkan di `routes/web.php` untuk memfasilitasi panggilan dari ekstensi yang tanpa prefix `/api` (sebelumnya diubah karena error 404), namun secara default Laravel menerapkan middleware validasi CSRF pada rute `POST` di web. Karena ekstensi mengautentikasi via token Bearer Sanctum dan bukan *cookie session browser* biasa, tidak ada token CSRF yang disertakan sehingga Laravel menolak dengan 419. Fix: Rute `certificates/sync-check` telah dikecualikan secara eksplisit dari perlindungan CSRF di dalam blok `withMiddleware` pada `bootstrap/app.php`. Rilis Web telah di-bump ke versi `1.2.8`.
