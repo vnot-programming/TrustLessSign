@@ -662,6 +662,22 @@
       box-shadow: 0 0 12px var(--accent-danger-soft);
       transform: scale(1.05);
     }
+    
+    /* Custom Scrollbar for Bio-Digital Minimalism */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-default);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
   </style>
 </head>
 <body class="popup-view">
@@ -946,7 +962,7 @@
               <svg class="spinner" style="width: 12px; height: 12px; color: var(--accent-primary);" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             </span>
           </p>
-          <div id="image-signatures-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; max-height: 150px; overflow-y: auto;">
+          <div id="image-signatures-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; max-height: 150px; overflow-y: auto; overflow-x: hidden; padding-right: 4px;">
             <!-- Thumbnails injected here -->
           </div>
           <button id="btn-add-image-signature" class="btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
