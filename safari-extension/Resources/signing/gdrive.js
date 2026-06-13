@@ -180,3 +180,111 @@ async function uploadIdentityToDrive(fileName, tsignBase64, gdriveToken) {
   };
 }
 
+/**
+ * Image Signature Storage Operations (Zero-Knowledge / Trustless)
+ * Stores signatures in: TrustLessSign/ImageSignatures
+ */
+
+async function getImageSignaturesFolder(gdriveToken) {
+  const rootFolderId = await getOrCreateFolder('TrustLessSign', null, gdriveToken);
+  return await getOrCreateFolder('ImageSignatures', rootFolderId, gdriveToken);
+}
+
+async function uploadImageSignature(fileDataUrl, fileName, mimeType, gdriveToken) {
+  const folderId = await getImageSignaturesFolder(gdriveToken);
+  
+  const meta = {
+    name: fileName,
+    mimeType: mimeType,
+    parents: [folderId]
+  };
+
+  const boundary     = '314159265358979323846img';
+  const delimiter    = `\r\n--${boundary}\r\n`;
+  const closeDelimiter = `\r\n--${boundary}--`;
+
+  // Remove Data URL prefix to get pure base64
+  const base64Data = fileDataUrl.split(',')[1];
+
+  let multipartBody = '';
+  multipartBody += delimiter;
+  multipartBody += 'Content-Type: application/json; charset=UTF-8\r\n\r\n';
+  multipartBody += JSON.stringify(meta);
+  multipartBody += delimiter;
+  multipartBody += `Content-Type: ${mimeType}\r\n`;
+  multipartBody += 'Content-Transfer-Encoding: base64\r\n\r\n';
+  multipartBody += base64Data;
+  multipartBody += closeDelimiter;
+
+  const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,thumbnailLink,webContentLink', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${gdriveToken}`,
+      'Content-Type': `multipart/related; boundary=${boundary}`
+    },
+    body: multipartBody
+  });
+
+  if (!uploadRes.ok) {
+    throw new Error(`Image signature upload failed: ${await uploadRes.text()}`);
+  }
+
+  return await uploadRes.json();
+}
+
+async function listImageSignatures(gdriveToken) {
+  try {
+    const folderId = await getImageSignaturesFolder(gdriveToken);
+    
+    // Search for image files inside the ImageSignatures folder
+    const query = `'${folderId}' in parents and mimeType contains 'image/' and trashed=false`;
+    
+    const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,thumbnailLink,webContentLink,createdTime)&orderBy=createdTime desc`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${gdriveToken}`
+      }
+    });
+
+    if (!searchRes.ok) throw new Error('Failed to list image signatures');
+    
+    const data = await searchRes.json();
+    return data.files || [];
+  } catch (err) {
+    console.error("List Images Error:", err);
+    return [];
+  }
+}
+
+async function deleteImageSignature(fileId, gdriveToken) {
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${gdriveToken}`
+    }
+  });
+  if (!res.ok) {
+    throw new Error('Failed to delete image signature');
+  }
+  return true;
+}
+
+async function downloadImageFile(fileId, gdriveToken) {
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${gdriveToken}`
+    }
+  });
+  
+  if (!res.ok) throw new Error('Failed to download image file');
+  
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result); // Returns Data URL
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+

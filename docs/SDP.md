@@ -432,3 +432,14 @@
   - Me-*rollback database*.
 - **Status saat ini:** Selesai (Revert `web-v1.3.0-alpha1`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Peringatan keras: Proyek ini menganut filosofi **Trustless / Zero-Knowledge**. Instruksi awal pada `image-signature-task.md` (Sprint 1 Backend) ternyata melanggar filosofi aplikasi karena mencoba menyimpan gambar tanda tangan pengguna di server/S3 yang dikendalikan oleh backend Laravel. Sistem telah di-*rollback* sepenuhnya. Solusi yang benar: Seluruh pengelolaan gambar tanda tangan (CRUD) **WAJIB** dilakukan langsung dari Ekstensi Chrome/Safari ke **Google Drive pengguna**, tanpa pernah menyentuh *backend* Laravel. File `SDP.md` ini menjadi saksi pembatalan Sprint 1. AI selanjutnya WAJIB langsung merancang penyimpanan via API Google Drive di sisi ekstensi (*Sprint 2*).
+
+- **Tanggal/Waktu:** 2026-06-13T11:15:00Z
+- **Tugas yang diselesaikan:** Implementasi Sprint 2 (Frontend UI) untuk Image Signatures via API Google Drive
+- **File yang diubah/dibuat:**
+  - `chrome-extension/signing/gdrive.js` (Fungsi Upload/Fetch Image ke Drive)
+  - `chrome-extension/popup/popup.html` (Penambahan Galeri & Tombol Upload)
+  - `chrome-extension/popup/popup.js` (Logika UI Galeri)
+  - Disinkronisasikan ke `safari-extension`
+  - Manifest version *bump* ke `1.3.0`
+- **Status saat ini:** Selesai (Sprint 2 - Versi Ekstensi `ext-v1.3.0`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengacu pada aturan `Trustless Architecture`, fitur *Image Signature* kini menyimpan data 100% di akun Google Drive pengguna. Fungsi di `gdrive.js` telah diperluas untuk mengelola direktori `TrustLessSign/ImageSignatures`. Di tab *Keys & Cert*, galeri tanda tangan visual berhasil dirender. Pengguna dapat mengunggah (ukuran dibatasi maks 5MB), melihat pratinjau mini, menetapkan tanda tangan utama (*default*), dan menghapusnya (*double-click*). Semua fungsi memanfaatkan token Drive dari *storage local*. Langkah selanjutnya untuk AI (Sprint 3) adalah mengintegrasikan penyematan gambar ini langsung ke dokumen PDF via `pdf-lib.js` saat proses penandatanganan (Sign PDF).
