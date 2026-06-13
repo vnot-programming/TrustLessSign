@@ -1215,12 +1215,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Generate QR code base64 locally in popup using qrious
         const verifyToken = crypto.randomUUID();
         const verifyUrl = `${baseUrl}/verify/${verifyToken}`;
-        const qr = new QRious({
-          value: verifyUrl,
-          size: 150,
-          level: 'H'
-        });
-        const qrPng = qr.toDataURL('image/png');
+        const shortId = `TLS-${verifyToken.substring(0, 8).toUpperCase()}`;
+
+        // Get default image signature
+        const st = await chrome.storage.local.get('default_image_signature_id');
+        let uploadedImageBase64 = null;
+        let isQrCode = true;
+
+        if (st.default_image_signature_id) {
+            try {
+                const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
+                if (imgSig && imgSig.dataUrl) {
+                    uploadedImageBase64 = imgSig.dataUrl;
+                    isQrCode = false; 
+                }
+            } catch (err) { console.error("Error loading image signature", err); }
+        }
+
+        if (isQrCode) {
+            const qr = new QRious({
+              value: verifyUrl,
+              size: 150,
+              level: 'H'
+            });
+            uploadedImageBase64 = qr.toDataURL('image/png');
+        }
+
+        let signerName = document.getElementById('user-name-text').textContent || 'TrustlessSign User';
+        if (signerName === 'Authenticated User' || !signerName) {
+            const certData = await fetch(`${baseUrl}/api/certificates/me`, {
+                headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+            }).then(r=>r.json()).catch(()=>null);
+            if (certData && certData.certificates && certData.certificates.length > 0) {
+                 const activeCert = certData.certificates.find(c => c.serial_number === localSerial);
+                 if (activeCert) signerName = activeCert.subject_cn;
+            }
+        }
+
+        const qrPng = await window.generateSignatureFrame(
+            signerName,
+            shortId,
+            verifyUrl,
+            uploadedImageBase64,
+            isQrCode
+        );
 
         // Compile final reason text
         const selectedSubId = subcategorySelect.value;
