@@ -820,15 +820,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgSigLoading = document.getElementById('img-sig-loading');
 
   const refreshImageSignatures = async () => {
-    chrome.storage.local.get(['gdriveToken', 'default_image_signature_id'], async (storage) => {
-      if (!storage.gdriveToken) return;
-      
+    chrome.storage.local.get(['default_image_signature_id'], async (storage) => {
       imgSigLoading.style.display = 'inline-block';
-      imgSigList.innerHTML = '';
       
       try {
-        const files = await listImageSignatures(storage.gdriveToken);
+        const files = await getAllImageSignaturesLocal();
         const defaultId = storage.default_image_signature_id;
+        
+        imgSigList.innerHTML = '';
         
         if (files.length === 0) {
           imgSigList.innerHTML = '<p style="grid-column: span 2; text-align: center; font-size: 0.75rem; color: var(--text-tertiary); padding: 12px;">No visual signatures uploaded yet.</p>';
@@ -837,6 +836,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const isDefault = file.id === defaultId;
             const item = document.createElement('div');
             item.className = 'img-sig-item';
+            item.id = `img-sig-item-${file.id}`;
             item.style.cssText = `
               border: 1px solid ${isDefault ? 'var(--accent-primary)' : 'var(--border-subtle)'};
               border-radius: 8px;
@@ -847,18 +847,29 @@ document.addEventListener('DOMContentLoaded', async () => {
               display: flex;
               flex-direction: column;
               align-items: center;
+              transition: all 0.2s ease;
             `;
             
             item.innerHTML = `
-              <img src="${file.thumbnailLink}" alt="${file.name}" style="width: 100%; height: 50px; object-fit: contain; border-radius: 4px; background: white;">
+              <img src="${file.dataUrl}" alt="${file.name}" style="width: 100%; height: 50px; object-fit: contain; border-radius: 4px; background: white;">
               <span style="font-size: 0.65rem; margin-top: 4px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">${file.name}</span>
-              ${isDefault ? '<div style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' : ''}
+              ${isDefault ? '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' : ''}
             `;
 
-            // Click to set as default
+            // Click to set as default - NO FLICKERING
             item.addEventListener('click', () => {
               chrome.storage.local.set({ 'default_image_signature_id': file.id }, () => {
-                refreshImageSignatures();
+                // Update DOM directly instead of reloading to prevent flickering
+                document.querySelectorAll('.img-sig-item').forEach(el => {
+                  el.style.border = '1px solid var(--border-subtle)';
+                  el.style.background = 'var(--surface-secondary)';
+                  const badge = el.querySelector('.def-badge');
+                  if (badge) badge.remove();
+                });
+                
+                item.style.border = '1px solid var(--accent-primary)';
+                item.style.background = 'var(--accent-primary-soft)';
+                item.insertAdjacentHTML('beforeend', '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>');
               });
             });
 
@@ -866,15 +877,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             item.addEventListener('dblclick', async (e) => {
               e.stopPropagation();
               if (confirm('Delete this image signature?')) {
-                imgSigLoading.style.display = 'inline-block';
                 item.style.opacity = '0.5';
                 try {
-                  await deleteImageSignature(file.id, storage.gdriveToken);
-                  if (isDefault) chrome.storage.local.remove('default_image_signature_id');
-                  refreshImageSignatures();
+                  await deleteImageSignatureLocal(file.id);
+                  if (isDefault) {
+                    chrome.storage.local.remove('default_image_signature_id');
+                  }
+                  refreshImageSignatures(); // Full refresh is ok for deletion
                 } catch (e) {
                   showKeysError('Failed to delete image: ' + e.message);
-                  refreshImageSignatures();
+                  item.style.opacity = '1';
                 }
               }
             });
@@ -887,7 +899,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; padding: 16px 8px; background: var(--accent-danger-soft); border-radius: 8px; border: 1px dashed var(--accent-danger);">
             <svg style="color: var(--accent-danger); margin-bottom: 8px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary);">Failed to load signatures</span>
-            <span style="font-size: 0.65rem; color: var(--text-secondary); text-align: center; margin-top: 4px;">Could not retrieve visual signatures. Please check your connection or re-authenticate Google Drive.</span>
+            <span style="font-size: 0.65rem; color: var(--text-secondary); text-align: center; margin-top: 4px;">Could not retrieve visual signatures from local storage.</span>
           </div>
         `;
       } finally {
@@ -913,36 +925,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       btnAddImageSig.disabled = true;
-      btnAddImageSig.innerHTML = '<svg class="spinner" style="width: 14px; height: 14px; margin-right: 8px; color: currentColor;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Uploading...';
+      btnAddImageSig.innerHTML = '<svg class="spinner" style="width: 14px; height: 14px; margin-right: 8px; color: currentColor;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...';
 
       try {
-        chrome.storage.local.get(['gdriveToken'], async (storage) => {
-          if (!storage.gdriveToken) throw new Error('Not authenticated with Google Drive');
-          
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            try {
-              const fileName = `Signature_${new Date().getTime()}`;
-              const res = await uploadImageSignature(reader.result, fileName, file.type, storage.gdriveToken);
-              
-              // If it's the first one, set as default
-              chrome.storage.local.get(['default_image_signature_id'], (st) => {
-                if (!st.default_image_signature_id) {
-                  chrome.storage.local.set({ 'default_image_signature_id': res.id }, () => refreshImageSignatures());
-                } else {
-                  refreshImageSignatures();
-                }
-              });
-            } catch (err) {
-              showKeysError(err.message);
-            } finally {
-              btnAddImageSig.disabled = false;
-              btnAddImageSig.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> Upload New Image';
-              uploadImgSigFile.value = '';
-            }
-          };
-          reader.readAsDataURL(file);
-        });
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            const id = crypto.randomUUID();
+            const fileName = `Signature_${new Date().getTime()}`;
+            const res = await saveImageSignatureLocal(id, fileName, file.type, reader.result);
+            
+            // If it's the first one, set as default
+            chrome.storage.local.get(['default_image_signature_id'], (st) => {
+              if (!st.default_image_signature_id) {
+                chrome.storage.local.set({ 'default_image_signature_id': id }, () => refreshImageSignatures());
+              } else {
+                refreshImageSignatures();
+              }
+            });
+          } catch (err) {
+            showKeysError('Failed to save image locally: ' + err);
+          } finally {
+            btnAddImageSig.disabled = false;
+            btnAddImageSig.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg> Upload New Image';
+            uploadImgSigFile.value = '';
+          }
+        };
+        reader.readAsDataURL(file);
       } catch (e) {
         showKeysError('Failed to read file.');
         btnAddImageSig.disabled = false;

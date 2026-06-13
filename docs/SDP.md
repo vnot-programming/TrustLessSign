@@ -505,3 +505,13 @@
   - `safari-extension/Resources/popup.html`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.5`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Analisis lebih dalam terhadap rentetan error `addEventListener` pada `btnPopout` dan `btnLoginGoogle` mengungkap bahwa seluruh konten `<body>` di dalam berkas `popup.html` secara tidak sengaja terhapus (terpotong) pada saat manipulasi injeksi skrip `<script>` di rilis `1.3.2`. Hal ini menyebabkan hampir semua *event listener* gagal karena elemen UI tidak eksis. Berkas `popup.html` telah dipulihkan (*restore*) ke keadaan aslinya secara penuh dan urutan impor *script* (`forge.min.js`, `gdrive.js`) telah diletakkan di tempat yang benar pada bagian bawah DOM. Ekstensi di-bump ke `1.3.5`.
+
+- **Tanggal/Waktu:** 2026-06-13T13:10:00Z
+- **Tugas yang diselesaikan:** Fix Bug Flicker UI dan Migrasi Penyimpanan Gambar Tanda Tangan ke IndexedDB Lokal
+- **File yang diubah/dibuat:**
+  - `chrome-extension/signing/local-db.js` (Baru - Wrapper IndexedDB)
+  - `chrome-extension/popup/popup.js` (Memperbarui logika Gallery)
+  - `chrome-extension/popup/popup.html` (Impor script `local-db.js`)
+  - Disinkronisasikan ke `safari-extension`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.6`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Merespons keluhan terkait kedipan UI (*flicker*) saat pengguna mengeklik gambar tanda tangan (Selection), masalah ini berakar dari proses `refreshImageSignatures()` yang sebelumnya selalu me-*reload* seluruh daftar gambar dari Google Drive API secara penuh setiap kali terjadi perubahan status *default*. Selain itu, arsitektur penyimpanan juga direvisi: Sesuai arahan baru, gambar tanda tangan tidak lagi langsung diunggah ke Google Drive saat dipilih, melainkan ditampung ke penyimpanan *IndexedDB* lokal peramban (melalui `local-db.js`). Logika UI kini langsung memperbarui kelas CSS secara instan saat seleksi gambar dilakukan sehingga bebas kedipan. Gambar baru akan ikut terunggah ke Drive nantinya saat proses *Sign PDF* dieksekusi bersamaan dengan dokumen PDF (akan diimplementasi di *Sprint 3*). Versi ekstensi naik ke `1.3.6`.
