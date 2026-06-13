@@ -877,7 +877,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         }
       } catch (err) {
-        imgSigList.innerHTML = '<p style="grid-column: span 2; text-align: center; font-size: 0.75rem; color: var(--accent-danger);">Failed to load signatures</p>';
+        imgSigList.innerHTML = `
+          <div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; padding: 16px 8px; background: var(--accent-danger-soft); border-radius: 8px; border: 1px dashed var(--accent-danger);">
+            <svg style="color: var(--accent-danger); margin-bottom: 8px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary);">Failed to Sync Drive</span>
+            <span style="font-size: 0.65rem; color: var(--text-secondary); text-align: center; margin-top: 4px;">Could not retrieve visual signatures. Please check your connection or re-authenticate Google Drive.</span>
+          </div>
+        `;
       } finally {
         imgSigLoading.style.display = 'none';
       }
