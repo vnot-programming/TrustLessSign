@@ -358,27 +358,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('popout') === 'true') {
     bodyEl.classList.remove('popup-view');
-    btnPopout.classList.add('hidden'); // Hide popout button in popout view
+    if (btnPopout) btnPopout.classList.add('hidden'); // Hide popout button in popout view
   }
 
   // Popout click listener
-  btnPopout.addEventListener('click', () => {
-    const width = 450;
-    const height = 700;
-    const left = Math.round((screen.width - width) / 2);
-    const top = Math.round((screen.height - height) / 2);
+  if (btnPopout) {
+    btnPopout.addEventListener('click', () => {
+      const width = 450;
+      const height = 700;
+      const left = Math.round((screen.width - width) / 2);
+      const top = Math.round((screen.height - height) / 2);
 
-    chrome.windows.create({
-      url: chrome.runtime.getURL('popup/popup.html?popout=true'),
-      type: 'popup',
-      width: width,
-      height: height,
-      left: left,
-      top: top
-    }, () => {
-      window.close();
+      chrome.windows.create({
+        url: chrome.runtime.getURL('popup/popup.html?popout=true'),
+        type: 'popup',
+        width: width,
+        height: height,
+        left: left,
+        top: top
+      }, () => {
+        window.close();
+      });
     });
-  });
+  }
 
   // 2. Check Auth Status
   const checkAuth = async () => {

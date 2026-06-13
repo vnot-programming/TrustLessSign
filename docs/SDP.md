@@ -489,3 +489,11 @@
   - `safari-extension/Resources/popup.js`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.3`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan inisialisasi akibat elemen DOM dengan ID `btn-theme-toggle` dan `extension-lang-select` absen secara permanen di kerangka `popup.html`, namun skrip `popup.js` secara agresif mencoba menyematkan *Event Listener* ke dalam ID tersebut. Hal ini menyebabkan antarmuka memblokir eksekusi di baris ke-315. Perbaikan dilakukan dengan menyuntikkan operator kondisional (`if (btnThemeToggle) { ... }`) untuk mencegah *null pointer exception*. Versi dirilis ke `1.3.3`.
+
+- **Tanggal/Waktu:** 2026-06-13T12:45:00Z
+- **Tugas yang diselesaikan:** Fix Bug `TypeError: Cannot read properties of null (reading 'addEventListener')` pada `btnPopout`.
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.js`
+  - `safari-extension/Resources/popup.js`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.4`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Analisis lebih lanjut mengungkap kesalahan (*TypeError*) yang persis sama terulang pada pemanggilan fungsi `btnPopout.addEventListener`. Fitur `btnPopout` rupanya juga telah direvisi dari struktur DOM `popup.html`. Perbaikan identik (*null safety conditional*) telah diaplikasikan pada baris-baris pemanggil variabel `btnPopout` untuk memitigasi kegagalan muat antarmuka secara keseluruhan. Ekstensi rilis `1.3.4`.
