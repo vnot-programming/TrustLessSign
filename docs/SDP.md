@@ -350,5 +350,11 @@
 - **Tanggal/Waktu:** 2026-06-13T05:56:00Z
 - **Tugas yang diselesaikan:** Fix Bug — Banner "Sertifikat telah di-revoke" (oranye) tidak hilang setelah generate sertifikat baru
 - **File yang diubah/dibuat:** `web/resources/js/Pages/Dashboard.jsx`
-- **Status saat ini:** Selesai (Version `web-v1.2.4`)
+- **Status saat ini:** Selesai (Version `web-v1.2.5`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Root cause: setelah `handleGenerateCertificate` berhasil dan `router.reload()` dipanggil, state `syncStatus` (yang masih menyimpan `{ status: 'revoked' }` dari sertifikat lama) tidak di-reset. `router.reload()` me-remount komponen sehingga useEffect sync-check re-run otomatis — tidak perlu counter trigger tambahan. Fix: ditambahkan helper `handleCertActivated()` yang memanggil `setModalOpen(false)` + `setSyncStatus(null)` (menghapus banner lama secara instan sebagai feedback visual) + `router.reload()` (remount komponen, sync-check re-run fresh). Helper ini digunakan di dua callsite: auto-close (setTimeout 2 detik) dan tombol "Close & Continue" pada flow backup file.
+
+- **Tanggal/Waktu:** 2026-06-13T06:13:00Z
+- **Tugas yang diselesaikan:** Koreksi SSOT — Sinkronisasi `web/package.json` ke versi `1.2.5` (SemVer Strict Versioning §4.2)
+- **File yang diubah/dibuat:** `web/package.json`
+- **Status saat ini:** Selesai (Version `web-v1.2.5`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan pelanggaran Strict Versioning Rules §4.2 — tag `web-v1.2.4` dan `web-v1.2.5` sudah di-push ke GitHub tanpa memperbarui `web/package.json` terlebih dahulu sebagai SSOT. `package.json` masih di `1.2.3` sementara tag sudah di `1.2.5`. Koreksi: `version`, `version_name` diupdate ke `1.2.5` dan `version_code` ke `125`. **PERHATIAN UNTUK AI SELANJUTNYA:** Selalu update `package.json` SEBELUM membuat git tag. Urutan wajib: (1) Edit `package.json` → (2) `git commit` → (3) `git tag web-vX.Y.Z` → (4) `git push origin main --tags`.
