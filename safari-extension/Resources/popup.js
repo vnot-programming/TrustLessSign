@@ -693,7 +693,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        const password = prompt('Enter your Master Password to backup identity:');
+        const password = await customPrompt('Identity Backup', 'Enter your Master Password to backup identity:');
         if (!password || password.length < 8) {
           showKeysError('Invalid Master Password.');
           return;
@@ -771,7 +771,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const password = prompt('Enter the Master Password used when this identity was created:');
+      const password = await customPrompt('Import Identity', 'Enter the Master Password used when this identity was created:');
       if (!password || password.length < 8) {
         showKeysError('Invalid Master Password.');
         return;
@@ -1106,6 +1106,51 @@ document.addEventListener('DOMContentLoaded', async () => {
   const showSignError = (msg) => {
     signStatus.classList.remove('hidden');
     signStatus.textContent = msg;
+  };
+
+  // Custom Promise-based prompt modal
+  const customPrompt = (title, desc) => {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('password-prompt-modal');
+      const titleEl = document.getElementById('pwd-prompt-title');
+      const descEl = document.getElementById('pwd-prompt-desc');
+      const inputEl = document.getElementById('pwd-prompt-input');
+      const btnSubmit = document.getElementById('btn-pwd-prompt-submit');
+      const btnCancel = document.getElementById('btn-pwd-prompt-cancel');
+      
+      titleEl.textContent = title;
+      descEl.textContent = desc;
+      inputEl.value = '';
+      inputEl.type = 'password';
+      modal.classList.add('visible');
+      setTimeout(() => inputEl.focus(), 100);
+
+      const cleanup = () => {
+        modal.classList.remove('visible');
+        btnSubmit.removeEventListener('click', onSubmit);
+        btnCancel.removeEventListener('click', onCancel);
+        inputEl.removeEventListener('keydown', onKeydown);
+      };
+
+      const onSubmit = () => {
+        resolve(inputEl.value);
+        cleanup();
+      };
+
+      const onCancel = () => {
+        resolve(null);
+        cleanup();
+      };
+
+      const onKeydown = (e) => {
+        if (e.key === 'Enter') onSubmit();
+        if (e.key === 'Escape') onCancel();
+      };
+
+      btnSubmit.addEventListener('click', onSubmit);
+      btnCancel.addEventListener('click', onCancel);
+      inputEl.addEventListener('keydown', onKeydown);
+    });
   };
 
   // Helper function to update progress overlay

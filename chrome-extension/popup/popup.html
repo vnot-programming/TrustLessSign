@@ -930,6 +930,31 @@
     </div>
   </div>
 
+  <!-- PASSWORD PROMPT MODAL -->
+  <div id="password-prompt-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-icon-container" style="background: var(--surface-secondary); color: var(--text-primary); border-color: var(--border-subtle);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h3 id="pwd-prompt-title" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Master Password Required</h3>
+      <p id="pwd-prompt-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5;">Enter password</p>
+      
+      <div class="password-wrapper" style="margin-bottom: 20px; text-align: left;">
+        <input type="password" id="pwd-prompt-input" class="form-control" placeholder="Enter password..." style="text-align: center;">
+        <button type="button" class="toggle-password" data-target="pwd-prompt-input" title="Show/Hide Password">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button id="btn-pwd-prompt-cancel" class="btn-secondary" style="flex: 1; min-height: 44px; margin: 0;">Cancel</button>
+        <button id="btn-pwd-prompt-submit" class="btn-primary" style="flex: 1; min-height: 44px; margin: 0;">Submit</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../signing/signer.js"></script>
   <script src="popup.js"></script>
 </body>
