@@ -312,39 +312,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  btnThemeToggle.addEventListener('click', () => {
-    chrome.storage.local.get(['extensionTheme'], (storage) => {
-      const currentTheme = storage.extensionTheme || 'system';
-      let newTheme = 'system';
-      if (currentTheme === 'system') {
-        newTheme = 'light';
-      } else if (currentTheme === 'light') {
-        newTheme = 'dark';
-      } else {
-        newTheme = 'system';
-      }
-      chrome.storage.local.set({ extensionTheme: newTheme }, () => {
-        applyTheme(newTheme);
+  if (btnThemeToggle) {
+    btnThemeToggle.addEventListener('click', () => {
+      chrome.storage.local.get(['extensionTheme'], (storage) => {
+        const currentTheme = storage.extensionTheme || 'system';
+        let newTheme = 'system';
+        if (currentTheme === 'system') {
+          newTheme = 'light';
+        } else if (currentTheme === 'light') {
+          newTheme = 'dark';
+        } else {
+          newTheme = 'system';
+        }
+        chrome.storage.local.set({ extensionTheme: newTheme }, () => {
+          applyTheme(newTheme);
+        });
       });
     });
-  });
+  }
 
   // Language Switcher Logic
   const initLanguage = () => {
     chrome.storage.local.get(['extensionLang'], (storage) => {
       const lang = storage.extensionLang || 'en';
-      langSelect.value = lang;
+      if (langSelect) langSelect.value = lang;
       translateUI(lang);
     });
   };
 
-  langSelect.addEventListener('change', (e) => {
-    const newLang = e.target.value;
-    chrome.storage.local.set({ extensionLang: newLang }, () => {
-      translateUI(newLang);
-      checkAuth();
+  if (langSelect) {
+    langSelect.addEventListener('change', (e) => {
+      const newLang = e.target.value;
+      chrome.storage.local.set({ extensionLang: newLang }, () => {
+        translateUI(newLang);
+        if (typeof checkAuth === 'function') checkAuth();
+      });
     });
-  });
+  }
 
   // Setup PDFjs
   const pdfjsLib = window['pdfjs-dist/build/pdf'];

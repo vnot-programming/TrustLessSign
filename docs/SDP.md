@@ -481,3 +481,11 @@
   - `safari-extension/Resources/popup.html`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.2`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan penulisan (*import*) skrip pada antarmuka *popup*. Fungsi manajemen `uploadImageSignature` dideklarasikan pada file terpisah (`gdrive.js`), namun file skrip tersebut belum disisipkan ke dalam tag `<script>` pada dokumen HTML. Hal ini mengakibatkan aksi pengunggahan memicu kesalahan *ReferenceError*. Kesalahan telah diperbaiki dengan mengimpor `gdrive.js` dan dependensinya (`forge.min.js`) secara eksplisit ke struktur DOM. Versi telah di-bump menjadi `1.3.2`.
+
+- **Tanggal/Waktu:** 2026-06-13T12:35:00Z
+- **Tugas yang diselesaikan:** Fix Bug `Uncaught TypeError: Cannot read properties of null (reading 'addEventListener')`
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.js`
+  - `safari-extension/Resources/popup.js`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.3`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan inisialisasi akibat elemen DOM dengan ID `btn-theme-toggle` dan `extension-lang-select` absen secara permanen di kerangka `popup.html`, namun skrip `popup.js` secara agresif mencoba menyematkan *Event Listener* ke dalam ID tersebut. Hal ini menyebabkan antarmuka memblokir eksekusi di baris ke-315. Perbaikan dilakukan dengan menyuntikkan operator kondisional (`if (btnThemeToggle) { ... }`) untuk mencegah *null pointer exception*. Versi dirilis ke `1.3.3`.
