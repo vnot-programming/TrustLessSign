@@ -443,3 +443,13 @@
   - Manifest version *bump* ke `1.3.0`
 - **Status saat ini:** Selesai (Sprint 2 - Versi Ekstensi `ext-v1.3.0`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mengacu pada aturan `Trustless Architecture`, fitur *Image Signature* kini menyimpan data 100% di akun Google Drive pengguna. Fungsi di `gdrive.js` telah diperluas untuk mengelola direktori `TrustLessSign/ImageSignatures`. Di tab *Keys & Cert*, galeri tanda tangan visual berhasil dirender. Pengguna dapat mengunggah (ukuran dibatasi maks 5MB), melihat pratinjau mini, menetapkan tanda tangan utama (*default*), dan menghapusnya (*double-click*). Semua fungsi memanfaatkan token Drive dari *storage local*. Langkah selanjutnya untuk AI (Sprint 3) adalah mengintegrasikan penyematan gambar ini langsung ke dokumen PDF via `pdf-lib.js` saat proses penandatanganan (Sign PDF).
+
+- **Tanggal/Waktu:** 2026-06-13T11:42:00Z
+- **Tugas yang diselesaikan:** Pembaruan Desain Fallback & Refactoring Dokumen Perencanaan (Zero-Knowledge)
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.js`
+  - `safari-extension/Resources/popup.js`
+  - `docs/new/image-signature-implementation_plan.md`
+  - `docs/new/image-signature-task.md`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Tampilan peringatan (*fallback*) ketika ekstensi gagal memuat daftar *Visual Signatures* dari Google Drive telah diperbarui agar selaras dengan panduan *Bio-Digital Minimalism 2026*. Menampilkan ikon berpalet `accent-danger` dengan gaya terstruktur. Selain itu, dokumen `implementation_plan.md` dan `image-signature-task.md` telah ditulis ulang (*rewritten*) sepenuhnya. Dokumen tersebut kini menolak sama sekali gagasan penggunaan database backend dan mendelegasikan otoritas penuh pada arsitektur Trustless / Zero-Knowledge menggunakan API Google Drive.
