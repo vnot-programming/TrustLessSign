@@ -525,3 +525,11 @@
   - `safari-extension/Resources/popup.html`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.7`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Sebelumnya, status pemuatan otorisasi ("Connecting to Google...") dirender hanya sebagai teks statis berwarna merah (`var(--accent-danger)`) karena konfigurasi *hardcode* pada elemen `#login-status`. Pendekatan ini tidak sesuai dengan prinsip desain aplikasi yang mengutamakan indikator multi-visual. Modifikasi dilakukan dengan membangun fungsi pendukung `setLoginStatus(state, text)` pada skrip `popup.js` untuk mengontrol CSS secara dinamis. Status '*loading*' kini memunculkan *spinner SVG* berwarna biru kehijauan dengan latar '*surface-secondary*', sedangkan status gagal dikembalikan ke mode peringatan merah putus-putus. Versi rilis diperbarui ke `1.3.7`.
+
+- **Tanggal/Waktu:** 2026-06-13T14:00:00Z
+- **Tugas yang diselesaikan:** Implementasi Efek Glow Hijau pada Active Device Card & Bumping Web Version ke 1.2.9
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/Dashboard.jsx`
+  - `web/package.json`
+- **Status saat ini:** Selesai (Version Web `web-v1.2.9`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah layout kartu perangkat aktif pada halaman Dashboard utama agar memancarkan bayangan/glow hijau lembut saat kursor diletakkan di atasnya (`group hover:border-accent-primary/40 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.25),0_0_28px_rgba(16,185,129,0.12)]`). Menyelaraskan warna badge lingkaran nomor urut menjadi `bg-accent-success-soft` dan `text-accent-success` dari yang sebelumnya menggunakan `bg-accent-primary-soft`. Melakukan bump versi web ke `1.2.9` di `web/package.json` dan memicu build produksi Vite. Tag `web-v1.2.9` telah dibuat dan di-push untuk memicu proses CI/CD deployment.
