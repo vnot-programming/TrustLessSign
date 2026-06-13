@@ -463,3 +463,13 @@
   - `docs/new/image-signature-task.md`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Teks kesalahan pada UI Galeri *Visual Signatures* dikembalikan menjadi pesan lugas "Failed to load signatures" sambil tetap mempertahankan balutan desain *aesthetic* kotak peringatan `accent-danger-soft`. Selain itu, batas ambang ukuran gambar (*file size limit*) pada berkas perencanaan dan logika validasi ekstensi telah ditingkatkan dari `5MB` menjadi `25MB`.
+
+- **Tanggal/Waktu:** 2026-06-13T12:05:00Z
+- **Tugas yang diselesaikan:** Push dan Tag Release Sinkronisasi Ekstensi
+- **File yang diubah/dibuat:**
+  - `chrome-extension/package.json`
+  - `chrome-extension/manifest.json`
+  - `safari-extension/Resources/manifest.json`
+  - `docs/releases/trustlesssign-v1.3.1.crx`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.1`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ekstensi versi 1.3.1 telah di-bump, di-build menjadi `.crx`, di-commit dan diberi tag `ext-v1.3.1` agar pipeline CI/CD mengeksekusi sinkronisasi file ke PC Desktop lokal pengguna via Tailscale. Tanpa Git Tag dengan prefix `ext-v`, proses sinkronisasi tidak akan terjadi.
