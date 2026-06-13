@@ -28,11 +28,11 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 - **Max File Size:** 25 MB
 - **Local Validation:** MIME types and sizes are checked locally via FileReader API before uploading.
 
-### 2.3 Storage Architecture (Google Drive API)
-- The extension authenticates with Google Drive using the existing `gdriveToken`.
-- Signatures are stored in `TrustLessSign/ImageSignatures`.
+### 2.3 Storage Architecture (Zero-Trust & IndexedDB)
+- The extension captures and stores visual signatures instantly in the browser's **IndexedDB** (`local-db.js`) to prevent UI flickering.
+- Images are only synchronized to the user's private Google Drive (`TrustLessSign/ImageSignatures`) via `gdrive.js` during the actual PDF signing execution or background sync.
 - Default signature ID is stored in `chrome.storage.local`.
-- No database tables or backend API endpoints are used for images.
+- No database tables or backend API endpoints are ever used for image storage or processing.
 
 ---
 
@@ -48,6 +48,12 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 │  │ Image Uploader │       │ PDF Processing    │  │
 │  │ (Local Canvas) │──────>│ (pdf-lib.js)      │  │
 │  └────────────────┘       └───────────────────┘  │
+│          │                          │            │
+│          ↓                          │            │
+│  ┌────────────────────────┐         │            │
+│  │     IndexedDB          │         │            │
+│  │   (local-db.js)        │         │            │
+│  └────────────────────────┘         │            │
 │          │                          │            │
 │          ↓                          ↓            │
 │  ┌────────────────────────────────────────────┐  │
@@ -76,18 +82,36 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 *Note: This phase was initially planned but completely rolled back to enforce the Zero-Knowledge protocol.*
 
 ### Phase 2: Extension Storage & UI (COMPLETED)
-- [x] Implement Google Drive API for direct uploads (`gdrive.js`)
+- [x] Create Local Database wrapper (`local-db.js`) using IndexedDB for instant UI response without flicker.
 - [x] Create Visual Signatures Gallery in the "Keys & Cert" tab
-- [x] Support marking signatures as default
+- [x] Support marking signatures as default and store state in `chrome.storage.local`
 - [x] Apply Bio-Digital Minimalism aesthetic (Custom modales, Fallbacks, CSS)
 
-### Phase 3: PDF Embedding (Next)
-- [ ] Read image buffer from Google Drive directly during the signing process
-- [ ] Integrate `pdf-lib` to embed the PNG/JPG onto the PDF canvas
-- [ ] Tie image selection to the existing QR drag-and-drop selector
-- [ ] Maintain aspect ratio and visual fidelity
+### Phase 3: PDF Embedding & Barcode Signature Framing (Next)
+- [ ] Implement Canvas API generator (`barcode-generator.js`) to compose the TrustLessSign Signature Frame.
+- [ ] Inject JsBarcode library for 1D Code 128 generation.
+- [ ] Implement silent Zero-Trust Authentication validation before rendering `signerName` to ensure cryptographic validity.
+- [ ] Render static elements: White background, 24px padding, thick green left border with rounded corners.
+- [ ] Render Header: Green check icon + "Signed by: [signerName]".
+- [ ] Render Body: Embed the user's uploaded image (or cursive text). If using QR Code, embed the QR Code instead.
+- [ ] Render Meta & Barcode: Add "TrustLessSign Zero Trust", `shortId` (e.g., TLS-XXXX), Code 128 Barcode, and Footer URL. (Note: Omit `shortId`, Barcode, and Footer URL if wrapping a QR Code).
+- [ ] Convert the composed Canvas into an image buffer.
+- [ ] Read image buffer from Google Drive / IndexedDB during the signing process.
+- [ ] Integrate `pdf-lib` to embed the composed Canvas image onto the PDF canvas.
+- [ ] Tie image selection to the existing drag-and-drop selector using a Ghost Element or 50ms Debounce to prevent memory leak during live preview simulation.
 
-### Phase 4: Testing & Polish
-- [ ] Test upload quotas and Drive synchronization
-- [ ] Test cross-browser compatibility (Safari vs Chrome)
-- [ ] End-to-end PDF signing with both visual and cryptographic stamps
+### Phase 4: Web Verify Scanner Integration
+- [ ] Update `web/resources/js/Pages/Verify.jsx` to include an EditText for manual Short ID entry.
+- [ ] Integrate `html5-qrcode` library in **Headless Mode** (`Html5Qrcode` class) without the built-in scanner UI.
+- [ ] Build custom scanner UI: target box, animated green scanning line, blurred background outside the target, and camera switch button.
+- [ ] Implement Responsive Video & Camera Selection logic:
+  - Set dynamic `aspectRatio` (1.33 or 1.77 for PC/Landscape; auto/vertical for Mobile).
+  - Use `{ facingMode: "environment" }` by default to prioritize the rear camera.
+  - Use `Html5Qrcode.getCameras()` to allow users to switch cameras if needed.
+- [ ] Implement graceful Error Handling for `NotAllowedError` and `NotReadableError` (Show interactive warning guiding to Manual Input).
+- [ ] Map the scanned `shortId` to the document's verification API. (API returns metadata and document_hash ONLY, strictly Zero Trust).
+
+### Phase 5: Testing & Polish
+- [ ] Test upload quotas and Drive synchronization.
+- [ ] Test cross-browser compatibility (Safari vs Chrome) for Canvas generation and Camera access.
+- [ ] End-to-end PDF signing with both visual Canvas frame and cryptographic stamps.

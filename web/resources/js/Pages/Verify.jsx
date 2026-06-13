@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import { ShieldAlert, ShieldCheck, Download, Loader2 } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Download, Loader2, Camera, Search } from 'lucide-react';
 import axios from 'axios';
+import { Html5Qrcode } from 'html5-qrcode';
 
 export default function Verify({ token }) {
   const { messages } = usePage().props;
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!token);
+  const [shortIdInput, setShortIdInput] = useState('');
+  
+  // Scanner States
+  const [isScanning, setIsScanning] = useState(false);
+  const [scannerError, setScannerError] = useState('');
+  const scannerRef = useRef(null);
 
   const t = messages?.Verification || {
     title: "Document Verification",
@@ -24,15 +31,152 @@ export default function Verify({ token }) {
   };
 
   useEffect(() => {
-    axios.get(`/api/verify/${token}`)
-      .then(res => {
-        setData(res.data);
-      })
-      .catch(err => {
-        setError(err.response?.data?.message || 'Verification failed. Document not found.');
-      })
-      .finally(() => setLoading(false));
+    if (token) {
+      axios.get(`/api/verify/${token}`)
+        .then(res => {
+          setData(res.data);
+        })
+        .catch(err => {
+          setError(err.response?.data?.message || 'Verification failed. Document not found.');
+        })
+        .finally(() => setLoading(false));
+    }
   }, [token]);
+
+  // Scanner Logic
+  useEffect(() => {
+    let html5QrCode;
+    if (!token && isScanning) {
+      html5QrCode = new Html5Qrcode("reader");
+      
+      html5QrCode.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 100 },
+          aspectRatio: window.innerWidth < 600 ? 1.0 : 1.77,
+        },
+        (decodedText) => {
+          html5QrCode.stop().then(() => {
+            setIsScanning(false);
+            // Assuming the decoded text might be the full URL or just the token/shortId
+            // Extract token if it's a URL
+            let scannedToken = decodedText;
+            if (decodedText.includes('/verify/')) {
+               scannedToken = decodedText.split('/verify/').pop();
+            }
+            window.location.href = `/verify/${scannedToken}`;
+          });
+        },
+        (errorMessage) => {
+          // parse error, ignore mostly
+        }
+      ).catch((err) => {
+        setScannerError("Camera permission denied or camera not found. Please enter ID manually.");
+        setIsScanning(false);
+      });
+    }
+
+    return () => {
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(console.error);
+      }
+    };
+  }, [isScanning, token]);
+
+  const handleManualSubmit = (e) => {
+    e.preventDefault();
+    if (shortIdInput.trim()) {
+      window.location.href = `/verify/${shortIdInput.trim()}`;
+    }
+  };
+
+  if (!token) {
+    return (
+      <>
+        <Head title={t.title} />
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <div className="glass-panel max-w-lg w-full p-8 space-y-6">
+            <h1 className="text-2xl font-bold text-center border-b border-border-subtle pb-4">{t.title}</h1>
+            
+            <div className="space-y-4">
+              <p className="text-center text-text-secondary text-sm">
+                Scan the Barcode/QR Code on the document or enter the ID manually.
+              </p>
+
+              {/* Scanner View */}
+              {isScanning ? (
+                <div className="relative overflow-hidden rounded-xl border border-accent-primary shadow-lg bg-black">
+                  <div id="reader" className="w-full"></div>
+                  <button 
+                    onClick={() => setIsScanning(false)}
+                    className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 z-10 text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <style dangerouslySetInnerHTML={{__html: `
+                    @keyframes scan {
+                      0% { top: 30%; }
+                      50% { top: 70%; }
+                      100% { top: 30%; }
+                    }
+                  `}} />
+                  <div className="absolute inset-0 pointer-events-none border-[3px] border-accent-primary opacity-50 z-0"></div>
+                  <div className="absolute top-[30%] left-[15%] w-[70%] h-[2px] bg-accent-primary animate-[scan_2s_ease-in-out_infinite] shadow-[0_0_8px_var(--accent-primary)] z-10"></div>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setIsScanning(true)}
+                  className="w-full py-12 flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border-default rounded-xl bg-surface-secondary hover:border-accent-primary hover:bg-accent-primary-soft transition-colors text-text-secondary hover:text-accent-primary"
+                >
+                  <Camera size={48} strokeWidth={1.5} />
+                  <span className="font-semibold">Tap to Scan Barcode / QR</span>
+                </button>
+              )}
+
+              {scannerError && (
+                <div className="p-3 bg-accent-danger-soft border border-accent-danger text-accent-danger text-xs rounded-lg text-center">
+                  {scannerError}
+                </div>
+              )}
+
+              <div className="flex items-center gap-4 my-4">
+                <div className="flex-1 h-px bg-border-subtle"></div>
+                <span className="text-xs text-text-tertiary font-medium uppercase tracking-wider">OR</span>
+                <div className="flex-1 h-px bg-border-subtle"></div>
+              </div>
+
+              {/* Manual Entry */}
+              <form onSubmit={handleManualSubmit} className="space-y-3">
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider block">Manual ID Entry</label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-tertiary">
+                      <Search size={16} />
+                    </div>
+                    <input 
+                      type="text" 
+                      value={shortIdInput}
+                      onChange={(e) => setShortIdInput(e.target.value.toUpperCase())}
+                      placeholder="e.g. TLS-A1B2C3D4"
+                      className="w-full pl-10 pr-4 py-3 bg-surface-primary border border-border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent uppercase font-mono"
+                    />
+                  </div>
+                  <button 
+                    type="submit" 
+                    disabled={!shortIdInput.trim()}
+                    className="bg-text-primary text-surface-primary px-6 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity"
+                  >
+                    Verify
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

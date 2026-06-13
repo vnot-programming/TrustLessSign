@@ -21,9 +21,17 @@ class VerificationController extends Controller
      */
     public function getVerificationData($token)
     {
-        $document = Document::where('verify_token', $token)
-            ->with(['user', 'certificate'])
-            ->first();
+        $queryToken = strtolower(str_replace('TLS-', '', strtoupper($token)));
+        
+        if (str_starts_with(strtoupper($token), 'TLS-')) {
+            $document = Document::where('verify_token', 'LIKE', $queryToken . '%')
+                ->with(['user', 'certificate'])
+                ->first();
+        } else {
+            $document = Document::where('verify_token', $token)
+                ->with(['user', 'certificate'])
+                ->first();
+        }
 
         if (!$document) {
             return response()->json([

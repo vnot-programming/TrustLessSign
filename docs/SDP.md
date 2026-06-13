@@ -544,3 +544,28 @@
   - `safari-extension/Resources/manifest.json`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.9`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Telah dilakukan perombakan antarmuka Card Profil pengguna di dalam ekstensi (baik untuk Google Chrome maupun Safari) sehingga penampilannya selaras dengan desain "Active Devices" pada Web Dashboard. Desain baru mengadopsi standar Bio-Digital Minimalism 2026 dengan menggunakan `var(--surface-secondary)` untuk latar belakang dan efek *glow* (menyala) Hijau Aestetik pada saat *hover*. Tombol *Logout* juga disesuaikan menjadi bergaya *danger-outline* transparan. Versi ekstensi telah diperbarui secara serentak menjadi `1.3.9`.
+
+- **Tanggal/Waktu:** 2026-06-13T14:52:00Z
+- **Tugas yang diselesaikan:** 
+  - Membuat dan mengintegrasikan Canvas Barcode Signature Frame (`barcode-generator.js`) ke dalam proses penandatanganan dokumen di `popup.js` ekstensi (Phase 3). 
+  - Mengimplementasikan Web Verify Scanner Integration (`/verify` page) yang menggunakan library `html5-qrcode` (Headless) untuk memindai Barcode/QR langsung dari kamera, lengkap dengan antarmuka pindai khusus dan kolom input Short ID secara manual (Phase 4).
+  - Mengubah `VerificationController.php` untuk mendukung pencarian berdasarkan Short ID (`TLS-XXXX`).
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.js` (Memanggil `generateSignatureFrame` untuk pembuatan frame tanda tangan dengan opsi barcode/QR)
+  - `safari-extension/Resources/popup.js` (Disinkronkan)
+  - `web/routes/web.php` (Memperbolehkan token sebagai opsional di rute `/verify`)
+  - `web/app/Http/Controllers/VerificationController.php` (Pencarian berbasis `LIKE` untuk Short ID)
+  - `web/resources/js/Pages/Verify.jsx` (Integrasi Scanner UI dan Manual Input)
+  - `web/package.json` (Penambahan `html5-qrcode`)
+- **Status saat ini:** Selesai (Phase 3 dan Phase 4 sudah diimplementasikan).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Halaman verifikasi sudah dapat melakukan scanning dan pencarian ID dengan prefix TLS-. Pastikan pipeline CI/CD dijalankan atau `npm run build` dieksekusi oleh user di sisi klien untuk melihat perubahan pada antarmuka web. Evaluasi workflow penandatanganan keseluruhan dengan menguji validasi verifikasi PDF.
+
+- **Tanggal/Waktu:** 2026-06-13T14:52:00Z
+- **Tugas yang diselesaikan:** Revisi Dokumen Perencanaan (Implementation Plan & Task) ke Arsitektur Zero Trust
+- **File yang diubah/dibuat:**
+  - `docs/new/image-signature-implementation_plan.md`
+  - `docs/new/image-signature-task.md`
+  - `docs/new/multiple-signature-implementation_plan.md`
+  - `docs/new/multiple-signature-task.md`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menyelaraskan ulang dokumen *Implementation Plan* dan *Task* agar mematuhi arsitektur *Zero Trust*. Pada fitur *Image Signature*, sinkronisasi dengan status terbaru di mana penyimpanan sementara kini dialihkan ke peramban lokal (`IndexedDB` melalui `local-db.js`) demi menghindari kedipan UI, dan bukan langsung ke Google Drive API. Pada fitur *Multiple Signature*, arsitektur direvisi sedemikian rupa agar *backend* Laravel tidak lagi menerima *file upload* PDF secara mentah, melainkan hanya berfungsi sebagai pengelola urutan *Workflow State Machine* yang menerima `document_hash` dan `encrypted_drive_url`.

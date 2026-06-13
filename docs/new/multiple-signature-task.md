@@ -121,11 +121,10 @@ POST /api/v1/documents/create-with-signers
 ```
 
 **Implementation:**
-- [ ] Accept multipart/form-data (file + signer JSON)
+- [ ] Accept JSON payload with `document_hash` and `encrypted_drive_url` (Reject multipart file uploads)
 - [ ] Validate signer emails (format, duplicates)
 - [ ] Validate signer order (sequential, no gaps)
-- [ ] Upload document to storage
-- [ ] Initialize workflow via WorkflowService
+- [ ] Initialize workflow via WorkflowService using `document_hash`
 - [ ] Return created document + signer statuses
 
 **Acceptance Criteria:**

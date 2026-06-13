@@ -25,6 +25,11 @@ Enable documents to require signatures from multiple signers in a defined sequen
 - **Contracts:** Party A → Party B → Witness
 - **Multi-tenant Agreements:** Landlord → Tenant 1 → Tenant 2
 
+### 1.4 TrustLessSign Zero-Trust Compliance (CRITICAL)
+- **No Plaintext Documents on Server:** The Laravel backend MUST NEVER receive, process, or store the unencrypted PDF file.
+- **Decentralized Storage (Google Drive):** The physical document is stored on the initiator's Google Drive and shared with subsequent signers, or transmitted as an End-to-End Encrypted (E2EE) payload.
+- **State Machine Only:** The backend only orchestrates the workflow logic (who signs next, timestamps, reminders) using a cryptographic `document_hash` or `document_id` as a reference point.
+
 ---
 
 ## 2. Technical Requirements
@@ -68,18 +73,12 @@ DRAFT → PENDING → IN_PROGRESS → COMPLETED
 ```
 ┌─────────────────────────────────────────┐
 │         Document Workflow Engine        │
+│          (Laravel Backend)              │
 │                                         │
 │  ┌───────────────────────────────────┐ │
 │  │  Workflow State Machine           │ │
-│  │  - DRAFT → PENDING → IN_PROGRESS  │ │
-│  │  - Transition rules               │ │
-│  └───────────────────────────────────┘ │
-│                 │                       │
-│                 ↓                       │
-│  ┌───────────────────────────────────┐ │
-│  │  Signer Queue Manager             │ │
-│  │  - Order enforcement              │ │
-│  │  - Next signer determination      │ │
+│  │  - Orchestrates PENDING/READY     │ │
+│  │  - Manages Document Hash only     │ │
 │  └───────────────────────────────────┘ │
 │                 │                       │
 │                 ↓                       │
@@ -89,16 +88,16 @@ DRAFT → PENDING → IN_PROGRESS → COMPLETED
 │  │  - Reminders (cron)               │ │
 │  └───────────────────────────────────┘ │
 └─────────────────────────────────────────┘
-                  │
-                  ↓
+                  ↕ (Status & Hashes only, NO FILES)
 ┌─────────────────────────────────────────┐
-│         Database Layer                  │
+│       TrustLessSign Extension           │
+│         (Client-Side Browser)           │
 │                                         │
-│  ┌───────────────┐  ┌────────────────┐ │
-│  │  documents    │  │  signers       │ │
-│  │  - workflow   │→│  - order       │ │
-│  │  - status     │  │  - status      │ │
-│  └───────────────┘  └────────────────┘ │
+│  ┌───────────────────────────────────┐ │
+│  │  PDF Cryptographic Signer         │ │
+│  │  - Local PDF Manipulation         │ │
+│  │  - Push to Google Drive           │ │
+│  └───────────────────────────────────┘ │
 └─────────────────────────────────────────┘
 ```
 
@@ -111,6 +110,7 @@ ALTER TABLE documents ADD COLUMN workflow_status ENUM('draft', 'pending', 'in_pr
 ALTER TABLE documents ADD COLUMN current_signer_id BIGINT UNSIGNED NULL;
 ALTER TABLE documents ADD COLUMN expires_at TIMESTAMP NULL;
 ALTER TABLE documents ADD COLUMN remind_after_days INT DEFAULT 3;
+ALTER TABLE documents ADD COLUMN encrypted_drive_url TEXT NULL; -- Zero Trust link to actual file
 
 -- Create signers table
 CREATE TABLE document_signers (
@@ -189,7 +189,8 @@ Request:
 {
   "document": {
     "title": "Purchase Order #12345",
-    "file": <file upload>,
+    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "encrypted_drive_url": "https://drive.google.com/...",
     "workflow_type": "sequential",
     "expires_at": "2026-07-01T00:00:00Z",
     "remind_after_days": 3
@@ -428,9 +429,9 @@ class WorkflowService
 
 #### 4.4 Document Creation API
 - [ ] Create `DocumentWithSignersController`
-- [ ] Implement multipart file upload with signer data
+- [ ] Implement payload validation (reject actual file uploads, accept `document_hash` and `encrypted_drive_url` only)
 - [ ] Validate signer order and emails
-- [ ] Initialize workflow after document upload
+- [ ] Initialize workflow tracking in database without touching the physical PDF
 
 #### 4.5 Signing API
 - [ ] Implement signer authentication (token-based for external)

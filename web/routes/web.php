@@ -15,7 +15,7 @@ Route::get('/login', function () {
     ]);
 })->name('login');
 
-Route::get('/verify/{token}', function ($token) {
+Route::get('/verify/{token?}', function ($token = null) {
     return Inertia::render('Verify', ['token' => $token]);
 })->name('verify.page');
 
