@@ -533,3 +533,14 @@
   - `web/package.json`
 - **Status saat ini:** Selesai (Version Web `web-v1.2.9`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah layout kartu perangkat aktif pada halaman Dashboard utama agar memancarkan bayangan/glow hijau lembut saat kursor diletakkan di atasnya (`group hover:border-accent-primary/40 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.25),0_0_28px_rgba(16,185,129,0.12)]`). Menyelaraskan warna badge lingkaran nomor urut menjadi `bg-accent-success-soft` dan `text-accent-success` dari yang sebelumnya menggunakan `bg-accent-primary-soft`. Melakukan bump versi web ke `1.2.9` di `web/package.json` dan memicu build produksi Vite. Tag `web-v1.2.9` telah dibuat dan di-push untuk memicu proses CI/CD deployment.
+
+- **Tanggal/Waktu:** 2026-06-13T14:45:00Z
+- **Tugas yang diselesaikan:** Modifikasi Browser Extension pada Card Profil Google User
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.html`
+  - `safari-extension/Resources/popup.html`
+  - `chrome-extension/package.json`
+  - `chrome-extension/manifest.json`
+  - `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.9`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Telah dilakukan perombakan antarmuka Card Profil pengguna di dalam ekstensi (baik untuk Google Chrome maupun Safari) sehingga penampilannya selaras dengan desain "Active Devices" pada Web Dashboard. Desain baru mengadopsi standar Bio-Digital Minimalism 2026 dengan menggunakan `var(--surface-secondary)` untuk latar belakang dan efek *glow* (menyala) Hijau Aestetik pada saat *hover*. Tombol *Logout* juga disesuaikan menjadi bergaya *danger-outline* transparan. Versi ekstensi telah diperbarui secara serentak menjadi `1.3.9`.

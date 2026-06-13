@@ -600,6 +600,66 @@
       margin-bottom: 16px;
       border: 2px solid var(--accent-danger); /* Multi-visual indicator */
     }
+    /* Profile Device Card Styling (Bio-Digital Minimalism 2026) */
+    .profile-device-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background-color: var(--surface-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .profile-device-card:hover {
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 20px var(--accent-primary-soft);
+      transform: translateY(-2px);
+    }
+
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--surface-primary);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .profile-device-card:hover .user-avatar-circle {
+      border-color: var(--accent-primary);
+      background-color: var(--accent-primary-soft);
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      border: 1px solid var(--accent-danger);
+      color: var(--accent-danger);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-danger-outline:hover {
+      background-color: var(--accent-danger-soft);
+      box-shadow: 0 0 12px var(--accent-danger-soft);
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body class="popup-view">
@@ -715,9 +775,9 @@
     <!-- MAIN DASHBOARD VIEW -->
     <div id="view-main" class="hidden" style="display: flex; flex-direction: column; gap: 16px;">
             <!-- Profile Widget -->
-      <div id="profile-card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--surface-secondary); border-radius: 12px; border: 1px solid var(--border-subtle);">
+      <div id="profile-card" class="profile-device-card">
         <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-          <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--accent-primary-soft); background-size: cover; border: 1px solid var(--border-default); position: relative; overflow: hidden; flex-shrink: 0;">
+          <div id="user-avatar" class="user-avatar-circle">
             <!-- Skeleton placeholder for avatar -->
             <div id="avatar-skeleton" style="position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface-secondary) 0%, var(--border-subtle) 50%, var(--surface-secondary) 100%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite;"></div>
           </div>
@@ -732,7 +792,7 @@
             </div>
           </div>
         </div>
-        <button id="btn-logout" style="text-xs px-2.5 py-1 rounded-md border border-accent-danger text-accent-danger hover:bg-accent-danger hover:text-white transition-all font-semibold shrink-0; padding: 6px 10px; font-size: 0.65rem; font-weight: 600;" title="Logout">
+        <button id="btn-logout" class="btn-danger-outline" title="Logout">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
