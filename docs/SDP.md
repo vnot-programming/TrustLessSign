@@ -424,3 +424,11 @@
   - `web/routes/console.php`
 - **Status saat ini:** Selesai (Sprint 1)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Seluruh arsitektur backend untuk fitur penyematan gambar tanda tangan (Sprint 1) telah selesai. Skema database menggunakan relasi UUID. API endpoints telah dibuat di bawah rute `api/v1/signatures/*`. Validasi gambar, sanitasi ukuran maksimum 5MB, serta `CleanupUnusedSignatures` command telah dikonfigurasi. Untuk AI berikutnya, silakan melanjutkan ke Sprint 2 (Chrome Extension UI) dengan membangun Modal dan Signature Gallery di antarmuka ekstensi menggunakan API endpoints yang baru saja disediakan.
+
+- **Tanggal/Waktu:** 2026-06-13T10:55:00Z
+- **Tugas yang diselesaikan:** REVISI ARSITEKTUR Kritis - Rollback Sprint 1 (Zero-Knowledge Compliance)
+- **File yang diubah/dibuat:**
+  - Menghapus semua file Backend yang dibuat pada `web-v1.3.0-alpha1` (Migration, Model, Controller, Service).
+  - Me-*rollback database*.
+- **Status saat ini:** Selesai (Revert `web-v1.3.0-alpha1`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Peringatan keras: Proyek ini menganut filosofi **Trustless / Zero-Knowledge**. Instruksi awal pada `image-signature-task.md` (Sprint 1 Backend) ternyata melanggar filosofi aplikasi karena mencoba menyimpan gambar tanda tangan pengguna di server/S3 yang dikendalikan oleh backend Laravel. Sistem telah di-*rollback* sepenuhnya. Solusi yang benar: Seluruh pengelolaan gambar tanda tangan (CRUD) **WAJIB** dilakukan langsung dari Ekstensi Chrome/Safari ke **Google Drive pengguna**, tanpa pernah menyentuh *backend* Laravel. File `SDP.md` ini menjadi saksi pembatalan Sprint 1. AI selanjutnya WAJIB langsung merancang penyimpanan via API Google Drive di sisi ekstensi (*Sprint 2*).
