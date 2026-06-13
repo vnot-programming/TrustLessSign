@@ -515,3 +515,13 @@
   - Disinkronisasikan ke `safari-extension`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.6`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Merespons keluhan terkait kedipan UI (*flicker*) saat pengguna mengeklik gambar tanda tangan (Selection), masalah ini berakar dari proses `refreshImageSignatures()` yang sebelumnya selalu me-*reload* seluruh daftar gambar dari Google Drive API secara penuh setiap kali terjadi perubahan status *default*. Selain itu, arsitektur penyimpanan juga direvisi: Sesuai arahan baru, gambar tanda tangan tidak lagi langsung diunggah ke Google Drive saat dipilih, melainkan ditampung ke penyimpanan *IndexedDB* lokal peramban (melalui `local-db.js`). Logika UI kini langsung memperbarui kelas CSS secara instan saat seleksi gambar dilakukan sehingga bebas kedipan. Gambar baru akan ikut terunggah ke Drive nantinya saat proses *Sign PDF* dieksekusi bersamaan dengan dokumen PDF (akan diimplementasi di *Sprint 3*). Versi ekstensi naik ke `1.3.6`.
+
+- **Tanggal/Waktu:** 2026-06-13T13:30:00Z
+- **Tugas yang diselesaikan:** Redesign UI Login Status "Connecting to Google..."
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.js`
+  - `chrome-extension/popup/popup.html`
+  - `safari-extension/Resources/popup.js`
+  - `safari-extension/Resources/popup.html`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.7`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Sebelumnya, status pemuatan otorisasi ("Connecting to Google...") dirender hanya sebagai teks statis berwarna merah (`var(--accent-danger)`) karena konfigurasi *hardcode* pada elemen `#login-status`. Pendekatan ini tidak sesuai dengan prinsip desain aplikasi yang mengutamakan indikator multi-visual. Modifikasi dilakukan dengan membangun fungsi pendukung `setLoginStatus(state, text)` pada skrip `popup.js` untuk mengontrol CSS secara dinamis. Status '*loading*' kini memunculkan *spinner SVG* berwarna biru kehijauan dengan latar '*surface-secondary*', sedangkan status gagal dikembalikan ke mode peringatan merah putus-putus. Versi rilis diperbarui ke `1.3.7`.
