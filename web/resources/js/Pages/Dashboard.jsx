@@ -13,23 +13,23 @@ export default function Dashboard() {
   const hasCerts = certs.length > 0;
 
   // States
-  const [modalOpen, setModalOpen]   = useState(false);
-  const [confirmText, setConfirmText]   = useState('');
-  const [password, setPassword]         = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [deviceName, setDeviceName]     = useState('');
-  const [loading, setLoading]           = useState(false);
-  const [success, setSuccess]           = useState(false);
-  const [backupData, setBackupData]     = useState(null);
-  const [errorMsg, setErrorMsg]         = useState('');
+  const [deviceName, setDeviceName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [backupData, setBackupData] = useState(null);
+  const [errorMsg, setErrorMsg] = useState('');
   const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, outdated: false });
   const [syncStatus, setSyncStatus] = useState(null); // { status: 'active' | 'mismatch' | 'no_extension_cert' | 'revoked' | 'error' | 'timeout', data: null }
-  const [extensionModalOpen, setExtensionModalOpen]     = useState(false);
+  const [extensionModalOpen, setExtensionModalOpen] = useState(false);
   const [extensionOutdatedOpen, setExtensionOutdatedOpen] = useState(false);
-  const [showPassword, setShowPassword]     = useState(false);
-  const [revokeTarget, setRevokeTarget]     = useState(null); // { serial_number, device_name }
-  const [revokeLoading, setRevokeLoading]   = useState(false);
-  const [revokeError, setRevokeError]       = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [revokeTarget, setRevokeTarget] = useState(null); // { serial_number, device_name }
+  const [revokeLoading, setRevokeLoading] = useState(false);
+  const [revokeError, setRevokeError] = useState('');
 
   const t = messages?.Dashboard || {
     welcome_back: "Welcome Back",
@@ -82,7 +82,7 @@ export default function Dashboard() {
   const isVersionOutdated = (installed, required) => {
     if (!installed || !required) return false;
     // Strip any pre-release suffix like -dev, -beta for numeric comparison
-    const parse = (v) => v.replace(/[-+].*/,'').split('.').map(Number);
+    const parse = (v) => v.replace(/[-+].*/, '').split('.').map(Number);
     const a = parse(installed);
     const b = parse(required);
     for (let i = 0; i < Math.max(a.length, b.length); i++) {
@@ -125,51 +125,51 @@ export default function Dashboard() {
   // [NEW] Extension-First Sync Check
   useEffect(() => {
     if (!extensionStatus.installed) return;
-    
+
     let isMounted = true;
     const syncTimeout = setTimeout(() => {
-        if (isMounted) {
-            setSyncStatus({ status: 'timeout' });
-        }
+      if (isMounted) {
+        setSyncStatus({ status: 'timeout' });
+      }
     }, 5000); // circuit breaker / fallback
 
     const handleSerialResponse = async (e) => {
-        if (e.data && e.data.type === 'TRUSTLESS_GET_CERT_SERIAL_RESPONSE') {
-            clearTimeout(syncTimeout);
-            window.removeEventListener('message', handleSerialResponse);
-            if (!isMounted) return;
-
-            const { serial, hasCert } = e.data.payload;
-            if (!hasCert || !serial) {
-                setSyncStatus({ status: 'no_extension_cert' });
-                return;
-            }
-
-            try {
-                const syncRes = await axios.post('/certificates/sync-check', {
-                    serial_number: serial
-                });
-                
-                if (syncRes.data.active) {
-                    setSyncStatus({ status: 'active', data: syncRes.data });
-                } else if (syncRes.data.is_revoked || syncRes.data.expired) {
-                    setSyncStatus({ status: 'revoked', data: syncRes.data });
-                } else if (!syncRes.data.owned) {
-                    setSyncStatus({ status: 'mismatch', data: syncRes.data });
-                }
-            } catch (err) {
-                setSyncStatus({ status: 'error' });
-            }
-        }
-    };
-    
-    window.addEventListener('message', handleSerialResponse);
-    window.postMessage({ type: 'TRUSTLESS_GET_CERT_SERIAL_REQUEST' }, '*');
-    
-    return () => {
-        isMounted = false;
+      if (e.data && e.data.type === 'TRUSTLESS_GET_CERT_SERIAL_RESPONSE') {
         clearTimeout(syncTimeout);
         window.removeEventListener('message', handleSerialResponse);
+        if (!isMounted) return;
+
+        const { serial, hasCert } = e.data.payload;
+        if (!hasCert || !serial) {
+          setSyncStatus({ status: 'no_extension_cert' });
+          return;
+        }
+
+        try {
+          const syncRes = await axios.post('/certificates/sync-check', {
+            serial_number: serial
+          });
+
+          if (syncRes.data.active) {
+            setSyncStatus({ status: 'active', data: syncRes.data });
+          } else if (syncRes.data.is_revoked || syncRes.data.expired) {
+            setSyncStatus({ status: 'revoked', data: syncRes.data });
+          } else if (!syncRes.data.owned) {
+            setSyncStatus({ status: 'mismatch', data: syncRes.data });
+          }
+        } catch (err) {
+          setSyncStatus({ status: 'error' });
+        }
+      }
+    };
+
+    window.addEventListener('message', handleSerialResponse);
+    window.postMessage({ type: 'TRUSTLESS_GET_CERT_SERIAL_REQUEST' }, '*');
+
+    return () => {
+      isMounted = false;
+      clearTimeout(syncTimeout);
+      window.removeEventListener('message', handleSerialResponse);
     };
   }, [extensionStatus.installed]);
 
@@ -241,7 +241,7 @@ export default function Dashboard() {
       const handleExtensionResponse = (e) => {
         if (e.data && e.data.type === 'TRUSTLESS_GENERATE_KEY_RESPONSE') {
           window.removeEventListener('message', handleExtensionResponse);
-          
+
           const response = e.data.payload;
           if (response && response.status === 'success') {
             setSuccess(true);
@@ -271,10 +271,10 @@ export default function Dashboard() {
       window.postMessage({
         type: 'TRUSTLESS_GENERATE_KEY_REQUEST',
         payload: {
-          password:   password,
+          password: password,
           deviceName: deviceName || 'Dashboard',
-          email:      user.email,
-          apiToken:   token
+          email: user.email,
+          apiToken: token
         }
       }, '*');
 
@@ -348,12 +348,11 @@ export default function Dashboard() {
 
         <main className="max-w-5xl mx-auto p-4 lg:p-8 mt-6">
           <h1 className="text-3xl font-bold mb-6">{t.welcome_back}</h1>
-          
+
           {syncStatus && syncStatus.status !== 'active' && (
-            <div className={`mb-6 p-4 rounded-xl border ${
-              syncStatus.status === 'revoked' ? 'bg-accent-warning-soft border-accent-warning text-accent-warning' : 
-              'bg-accent-danger-soft border-accent-danger text-accent-danger'
-            }`}>
+            <div className={`mb-6 p-4 rounded-xl border ${syncStatus.status === 'revoked' ? 'bg-accent-warning-soft border-accent-warning text-accent-warning' :
+                'bg-accent-danger-soft border-accent-danger text-accent-danger'
+              }`}>
               <div className="flex gap-3">
                 <AlertTriangle size={20} className="shrink-0 mt-0.5" />
                 <div>
@@ -375,14 +374,13 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-          
+
           {/* Certificate Management Section */}
           <div className="glass-panel p-6 mb-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-                  hasCerts ? 'bg-accent-success-soft text-accent-success' : 'bg-accent-warning-soft text-accent-warning'
-                }`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${hasCerts ? 'bg-accent-success-soft text-accent-success' : 'bg-accent-warning-soft text-accent-warning'
+                  }`}>
                   <ShieldCheck size={24} />
                 </div>
                 <div className="space-y-1">
@@ -398,11 +396,10 @@ export default function Dashboard() {
               </div>
               <button
                 onClick={handleCertificateAction}
-                className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all focus:ring focus:outline-none cursor-pointer shrink-0 ${
-                  hasCerts
+                className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all focus:ring focus:outline-none cursor-pointer shrink-0 ${hasCerts
                     ? 'bg-accent-primary text-white hover:bg-opacity-90'
                     : 'bg-accent-success text-white hover:bg-opacity-90'
-                }`}
+                  }`}
               >
                 {hasCerts ? (t.btn_add_device || 'Add Device') : t.btn_generate}
               </button>
@@ -413,26 +410,29 @@ export default function Dashboard() {
               <div className="mt-3 space-y-2 border-t border-border-subtle pt-4">
                 <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">{t.devices_title || 'Active Devices'}</p>
                 {certs.map((cert, idx) => (
-                  <div key={cert.serial_number} className="flex items-center justify-between p-3 bg-surface-secondary rounded-lg border border-border-subtle text-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-accent-primary-soft text-accent-primary flex items-center justify-center text-xs font-bold">
-                        {idx + 1}
+                  <div key={cert.serial_number} className="group relative rounded-lg border border-border-subtle bg-surface-secondary p-3 text-sm shadow-sm transition-all hover:border-accent-primary/40 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.25),0_0_28px_rgba(16,185,129,0.12)]">
+                    <div className="absolute inset-0 rounded-lg bg-accent-success/5 opacity-0 blur-xl transition-opacity group-hover:opacity-100"></div>
+                    <div className="relative flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-accent-success-soft text-accent-success flex items-center justify-center text-xs font-bold">
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-text-primary">
+                            {cert.device_name || 'Unknown Device'}
+                          </p>
+                          <p className="text-xs text-text-tertiary">
+                            {t.device_serial || 'Serial'}: {cert.serial_number?.slice(0, 12)}… · {t.device_expires || 'Expires'}: {new Date(cert.expires_at).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-text-primary">
-                          {cert.device_name || 'Unknown Device'}
-                        </p>
-                        <p className="text-xs text-text-tertiary">
-                          {t.device_serial || 'Serial'}: {cert.serial_number?.slice(0, 12)}… · {t.device_expires || 'Expires'}: {new Date(cert.expires_at).toLocaleDateString()}
-                        </p>
-                      </div>
+                      <button
+                        onClick={() => { setRevokeTarget(cert); setRevokeError(''); }}
+                        className="text-xs px-2.5 py-1 rounded-md border border-accent-danger text-accent-danger hover:bg-accent-danger hover:text-white transition-all font-semibold shrink-0"
+                      >
+                        {t.btn_revoke || 'Revoke'}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => { setRevokeTarget(cert); setRevokeError(''); }}
-                      className="text-xs px-2.5 py-1 rounded-md border border-accent-danger text-accent-danger hover:bg-accent-danger hover:text-white transition-all font-semibold shrink-0"
-                    >
-                      {t.btn_revoke || 'Revoke'}
-                    </button>
                   </div>
                 ))}
               </div>
@@ -443,17 +443,15 @@ export default function Dashboard() {
             <Link
               href="/sign"
               onClick={handleSignNewDoc}
-              className={`glass-panel p-6 flex flex-col items-center text-center gap-4 group transition-all ${
-                extensionStatus.outdated
+              className={`glass-panel p-6 flex flex-col items-center text-center gap-4 group transition-all ${extensionStatus.outdated
                   ? 'border-accent-warning hover:border-accent-warning cursor-pointer'
                   : 'hover:border-accent-primary cursor-pointer'
-              }`}
+                }`}
             >
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${
-                extensionStatus.outdated
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${extensionStatus.outdated
                   ? 'bg-accent-warning-soft text-accent-warning'
                   : 'bg-accent-primary-soft text-accent-primary'
-              }`}>
+                }`}>
                 {extensionStatus.outdated ? <AlertTriangle size={32} /> : <FileSignature size={32} />}
               </div>
               <div>
@@ -464,7 +462,7 @@ export default function Dashboard() {
                 )}
               </div>
             </Link>
-            
+
             <div className="glass-panel p-6 flex flex-col items-center text-center gap-4 cursor-not-allowed opacity-75">
               <div className="w-16 h-16 rounded-full bg-surface-tertiary flex items-center justify-center text-text-tertiary">
                 <UploadCloud size={32} />
@@ -484,7 +482,7 @@ export default function Dashboard() {
             <span className="flex items-center gap-1.5">
               TrustlessSign Web — {versionName}
               <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-success-soft text-accent-success">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                 {t.ext_status_ok || 'Up-to-date'}
               </span>
             </span>
@@ -506,7 +504,7 @@ export default function Dashboard() {
                 <>
                   <span className="text-text-tertiary">— {extensionStatus.version}</span>
                   <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-success-soft text-accent-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                     {t.ext_status_ok || 'Up-to-date'}
                   </span>
                 </>
@@ -515,7 +513,7 @@ export default function Dashboard() {
                 <>
                   <span className="text-text-tertiary">— {extensionStatus.version}</span>
                   <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-warning-soft text-accent-warning">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
                     {t.ext_status_outdated || 'Outdated'}
                   </span>
                 </>
@@ -554,12 +552,12 @@ export default function Dashboard() {
                         ⬇️ Download Local Backup (.tsign)
                       </button>
                     )}
-                     <button
-                       onClick={handleCertActivated}
-                       className="w-full text-text-tertiary hover:text-text-primary text-sm font-medium transition-colors py-2"
-                     >
-                       Close & Continue
-                     </button>
+                    <button
+                      onClick={handleCertActivated}
+                      className="w-full text-text-tertiary hover:text-text-primary text-sm font-medium transition-colors py-2"
+                    >
+                      Close & Continue
+                    </button>
                   </div>
                 )}
               </div>
@@ -615,14 +613,14 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-text-secondary">{t.new_cert_password}</label>
                     <div className="relative">
-                      <input 
-                        type={showPassword ? "text" : "password"} 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         placeholder={t.new_password_placeholder}
                         className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none pr-10"
                       />
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
@@ -639,14 +637,14 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <label className="block text-xs font-semibold text-text-secondary">{t.confirm_password_label}</label>
                     <div className="relative">
-                      <input 
-                        type={showPassword ? "text" : "password"} 
-                        value={confirmPassword} 
-                        onChange={(e) => setConfirmPassword(e.target.value)} 
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder={t.confirm_password_placeholder}
                         className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-primary focus:ring focus:outline-none pr-10"
                       />
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
@@ -664,7 +662,7 @@ export default function Dashboard() {
                 )}
 
                 <div className="flex justify-end gap-3 pt-2">
-                  <button 
+                  <button
                     disabled={loading}
                     onClick={() => setModalOpen(false)}
                     className="px-4 py-2 border border-border-default rounded-md hover:bg-surface-secondary transition-colors text-sm font-semibold cursor-pointer"
@@ -702,8 +700,8 @@ export default function Dashboard() {
               <p className="text-sm text-text-secondary leading-relaxed">
                 {t.ext_outdated_desc
                   ? t.ext_outdated_desc
-                      .replace('{{current}}', extensionStatus.version || '?')
-                      .replace('{{required}}', extensionMinVersion || '?')
+                    .replace('{{current}}', extensionStatus.version || '?')
+                    .replace('{{required}}', extensionMinVersion || '?')
                   : `Your extension (v${extensionStatus.version}) is outdated. Please update to v${extensionMinVersion} or newer to continue.`
                 }
               </p>
@@ -743,16 +741,16 @@ export default function Dashboard() {
                 {t.install_ext_desc || "TrustlessSign extension is required to generate cryptographic certificates safely in your browser."}
               </p>
             </div>
-            
+
             <div className="flex flex-col gap-3 pt-2">
-              <a 
+              <a
                 href="https://chrome.google.com/webstore/detail/trustlesssign"
                 target="_blank" rel="noreferrer"
                 className="w-full px-4 py-3 bg-accent-primary text-white rounded-md hover:bg-opacity-90 transition-all text-sm font-semibold flex justify-center items-center text-center cursor-pointer"
               >
                 {t.btn_chrome_store || "Install from Chrome Store"}
               </a>
-              <a 
+              <a
                 href={`https://github.com/vnot-programming/TrustLessSign/releases/download/v${__EXTENSION_VERSION__}/trustlesssign-v${__EXTENSION_VERSION__}.crx`}
                 target="_blank" rel="noreferrer"
                 className="w-full px-4 py-3 border border-border-default rounded-md hover:bg-surface-secondary transition-colors text-sm font-semibold flex justify-center items-center text-center cursor-pointer"
@@ -762,7 +760,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex justify-center pt-2">
-              <button 
+              <button
                 onClick={() => setExtensionModalOpen(false)}
                 className="text-text-secondary hover:text-text-primary text-sm font-medium transition-colors cursor-pointer"
               >
