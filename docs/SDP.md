@@ -497,3 +497,11 @@
   - `safari-extension/Resources/popup.js`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.4`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Analisis lebih lanjut mengungkap kesalahan (*TypeError*) yang persis sama terulang pada pemanggilan fungsi `btnPopout.addEventListener`. Fitur `btnPopout` rupanya juga telah direvisi dari struktur DOM `popup.html`. Perbaikan identik (*null safety conditional*) telah diaplikasikan pada baris-baris pemanggil variabel `btnPopout` untuk memitigasi kegagalan muat antarmuka secara keseluruhan. Ekstensi rilis `1.3.4`.
+
+- **Tanggal/Waktu:** 2026-06-13T12:55:00Z
+- **Tugas yang diselesaikan:** Fix Fatal Bug DOM Terpotong (Truncated `popup.html`)
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.html`
+  - `safari-extension/Resources/popup.html`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.5`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Analisis lebih dalam terhadap rentetan error `addEventListener` pada `btnPopout` dan `btnLoginGoogle` mengungkap bahwa seluruh konten `<body>` di dalam berkas `popup.html` secara tidak sengaja terhapus (terpotong) pada saat manipulasi injeksi skrip `<script>` di rilis `1.3.2`. Hal ini menyebabkan hampir semua *event listener* gagal karena elemen UI tidak eksis. Berkas `popup.html` telah dipulihkan (*restore*) ke keadaan aslinya secara penuh dan urutan impor *script* (`forge.min.js`, `gdrive.js`) telah diletakkan di tempat yang benar pada bagian bawah DOM. Ekstensi di-bump ke `1.3.5`.
