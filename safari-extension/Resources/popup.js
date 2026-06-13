@@ -481,8 +481,27 @@ document.addEventListener('DOMContentLoaded', async () => {
           userNameText = activeCert ? activeCert.subject_cn : userNameText;
         }
 
-        userName.textContent = userNameText;
-        userEmail.textContent = userEmailText;
+        // Update user profile with data - hide skeletons, show content
+        const userNameTextEl = document.getElementById('user-name-text');
+        const userNameSkeleton = document.getElementById('user-name-skeleton');
+        const userEmailTextEl = document.getElementById('user-email-text');
+        const userEmailSkeleton = document.getElementById('user-email-skeleton');
+        const avatarSkeleton = document.getElementById('avatar-skeleton');
+        
+        if (userNameTextEl) {
+          userNameTextEl.textContent = userNameText;
+          userNameTextEl.classList.remove('hidden');
+        }
+        if (userNameSkeleton) userNameSkeleton.classList.add('hidden');
+        
+        if (userEmailTextEl) {
+          userEmailTextEl.textContent = userEmailText;
+          userEmailTextEl.classList.remove('hidden');
+        }
+        if (userEmailSkeleton) userEmailSkeleton.classList.add('hidden');
+        
+        if (avatarSkeleton) avatarSkeleton.classList.add('hidden');
+        
         if (avatarUrl) {
           userAvatar.style.backgroundImage = `url('${avatarUrl}')`;
           userAvatar.style.backgroundSize = "cover";

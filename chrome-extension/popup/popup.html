@@ -483,6 +483,10 @@
       display: inline-block;
       animation: spin 2s linear infinite;
     }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
     /* Footer */
     .popup-footer {
       margin: 0 16px 16px 16px;
@@ -710,19 +714,29 @@
 
     <!-- MAIN DASHBOARD VIEW -->
     <div id="view-main" class="hidden" style="display: flex; flex-direction: column; gap: 16px;">
-      <!-- Profile Widget -->
-      <div class="glass-card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--surface-secondary); background-size: cover; border: 1px solid var(--border-default);"></div>
-          <div>
-            <div id="user-name" style="font-size: 0.8rem; font-weight: 600;">Loading...</div>
-            <div id="user-email" style="font-size: 0.7rem; color: var(--text-secondary);">loading...</div>
+            <!-- Profile Widget -->
+      <div id="profile-card" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--surface-secondary); border-radius: 12px; border: 1px solid var(--border-subtle);">
+        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+          <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--accent-primary-soft); background-size: cover; border: 1px solid var(--border-default); position: relative; overflow: hidden; flex-shrink: 0;">
+            <!-- Skeleton placeholder for avatar -->
+            <div id="avatar-skeleton" style="position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface-secondary) 0%, var(--border-subtle) 50%, var(--surface-secondary) 100%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite;"></div>
+          </div>
+          <div style="min-width: 0;">
+            <div id="user-name" style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary); position: relative;">
+              <span id="user-name-text" class="hidden"></span>
+              <div id="user-name-skeleton" style="background: linear-gradient(90deg, var(--surface-secondary) 0%, var(--border-subtle) 50%, var(--surface-secondary) 100%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 4px; height: 14px; width: 100px;"></div>
+            </div>
+            <div id="user-email" style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 2px; position: relative;">
+              <span id="user-email-text" class="hidden"></span>
+              <div id="user-email-skeleton" style="background: linear-gradient(90deg, var(--surface-secondary) 0%, var(--border-subtle) 50%, var(--surface-secondary) 100%); background-size: 200% 100%; animation: shimmer 1.5s ease-in-out infinite; border-radius: 4px; height: 12px; width: 140px;"></div>
+            </div>
           </div>
         </div>
-        <button id="btn-logout" class="btn-popout" style="padding: 4px;" title="Logout">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="btn-logout" style="text-xs px-2.5 py-1 rounded-md border border-accent-danger text-accent-danger hover:bg-accent-danger hover:text-white transition-all font-semibold shrink-0; padding: 6px 10px; font-size: 0.65rem; font-weight: 600;" title="Logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
+          <span style="margin-left: 4px;">Logout</span>
         </button>
       </div>
 
