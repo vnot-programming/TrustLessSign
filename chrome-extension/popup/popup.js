@@ -438,6 +438,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Auth successful: show dashboard and load components
         showMainView();
         updateCertStatus(activeCert);
+
+        if (!activeCert) {
+          alert("NO CERTIFICATE FOUND\nPlease import or generate a secure cryptographic key on Tab Keys & Cert.");
+          tabKeys.click();
+        }
+
         loadReasons(baseUrl, token);
 
         // Fetch user info from /api/user
