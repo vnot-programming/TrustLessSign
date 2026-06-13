@@ -473,3 +473,11 @@
   - `docs/releases/trustlesssign-v1.3.1.crx`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.3.1`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ekstensi versi 1.3.1 telah di-bump, di-build menjadi `.crx`, di-commit dan diberi tag `ext-v1.3.1` agar pipeline CI/CD mengeksekusi sinkronisasi file ke PC Desktop lokal pengguna via Tailscale. Tanpa Git Tag dengan prefix `ext-v`, proses sinkronisasi tidak akan terjadi.
+
+- **Tanggal/Waktu:** 2026-06-13T12:20:00Z
+- **Tugas yang diselesaikan:** Fix Bug `uploadImageSignature is not defined`
+- **File yang diubah/dibuat:**
+  - `chrome-extension/popup/popup.html`
+  - `safari-extension/Resources/popup.html`
+- **Status saat ini:** Selesai (Version Ext `ext-v1.3.2`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan kesalahan penulisan (*import*) skrip pada antarmuka *popup*. Fungsi manajemen `uploadImageSignature` dideklarasikan pada file terpisah (`gdrive.js`), namun file skrip tersebut belum disisipkan ke dalam tag `<script>` pada dokumen HTML. Hal ini mengakibatkan aksi pengunggahan memicu kesalahan *ReferenceError*. Kesalahan telah diperbaiki dengan mengimpor `gdrive.js` dan dependensinya (`forge.min.js`) secara eksplisit ke struktur DOM. Versi telah di-bump menjadi `1.3.2`.
