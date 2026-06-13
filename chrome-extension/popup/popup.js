@@ -972,12 +972,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       try {
         // === [BARU] Pre-Sign Cert Validation (Trustless) ===
-        const syncRes = await fetch(`${baseUrl}/api/certificates/sync-check`, {
+        const syncRes = await fetch(`${baseUrl}/certificates/sync-check`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ serial_number: localSerial })
         });

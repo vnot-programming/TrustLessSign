@@ -358,3 +358,9 @@
 - **File yang diubah/dibuat:** `web/package.json`
 - **Status saat ini:** Selesai (Version `web-v1.2.5`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ditemukan pelanggaran Strict Versioning Rules §4.2 — tag `web-v1.2.4` dan `web-v1.2.5` sudah di-push ke GitHub tanpa memperbarui `web/package.json` terlebih dahulu sebagai SSOT. `package.json` masih di `1.2.3` sementara tag sudah di `1.2.5`. Koreksi: `version`, `version_name` diupdate ke `1.2.5` dan `version_code` ke `125`. **PERHATIAN UNTUK AI SELANJUTNYA:** Selalu update `package.json` SEBELUM membuat git tag. Urutan wajib: (1) Edit `package.json` → (2) `git commit` → (3) `git tag web-vX.Y.Z` → (4) `git push origin main --tags`.
+
+- **Tanggal/Waktu:** 2026-06-13T07:45:00Z
+- **Tugas yang diselesaikan:** Fix Bug 404 pada Sinkronisasi Ekstensi (`sync-check`)
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`
+- **Status saat ini:** Selesai (Version Web `web-v1.2.7`, Ext `ext-v1.2.16`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** User melaporkan error ekstensi memunculkan status "Your certificate is no longer valid" secara sepihak dengan error Network 404 di endpoint `/api/certificates/sync-check`. Root cause: Route `sync-check` di backend Laravel didaftarkan di file `routes/web.php` tanpa prefix `/api`, sehingga URL aslinya adalah `/certificates/sync-check`. Namun, `popup.js` di chrome-extension memanggil endpoint tersebut dengan tambahan prefix `/api` sehingga mendapatkan error 404 dari Nginx. Fix: Prefix `/api` telah dihapus dari URL fetch di `popup.js`.
