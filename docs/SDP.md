@@ -409,3 +409,18 @@
   - `safari-extension/Resources/manifest.json`
 - **Status saat ini:** Selesai (Version Ext `ext-v1.2.19`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Sama seperti perbaikan sebelumnya pada `alert()`, penggunaan `prompt()` sistem untuk meminta *Master Password* pada saat mengekspor (Backup ke GDrive) atau mengimpor file identitas `.tsign` telah dihapus. Alur diganti menjadi proses asinkron (`Promise-based`) yang memanggil *Custom Password Modal Overlay* (`#password-prompt-modal`). Modal baru ini memiliki bilah *input password* dengan fungsionalitas `toggle show/hide`, mendukung kontrol papan ketik (Enter/Escape), serta diselaraskan dengan estetika HSL yang ditetapkan pada dokumen desain. Versi ekstensi dinaikkan ke `1.2.19`.
+
+- **Tanggal/Waktu:** 2026-06-13T10:05:00Z
+- **Tugas yang diselesaikan:** Implementasi Sprint 1: Backend Foundation untuk fitur Image Signature Support
+- **File yang diubah/dibuat:**
+  - `web/database/migrations/..._create_user_signatures_table.php`
+  - `web/database/migrations/..._add_signature_image_id_to_documents_table.php`
+  - `web/app/Models/ImageSignature.php`
+  - `web/app/Services/ImageSignatureService.php`
+  - `web/app/Http/Requests/UploadSignatureRequest.php`
+  - `web/app/Http/Controllers/Api/SignatureController.php`
+  - `web/routes/api.php`
+  - `web/app/Console/Commands/CleanupUnusedSignatures.php`
+  - `web/routes/console.php`
+- **Status saat ini:** Selesai (Sprint 1)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Seluruh arsitektur backend untuk fitur penyematan gambar tanda tangan (Sprint 1) telah selesai. Skema database menggunakan relasi UUID. API endpoints telah dibuat di bawah rute `api/v1/signatures/*`. Validasi gambar, sanitasi ukuran maksimum 5MB, serta `CleanupUnusedSignatures` command telah dikonfigurasi. Untuk AI berikutnya, silakan melanjutkan ke Sprint 2 (Chrome Extension UI) dengan membangun Modal dan Signature Gallery di antarmuka ekstensi menggunakan API endpoints yang baru saja disediakan.

@@ -47,6 +47,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/gdrive/refresh', [App\Http\Controllers\SocialiteController::class, 'refreshGdriveToken']);
 
+    // Image Signature Endpoints (v1)
+    Route::prefix('v1/signatures')->group(function () {
+        Route::post('/upload', [\App\Http\Controllers\Api\SignatureController::class, 'upload']);
+        Route::get('/', [\App\Http\Controllers\Api\SignatureController::class, 'index']);
+        Route::get('/{id}', [\App\Http\Controllers\Api\SignatureController::class, 'show']);
+        Route::delete('/{id}', [\App\Http\Controllers\Api\SignatureController::class, 'destroy']);
+        Route::post('/{id}/set-default', [\App\Http\Controllers\Api\SignatureController::class, 'setDefault']);
+        Route::get('/{id}/image', [\App\Http\Controllers\Api\SignatureController::class, 'getImage'])->name('api.signatures.image');
+    });
+
     // Admin-only endpoints (Admin authorization checked in controller methods)
     Route::post('/pki/bootstrap', [CertificateController::class, 'bootstrapCA']);
     Route::post('/certificates/revoke/{serial}', [CertificateController::class, 'revoke']);
