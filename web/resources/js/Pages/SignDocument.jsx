@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
-import Draggable from 'react-draggable';
+import { Rnd } from 'react-rnd';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ShieldCheck, Upload, Save, Eye, Key, Loader2, CheckCircle2, AlertCircle, FileText, ExternalLink, HelpCircle } from 'lucide-react';
 import LanguageSwitcher from '../Components/LanguageSwitcher';
 import ThemeToggle from '../Components/ThemeToggle';
-import QRious from '../Utils/qrious.min.js';
 import axios from 'axios';
 import JsBarcode from 'jsbarcode';
-import { generateSignatureFrame } from '../Utils/barcode-generator.js';
+import { generateSignatureFrame, generateModernTSignQR } from '../Utils/barcode-generator.js';
 
 // Make JsBarcode available globally for barcode-generator.js
 if (typeof window !== 'undefined') {
@@ -29,7 +28,6 @@ export default function SignDocument() {
   const [file, setFile] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [qrPosition, setQrPosition] = useState({ x: 50, y: 50 });
   const containerRef = useRef(null);
   const nodeRef = useRef(null);
   const [signatureType, setSignatureType] = useState('image');
@@ -42,6 +40,10 @@ export default function SignDocument() {
   const [customReason, setCustomReason] = useState('');
   const [notes, setNotes] = useState('');
   const [password, setPassword] = useState('dr4gonlistio');
+
+  // Draggable QR Position and Size
+  const [qrPosition, setQrPosition] = useState({ x: 50, y: 50 });
+  const [qrSize, setQrSize] = useState({ width: 160, height: 106 });
 
   // Status and result states
   const [extensionInstalled, setExtensionInstalled] = useState(false);
@@ -284,22 +286,8 @@ export default function SignDocument() {
             t.verify_at
         );
       } else {
-        // Generate visual QR code PNG using qrious
-        const qr = new QRious({
-          value: verifyUrlFull,
-          size: 600,
-          level: 'H'
-        });
-        const baseQr = qr.toDataURL('image/png');
-        finalQrPngBase64 = await generateSignatureFrame(
-            user.name,
-            shortId,
-            verifyUrlShort,
-            baseQr,
-            true, // isQrCode = true
-            t.signed_by,
-            t.verify_at
-        );
+        // Modern standalone QR Code
+        finalQrPngBase64 = await generateModernTSignQR(verifyUrlFull);
       }
 
       // Get concatenated final reason text
@@ -417,7 +405,7 @@ export default function SignDocument() {
             page: pageNumber,
             x: qrPosition.x,
             y: qrPosition.y,
-            size: 160
+            size: qrSize.width
           },
           reason_sub_category_id: selectedSubCategoryId ? parseInt(selectedSubCategoryId) : null,
           reason_final: reason_final,
@@ -714,25 +702,31 @@ export default function SignDocument() {
                       <Page pageNumber={pageNumber} width={600} />
                     </Document>
 
-                    {/* Draggable QR Code Representation */}
-                    <Draggable 
+                    {/* Resizable and Draggable QR Code Representation */}
+                    <Rnd
                       bounds="parent"
-                      position={qrPosition}
-                      onDrag={handleDrag}
-                      onStop={handleDragStop}
-                      nodeRef={nodeRef}
+                      size={{ width: qrSize.width, height: qrSize.height }}
+                      position={{ x: qrPosition.x, y: qrPosition.y }}
+                      onDragStop={(e, d) => setQrPosition({ x: d.x, y: d.y })}
+                      onResizeStop={(e, direction, ref, delta, position) => {
+                        setQrSize({
+                          width: parseInt(ref.style.width, 10),
+                          height: parseInt(ref.style.height, 10)
+                        });
+                        setQrPosition(position);
+                      }}
+                      lockAspectRatio={signatureType === 'qr' ? true : true}
+                      className="absolute top-0 left-0 border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden"
                     >
-                      <div ref={nodeRef} className="absolute top-0 left-0 w-[160px] h-[106px] border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                          Drag to place the signature that appears on the Document
+                          Drag and resize to place the signature
                         </div>
                         {signatureType === 'image' && imageSigDataUrl ? (
-                          <img src={imageSigDataUrl} alt="Visual Signature" className="max-w-full max-h-full object-contain pointer-events-none select-none" />
+                          <img src={imageSigDataUrl} alt="Visual Signature" className="w-full h-full object-contain pointer-events-none select-none" />
                         ) : (
-                          <span className="text-accent-primary font-bold text-xs text-center pointer-events-none select-none">{t.qr_area}</span>
+                          <img src="/logo-tSign.svg" alt="QR Code" className="w-1/3 h-1/3 opacity-50 pointer-events-none select-none" />
                         )}
-                      </div>
-                    </Draggable>
+                    </Rnd>
                   </div>
                 )}
               </section>
