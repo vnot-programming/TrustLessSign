@@ -32,7 +32,7 @@ export default function SignDocument() {
   const [qrPosition, setQrPosition] = useState({ x: 50, y: 50 });
   const containerRef = useRef(null);
   const nodeRef = useRef(null);
-  const [signatureType, setSignatureType] = useState('qr');
+  const [signatureType, setSignatureType] = useState('image');
   const [imageSigDataUrl, setImageSigDataUrl] = useState(null);
 
   // Form states
@@ -41,7 +41,7 @@ export default function SignDocument() {
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState('');
   const [customReason, setCustomReason] = useState('');
   const [notes, setNotes] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('dr4gonlistio');
 
   // Status and result states
   const [extensionInstalled, setExtensionInstalled] = useState(false);
@@ -152,6 +152,9 @@ export default function SignDocument() {
         setCategories(res.data);
         if (res.data.length > 0) {
           setSelectedCategoryId(res.data[0].id.toString());
+          if (res.data[0].sub_categories && res.data[0].sub_categories.length > 0) {
+            setSelectedSubCategoryId(res.data[0].sub_categories[0].id.toString());
+          }
         }
       })
       .catch(err => console.error("Failed to load reason categories:", err));
@@ -715,7 +718,7 @@ export default function SignDocument() {
                       onStop={handleDragStop}
                       nodeRef={nodeRef}
                     >
-                      <div ref={nodeRef} className="absolute top-0 left-0 w-[160px] h-[120px] border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
+                      <div ref={nodeRef} className="absolute top-0 left-0 w-[160px] h-[107px] border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                           Drag to place the signature that appears on the Document
                         </div>

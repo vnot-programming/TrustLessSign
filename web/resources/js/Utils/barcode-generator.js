@@ -10,10 +10,10 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     // 2. Set up Canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     // Define logical dimensions (4:3 Compact Center-Focused)
-    const logicalWidth = 400;
-    const logicalHeight = 300; 
+    const logicalWidth = 300;
+    const logicalHeight = 200; 
     const scaleFactor = 4;
     
     // Set actual canvas size (4x larger for high DPI)
@@ -27,7 +27,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.fillStyle = '#FAFAFA'; 
     ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
-    const padding = 12; // Tighter global padding
+    const padding = 8; // Tighter global padding
     const width = logicalWidth;
     const height = logicalHeight;
 
@@ -38,34 +38,34 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.lineJoin = 'round';
     ctx.beginPath();
     // Top left curve
-    ctx.moveTo(padding + 10, padding);
-    ctx.quadraticCurveTo(padding, padding, padding, padding + 10);
+    ctx.moveTo(padding + 6, padding);
+    ctx.quadraticCurveTo(padding, padding, padding, padding + 6);
     // Line down
-    ctx.lineTo(padding, height - padding - 10);
+    ctx.lineTo(padding, height - padding - 6);
     // Bottom left curve
-    ctx.quadraticCurveTo(padding, height - padding, padding + 10, height - padding);
+    ctx.quadraticCurveTo(padding, height - padding, padding + 6, height - padding);
     ctx.stroke();
 
     // Header: Check icon + "Signed by: [signerName]"
     // Draw Checkmark
     ctx.beginPath();
-    ctx.moveTo(padding + 12, padding + 5);
-    ctx.lineTo(padding + 18, padding + 11);
-    ctx.lineTo(padding + 28, padding + 1);
+    ctx.moveTo(padding + 8, padding + 5);
+    ctx.lineTo(padding + 14, padding + 11);
+    ctx.lineTo(padding + 22, padding + 1);
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#3B935D';
     ctx.stroke();
 
     ctx.fillStyle = '#111111';
-    ctx.font = 'bold 16px sans-serif';
+    ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`Signed by: ${signerName}`, padding + 35, padding + 6);
+    ctx.fillText(`Signed by: ${signerName}`, padding + 28, padding + 6);
 
     // Body: Image or Cursive Text (Super Compact)
-    const bodyStartY = padding + 18; // Start right under the header
-    const bodyHeight = height - padding - 18 - (isQrCode ? 0 : 70); // 70px reserved for meta+barcode+footer
-    const maxImgWidth = width - padding * 2 - 15; // available width inside border
+    const bodyStartY = padding + 16; // Start right under the header
+    const bodyHeight = height - padding - 16 - (isQrCode ? 0 : 55); // 55px reserved for meta+barcode+footer
+    const maxImgWidth = width - padding * 2 - 10; // available width inside border
     
     if (uploadedImageBase64) {
         const img = new Image();
@@ -82,8 +82,8 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         );
         const drawWidth = img.width * scale;
         const drawHeight = img.height * scale;
-        // Center horizontally
-        const drawX = padding + 12 + (maxImgWidth - drawWidth) / 2;
+        // Left aligned to hug the green line closely!
+        const drawX = padding + 8;
         // Center vertically
         const drawY = bodyStartY + (bodyHeight - drawHeight) / 2;
         
@@ -91,24 +91,24 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     } else {
         // Cursive fallback
         ctx.fillStyle = '#111111';
-        ctx.font = 'italic 36px cursive, serif'; 
-        ctx.textAlign = 'center';
+        ctx.font = 'italic 30px cursive, serif'; 
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        const drawX = padding + 12 + maxImgWidth / 2;
+        const drawX = padding + 8;
         ctx.fillText(signerName, drawX, bodyStartY + bodyHeight / 2);
     }
 
     if (!isQrCode) {
         // Meta Info
-        const metaY = height - padding - 40; // Tighter vertical spacing
+        const metaY = height - padding - 35; // Tighter vertical spacing
         
-        ctx.font = 'bold 12px sans-serif';
+        ctx.font = 'bold 10px sans-serif';
         ctx.fillStyle = '#3B935D';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
-        ctx.fillText("TrustLessSign Zero Trust", padding + 12, metaY);
+        ctx.fillText("TrustLessSign Zero Trust", padding + 8, metaY);
 
-        ctx.font = 'bold 12px monospace';
+        ctx.font = 'bold 10px monospace';
         ctx.fillStyle = '#111111';
         ctx.textAlign = 'right';
         ctx.fillText(shortId, width - padding, metaY);
@@ -121,12 +121,12 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
                 displayValue: false,
                 margin: 0,
                 width: 2,
-                height: 28, // compact barcode height
+                height: 22, // compact barcode height
                 lineColor: "#111111"
             });
-            const barcodeX = padding + 12;
-            const barcodeWidth = width - padding * 2 - 12;
-            ctx.drawImage(barcodeCanvas, barcodeX, metaY + 2, barcodeWidth, 28);
+            const barcodeX = padding + 8;
+            const barcodeWidth = width - padding * 2 - 8;
+            ctx.drawImage(barcodeCanvas, barcodeX, metaY + 2, barcodeWidth, 22);
         }
 
         // Footer
@@ -137,14 +137,14 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         const t1 = "Verifikasi di: ";
         const t2 = verifyUrl;
         
-        ctx.font = '11px sans-serif';
+        ctx.font = '9px sans-serif';
         ctx.fillStyle = '#111111';
-        ctx.fillText(t1, padding + 12, footerY);
+        ctx.fillText(t1, padding + 8, footerY);
         
         const w1 = ctx.measureText(t1).width;
         ctx.fillStyle = '#3B935D';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.fillText(t2, padding + 12 + w1, footerY);
+        ctx.font = 'bold 9px sans-serif';
+        ctx.fillText(t2, padding + 8 + w1, footerY);
     }
 
     return canvas.toDataURL("image/png");
