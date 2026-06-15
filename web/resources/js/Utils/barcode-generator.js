@@ -66,8 +66,8 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
 
     // Body: Image or Cursive Text
     const bodyStartY = padding + 14; 
-    // Give image more vertical space
-    const bodyHeight = height - padding - 14 - (isQrCode ? 0 : 45); 
+    // Give image more vertical space but keep it away from meta
+    const bodyHeight = height - padding - 14 - (isQrCode ? 0 : 50); 
     const maxImgWidth = width - rightPadding - bodyStartX; 
     
     if (uploadedImageBase64) {
@@ -103,7 +103,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
 
     if (!isQrCode) {
         // Meta Info
-        const metaY = height - padding - 28; 
+        const metaY = height - padding - 32; 
         
         ctx.font = 'bold 10px sans-serif';
         ctx.fillStyle = '#3B935D';
