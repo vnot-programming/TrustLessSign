@@ -598,3 +598,10 @@
   - `web/resources/js/Pages/SignDocument.jsx`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya:** Menambahkan fungsi Auto-Refresh GDrive Token sebelum proses eksekusi tanda tangan (melalui `/api/gdrive/refresh`) untuk mencegah token kedaluwarsa.
+
+- **Tanggal/Waktu:** 2026-06-15T16:02:00Z
+- **Tugas yang diselesaikan:** Penyesuaian Ulang Ukuran Tanda Tangan Visual (Diperkecil 2x)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Karena ukuran ukuran `size: 320` terlalu memakan tempat pada PDF, dikembalikan setengahnya menjadi `size: 160`, dengan _bounding box_ responsif UI `160x93px`. Resolusi _canvas_ tetap tajam (2400x1400).

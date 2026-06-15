@@ -12,7 +12,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     const ctx = canvas.getContext('2d');
     
     // Define logical dimensions
-    const logicalWidth = 600;
+    const logicalWidth = 450;
     const logicalHeight = 350; 
     const scaleFactor = 4;
     
@@ -132,9 +132,8 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
         
-        const t1 = "Untuk verifikasi, kunjungi ";
+        const t1 = "Verifikasi di: ";
         const t2 = verifyUrl;
-        const t3 = " dan masukkan kode di atas.";
         
         ctx.font = '14px sans-serif';
         ctx.fillStyle = '#111111';
@@ -144,11 +143,6 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.fillStyle = '#3B935D';
         ctx.font = 'bold 14px sans-serif';
         ctx.fillText(t2, padding + 30 + w1, footerY);
-        
-        const w2 = ctx.measureText(t2).width;
-        ctx.fillStyle = '#111111';
-        ctx.font = '14px sans-serif';
-        ctx.fillText(t3, padding + 30 + w1 + w2, footerY);
     }
 
     return canvas.toDataURL("image/png");
