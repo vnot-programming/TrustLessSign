@@ -58,21 +58,32 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
   const scale = pdfWidth / 600;
   const qrSize = (qrPosition?.size || 80) * scale;
   const targetX = (qrPosition?.x || 50) * scale;
-  const targetY = pdfHeight - ((qrPosition?.y || 50) * scale) - qrSize;
-
-  // Embed visual QR code
-  const qrImageBytes = forge.util.decode64(qrPngBase64.replace(/^data:image\/png;base64,/, ''));
+  // Embed visual QR code or image signature
+  const qrImageBytes = forge.util.decode64(qrPngBase64.replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, ''));
   const qrImageUint8 = new Uint8Array(qrImageBytes.length);
   for (let i = 0; i < qrImageBytes.length; i++) {
     qrImageUint8[i] = qrImageBytes.charCodeAt(i);
   }
 
-  const qrImage = await pdfDoc.embedPng(qrImageUint8);
+  // Detect image type by magic bytes
+  let qrImage;
+  if (qrImageUint8[0] === 0xFF && qrImageUint8[1] === 0xD8) {
+    qrImage = await pdfDoc.embedJpg(qrImageUint8);
+  } else {
+    qrImage = await pdfDoc.embedPng(qrImageUint8);
+  }
+
+  const aspect = qrImage.height / qrImage.width;
+  const drawHeight = qrSize * aspect;
+  
+  // Re-calculate targetY using actual drawHeight
+  const targetY = pdfHeight - ((qrPosition?.y || 50) * scale) - drawHeight;
+
   targetPage.drawImage(qrImage, {
     x: targetX,
     y: targetY,
     width: qrSize,
-    height: qrSize
+    height: drawHeight
   });
 
   pdfDoc.setTitle(metadata.original_filename);
@@ -185,4 +196,20 @@ async function decryptIdentityFromTsign(arrayBuffer, password) {
   } catch (err) {
     throw new Error('Decryption failed. Incorrect Master Password or corrupted file.');
   }
+}
+
+// Convert Base64 to Blob
+function base64ToBlob(base64, mimeType = 'application/octet-stream') {
+  const byteCharacters = atob(base64);
+  const byteArrays = [];
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  return new Blob(byteArrays, { type: mimeType });
 }

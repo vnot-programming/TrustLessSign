@@ -832,12 +832,22 @@
           <input type="file" id="sign-file" class="form-control" accept=".pdf">
         </div>
 
+        <!-- Signature Type Selector -->
+        <div class="form-group hidden" id="signature-type-container">
+          <label>Signature Type</label>
+          <select id="signature-type" class="form-control">
+            <option value="qr">QR Code Stamp</option>
+            <option value="image">Visual Image Signature</option>
+          </select>
+        </div>
+
         <!-- PDF Preview and Position selection -->
         <div id="pdf-preview-container" class="hidden" style="margin-top: 4px; margin-bottom: 12px; border: 1px solid var(--border-default); border-radius: 8px; overflow: hidden; position: relative; background-color: #eee; display: flex; justify-content: center; align-items: center; width: 100%; min-height: 180px;">
           <canvas id="pdf-canvas" style="width: 100%; height: auto; display: block;"></canvas>
-          <div id="qr-drag-box" style="position: absolute; top: 10px; left: 10px; width: 50px; height: 50px; border: 2px solid var(--accent-primary); background-color: var(--accent-primary-soft); cursor: move; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: bold; border-radius: 4px; user-select: none;">
+          <div id="qr-drag-box" style="position: absolute; top: 10px; left: 10px; width: 50px; height: 50px; border: 2px solid var(--accent-primary); background-color: var(--accent-primary-soft); cursor: move; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: bold; border-radius: 4px; user-select: none; overflow: hidden;">
             <div class="qr-drag-tooltip">Drag to place the signature that appears on the Document</div>
-            QR Code
+            <span id="qr-drag-text">QR Code</span>
+            <img id="qr-drag-img" src="" class="hidden" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" />
           </div>
         </div>
 

@@ -19,7 +19,8 @@ window.addEventListener('message', (event) => {
     'TRUSTLESS_PING_REQUEST',
     'TRUSTLESS_GENERATE_KEY_REQUEST',
     'TRUSTLESS_SIGN_REQUEST',
-    'TRUSTLESS_GET_CERT_SERIAL_REQUEST'
+    'TRUSTLESS_GET_CERT_SERIAL_REQUEST',
+    'TRUSTLESS_FETCH_IMAGE_SIG_REQUEST'
   ];
   if (!validRequests.includes(data.type)) return;
 
@@ -102,6 +103,25 @@ window.addEventListener('message', (event) => {
       window.postMessage({
         type: 'TRUSTLESS_SIGN_ERROR',
         payload: { error: 'EXTENSION_INVALIDATED', message: 'Extension context invalidated. Please refresh the page.' }
+      }, '*');
+    }
+    return;
+  }
+
+  // Handle Fetch Image Signature Request from Web Dashboard
+  if (data.type === 'TRUSTLESS_FETCH_IMAGE_SIG_REQUEST') {
+    try {
+      chrome.runtime.sendMessage({ type: 'FETCH_IMAGE_SIG' }, (response) => {
+        window.postMessage({
+          type: 'TRUSTLESS_FETCH_IMAGE_SIG_RESPONSE',
+          payload: response
+        }, '*');
+      });
+    } catch (err) {
+      console.error('Fetch Image Sig message failed:', err);
+      window.postMessage({
+        type: 'TRUSTLESS_FETCH_IMAGE_SIG_RESPONSE',
+        payload: { status: 'error', message: 'Extension context invalidated. Please refresh the page.' }
       }, '*');
     }
     return;

@@ -1,7 +1,7 @@
 // service-worker.js for TrustlessSign Extension (Manifest V3)
 self.window = self;
 
-importScripts('../assets/forge.min.js', '../assets/pdf-lib.min.js', '../signing/signer.js', '../signing/gdrive.js');
+importScripts('../assets/forge.min.js', '../assets/pdf-lib.min.js', '../signing/local-db.js', '../signing/signer.js', '../signing/gdrive.js');
 
 // Listen for messages from popup or content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -31,6 +31,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       handleUploadIdentity(request.payload)
         .then(res => sendResponse(res))
         .catch(err => sendResponse({ status: 'error', message: err.message }));
+    }
+
+    if (request.type === 'FETCH_IMAGE_SIG') {
+      chrome.storage.local.get(['default_image_signature_id'], async (st) => {
+        if (st.default_image_signature_id) {
+          try {
+            const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
+            if (imgSig && imgSig.dataUrl) {
+              sendResponse({ status: 'success', dataUrl: imgSig.dataUrl });
+            } else {
+              sendResponse({ status: 'error', message: 'Not found' });
+            }
+          } catch (err) {
+            sendResponse({ status: 'error', message: err.message });
+          }
+        } else {
+          sendResponse({ status: 'error', message: 'No default signature set' });
+        }
+      });
+      return true; // async
     }
   });
 

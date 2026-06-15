@@ -42,6 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const previewContainer = document.getElementById('pdf-preview-container');
   const pdfCanvas = document.getElementById('pdf-canvas');
   const qrDragBox = document.getElementById('qr-drag-box');
+  const signatureTypeContainer = document.getElementById('signature-type-container');
+  const signatureTypeSelect = document.getElementById('signature-type');
+  const qrDragText = document.getElementById('qr-drag-text');
+  const qrDragImg = document.getElementById('qr-drag-img');
   
   // Keygen tab fields
   const certStatusBadge = document.getElementById('cert-status-badge');
@@ -1101,6 +1105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const file = e.target.files[0];
     if (!file || file.type !== 'application/pdf') {
       previewContainer.classList.add('hidden');
+      if (signatureTypeContainer) signatureTypeContainer.classList.add('hidden');
       return;
     }
 
@@ -1110,7 +1115,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const pdfUint8 = new Uint8Array(currentFileBytes.slice(0));
       
       previewContainer.classList.remove('hidden');
+      if (signatureTypeContainer) signatureTypeContainer.classList.remove('hidden');
       signSuccessCard.classList.add('hidden');
+
+      // reset signature type preview
+      if (signatureTypeSelect) {
+        if (signatureTypeSelect.value === 'image') {
+          // manually trigger change event if it's already image
+          signatureTypeSelect.dispatchEvent(new Event('change'));
+        } else {
+          if (qrDragImg) qrDragImg.classList.add('hidden');
+          if (qrDragText) qrDragText.classList.remove('hidden');
+        }
+      }
 
       // Load and render PDF using PDFJS
       try {
@@ -1180,6 +1197,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('mouseup', () => {
     isDragging = false;
   });
+
+  if (signatureTypeSelect) {
+    signatureTypeSelect.addEventListener('change', async (e) => {
+      const type = e.target.value;
+      if (type === 'image') {
+        chrome.storage.local.get(['default_image_signature_id'], async (storage) => {
+          if (!storage.default_image_signature_id) {
+            alert('Please upload a visual signature first.');
+            signatureTypeSelect.value = 'qr';
+            if (qrDragImg) qrDragImg.classList.add('hidden');
+            if (qrDragText) qrDragText.classList.remove('hidden');
+            tabKeys.click();
+          } else {
+            try {
+              const imgSig = await getImageSignatureLocal(storage.default_image_signature_id);
+              if (imgSig && imgSig.dataUrl) {
+                if (qrDragImg) {
+                  qrDragImg.src = imgSig.dataUrl;
+                  qrDragImg.classList.remove('hidden');
+                }
+                if (qrDragText) qrDragText.classList.add('hidden');
+              } else {
+                throw new Error("Not found");
+              }
+            } catch (err) {
+              alert('Failed to load visual signature. Please re-upload.');
+              signatureTypeSelect.value = 'qr';
+              if (qrDragImg) qrDragImg.classList.add('hidden');
+              if (qrDragText) qrDragText.classList.remove('hidden');
+            }
+          }
+        });
+      } else {
+        if (qrDragImg) qrDragImg.classList.add('hidden');
+        if (qrDragText) qrDragText.classList.remove('hidden');
+      }
+    });
+  }
 
   // 8. Sign and Seal Submit
   btnSignSubmit.addEventListener('click', async () => {
@@ -1253,19 +1308,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         const verifyUrl = `${baseUrl}/verify/${verifyToken}`;
         const shortId = `TLS-${verifyToken.substring(0, 8).toUpperCase()}`;
 
-        // Get default image signature
-        const st = await chrome.storage.local.get('default_image_signature_id');
         let uploadedImageBase64 = null;
-        let isQrCode = true;
+        let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
 
-        if (st.default_image_signature_id) {
-            try {
-                const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
-                if (imgSig && imgSig.dataUrl) {
-                    uploadedImageBase64 = imgSig.dataUrl;
-                    isQrCode = false; 
+        if (!isQrCode) {
+            const st = await chrome.storage.local.get('default_image_signature_id');
+            if (st.default_image_signature_id) {
+                try {
+                    const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
+                    if (imgSig && imgSig.dataUrl) {
+                        uploadedImageBase64 = imgSig.dataUrl;
+                    } else {
+                        isQrCode = true;
+                    }
+                } catch (err) { 
+                    console.error("Error loading image signature", err); 
+                    isQrCode = true;
                 }
-            } catch (err) { console.error("Error loading image signature", err); }
+            } else {
+                isQrCode = true;
+            }
         }
 
         if (isQrCode) {

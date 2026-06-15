@@ -87,19 +87,21 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 - [x] Support marking signatures as default and store state in `chrome.storage.local`
 - [x] Apply Bio-Digital Minimalism aesthetic (Custom modales, Fallbacks, CSS)
 
-### Phase 3: PDF Embedding & Barcode Signature Framing (Next)
-- [ ] Implement Canvas API generator (`barcode-generator.js`) to compose the TrustLessSign Signature Frame.
-- [ ] Inject JsBarcode library for 1D Code 128 generation.
-- [ ] Implement silent Zero-Trust Authentication validation before rendering `signerName` to ensure cryptographic validity.
-- [ ] Render static elements: White background, 24px padding, thick green left border with rounded corners.
-- [ ] Render Header: Green check icon + "Signed by: [signerName]".
-- [ ] Render Body: Embed the user's uploaded image (or cursive text). If using QR Code, embed the QR Code instead.
-- [ ] Render Meta & Barcode: Add "TrustLessSign Zero Trust", `shortId` (e.g., TLS-XXXX), Code 128 Barcode, and Footer URL. (Note: Omit `shortId`, Barcode, and Footer URL if wrapping a QR Code).
-- [ ] Convert the composed Canvas into an image buffer.
-- [ ] Read image buffer from Google Drive / IndexedDB during the signing process.
-- [ ] Integrate `pdf-lib` to embed the composed Canvas image onto the PDF canvas.
-- [ ] Tie image selection to the existing drag-and-drop selector using a Ghost Element or 50ms Debounce to prevent memory leak during live preview simulation.
-
+### Phase 3: Signature Type Selector & Dynamic Drag Box Integration (Next)
+- [ ] **Extension Popup UI**:
+  - Add a "Signature Type" selector (QR Code vs Image Signature) above the PDF preview container.
+  - If "Image Signature" is selected but none exists, prompt the user to upload one and redirect them to the "Keys & Cert" tab.
+  - Dynamically update the `qr-drag-box` content: If "Image Signature" is selected, render a miniature preview of the default image signature inside the drag box instead of the "QR Code" text.
+- [ ] **Web Dashboard UI (`SignDocument.jsx`)**:
+  - Implement a Cross-Origin messaging bridge to fetch the default Image Signature from the Extension's IndexedDB.
+  - Add a "Signature Type" dropdown/selector (QR Code vs Visual Signature).
+  - Provide fallback logic: If extension is installed but no visual signature is found, show an alert directing the user to the extension to upload one.
+  - Update `Draggable` node: Use a React state to dynamically switch the box content between "QR Code Area" text and a visual `<img src={...} />` preview of the selected visual signature.
+- [ ] **Canvas Rendering & PDF Lib (`barcode-generator.js`)**:
+  - Implement Canvas API generator to compose the final visual frame (green border, check icon, "Signed by: [Name]").
+  - Embed the chosen element (QR code data OR visual signature image) into the center of the Canvas.
+  - If an Image Signature is used, omit the Barcode 128 (as per standard).
+  - Embed the composed Canvas output onto the PDF via `pdf-lib` at the exact coordinates recorded by the `qr-drag-box`.
 ### Phase 4: Web Verify Scanner Integration
 - [ ] Update `web/resources/js/Pages/Verify.jsx` to include an EditText for manual Short ID entry.
 - [ ] Integrate `html5-qrcode` library in **Headless Mode** (`Html5Qrcode` class) without the built-in scanner UI.

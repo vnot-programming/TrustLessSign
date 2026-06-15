@@ -7,6 +7,7 @@ import LanguageSwitcher from '../Components/LanguageSwitcher';
 import ThemeToggle from '../Components/ThemeToggle';
 import QRious from '../Utils/qrious.min.js';
 import axios from 'axios';
+import { generateSignatureFrame } from '../Utils/barcode-generator.js';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -24,6 +25,8 @@ export default function SignDocument() {
   const [qrPosition, setQrPosition] = useState({ x: 50, y: 50 });
   const containerRef = useRef(null);
   const nodeRef = useRef(null);
+  const [signatureType, setSignatureType] = useState('qr');
+  const [imageSigDataUrl, setImageSigDataUrl] = useState(null);
 
   // Form states
   const [categories, setCategories] = useState([]);
@@ -162,6 +165,28 @@ export default function SignDocument() {
       });
   }, []);
 
+  // Fetch visual signature from extension when selected
+  useEffect(() => {
+    if (signatureType === 'image' && !imageSigDataUrl) {
+      const handleFetchImage = (evt) => {
+        if (evt.data && evt.data.type === 'TRUSTLESS_FETCH_IMAGE_SIG_RESPONSE') {
+          window.removeEventListener('message', handleFetchImage);
+          const result = evt.data.payload;
+          if (result && result.status === 'success' && result.dataUrl) {
+            setImageSigDataUrl(result.dataUrl);
+          } else {
+            alert('No visual signature found. Please upload one in the TrustlessSign Extension (Keys & Cert tab).');
+            setSignatureType('qr');
+          }
+        }
+      };
+      window.addEventListener('message', handleFetchImage);
+      window.postMessage({ type: 'TRUSTLESS_FETCH_IMAGE_SIG_REQUEST' }, '*');
+      
+      return () => window.removeEventListener('message', handleFetchImage);
+    }
+  }, [signatureType, imageSigDataUrl]);
+
   const currentCategory = categories.find(c => c.id.toString() === selectedCategoryId);
   const subCategories = currentCategory?.sub_categories || [];
 
@@ -215,14 +240,33 @@ export default function SignDocument() {
       // Generate verification token client-side
       const verifyToken = crypto.randomUUID();
       const verifyUrl = `${window.location.origin}/verify/${verifyToken}`;
+      const shortId = verifyToken.split('-')[0].toUpperCase();
 
-      // Generate visual QR code PNG using qrious
-      const qr = new QRious({
-        value: verifyUrl,
-        size: 150,
-        level: 'H'
-      });
-      const qrPngBase64 = qr.toDataURL('image/png');
+      let finalQrPngBase64 = '';
+      if (signatureType === 'image') {
+        finalQrPngBase64 = await generateSignatureFrame(
+            user.name,
+            shortId,
+            verifyUrl,
+            imageSigDataUrl,
+            false // isQrCode = false
+        );
+      } else {
+        // Generate visual QR code PNG using qrious
+        const qr = new QRious({
+          value: verifyUrl,
+          size: 150,
+          level: 'H'
+        });
+        const baseQr = qr.toDataURL('image/png');
+        finalQrPngBase64 = await generateSignatureFrame(
+            user.name,
+            shortId,
+            verifyUrl,
+            baseQr,
+            true // isQrCode = true
+        );
+      }
 
       // Get concatenated final reason text
       const selectedSub = subCategories.find(s => s.id.toString() === selectedSubCategoryId);
@@ -345,7 +389,7 @@ export default function SignDocument() {
           reason_final: reason_final,
           notes: notes,
           password: password,
-          qrPngBase64: qrPngBase64,
+          qrPngBase64: finalQrPngBase64,
           author: user.name,
           verifyToken: verifyToken
         }
@@ -569,6 +613,19 @@ export default function SignDocument() {
                         />
                       </div>
 
+                      {/* Signature Type Selector */}
+                      <div className="space-y-1">
+                        <label className="block text-xs font-semibold text-text-secondary">Signature Type</label>
+                        <select 
+                          value={signatureType} 
+                          onChange={(e) => setSignatureType(e.target.value)}
+                          className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
+                        >
+                          <option value="qr">Cryptographic QR Code</option>
+                          <option value="image">Visual Signature (Image)</option>
+                        </select>
+                      </div>
+
                       {/* Password input */}
                       <div className="space-y-1">
                         <label className="block text-xs font-semibold text-text-secondary flex items-center gap-1">
@@ -631,11 +688,15 @@ export default function SignDocument() {
                       onStop={handleDragStop}
                       nodeRef={nodeRef}
                     >
-                      <div ref={nodeRef} className="absolute top-0 left-0 w-24 h-24 border-2 border-accent-primary bg-accent-primary-soft flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55">
+                      <div ref={nodeRef} className="absolute top-0 left-0 w-32 h-20 border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                           Drag to place the signature that appears on the Document
                         </div>
-                        <span className="text-accent-primary font-bold text-xs text-center pointer-events-none select-none">{t.qr_area}</span>
+                        {signatureType === 'image' && imageSigDataUrl ? (
+                          <img src={imageSigDataUrl} alt="Visual Signature" className="max-w-full max-h-full object-contain pointer-events-none select-none" />
+                        ) : (
+                          <span className="text-accent-primary font-bold text-xs text-center pointer-events-none select-none">{t.qr_area}</span>
+                        )}
                       </div>
                     </Draggable>
                   </div>

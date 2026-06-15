@@ -569,3 +569,16 @@
   - `docs/new/multiple-signature-task.md`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Menyelaraskan ulang dokumen *Implementation Plan* dan *Task* agar mematuhi arsitektur *Zero Trust*. Pada fitur *Image Signature*, sinkronisasi dengan status terbaru di mana penyimpanan sementara kini dialihkan ke peramban lokal (`IndexedDB` melalui `local-db.js`) demi menghindari kedipan UI, dan bukan langsung ke Google Drive API. Pada fitur *Multiple Signature*, arsitektur direvisi sedemikian rupa agar *backend* Laravel tidak lagi menerima *file upload* PDF secara mentah, melainkan hanya berfungsi sebagai pengelola urutan *Workflow State Machine* yang menerima `document_hash` dan `encrypted_drive_url`.
+
+- **Tanggal/Waktu:** 2026-06-15T14:39:49Z
+- **Tugas yang diselesaikan:** Integrasi Fitur Visual Signature ke Web Dashboard (Phase 3)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `chrome-extension/background/service-worker.js`
+  - `chrome-extension/content.js`
+  - `chrome-extension/signing/signer.js`
+  - `safari-extension/Resources/background.js`
+  - `safari-extension/Resources/content.js`
+  - `safari-extension/Resources/signing/signer.js`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Telah diselesaikan tahap integrasi Web Dashboard (Phase 3 Image Signature). Halaman Web Dashboard `SignDocument.jsx` kini dapat mengambil `Visual Signature` langsung dari Extension lewat IndexedDB menggunakan Cross-Origin message (via `content.js` dan `background.js`). Fitur selector 'Signature Type' telah diimplementasikan, fallback alert telah disediakan jika user belum men-set default image, dan UI Draggable node otomatis me-render image preview. Safari Extension juga telah disinkronisasi.

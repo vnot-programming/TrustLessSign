@@ -33,26 +33,23 @@
 **STATUS:** PENDING  
 **Assigned to:** Frontend/Extension Team
 
-### Task 3.1: Canvas Barcode Signature Generator
-**Files to create:** `extension/signing/barcode-generator.js`
-- [ ] Implement silent Identity Provider (IdP) background validation before granting `signerName`.
-- [ ] Create function to compose the signature frame using Canvas API.
-- [ ] Render background, rounded green border, and checkmark header.
-- [ ] Render cursive text (fallback to Google Signin Name) or uploaded image in the center.
-- [ ] Inject `JsBarcode` and generate Code 128 Barcode with `shortId`.
-- [ ] Add Footer URL (`tsign.vnot.my.id/verify`).
-- [x] Implement silent Identity Provider (IdP) background validation before granting `signerName`.
-- [x] Create function to compose the signature frame using Canvas API.
-- [x] Render background, rounded green border, and checkmark header.
-- [x] Render cursive text (fallback to Google Signin Name) or uploaded image in the center.
-- [x] Inject `JsBarcode` and generate Code 128 Barcode with `shortId`.
-- [x] Add Footer URL (`tsign.vnot.my.id/verify`).
-- [x] Implement conditional logic to omit `shortId`, barcode, and footer if framing a QR Code.
+### Task 3.1: Signature Type Selector & Dynamic Drag Box Integration
+**Assigned to:** Frontend/Extension Team
+- [x] Add a "Signature Type" selector (QR Code vs Image Signature) above the PDF preview container in Extension Popup UI
+- [x] Render miniature preview of the default image signature inside the drag box in Extension Popup UI
+- [x] **Web Dashboard UI (`SignDocument.jsx`)**:
+  - [x] Implement a Cross-Origin messaging bridge to fetch the default Image Signature from the Extension's IndexedDB.
+  - [x] Add a "Signature Type" dropdown/selector (QR Code vs Visual Signature).
+  - [x] Provide fallback logic: If extension is installed but no visual signature is found, show an alert.
+  - [x] Update `Draggable` node: dynamically switch between "QR Code Area" text and a visual preview.
 
 ### Task 3.2: Image Injection via PDF-Lib
 **Files to update:** `extension/signing/signer.js`
-- [x] Update `signer.js` to replace direct QR generation with `barcode-generator.js`.
-- [x] Modify `popup.js` to call `generateSignatureFrame` instead of generating only QR Base64.
+- [x] **Canvas Rendering & PDF Lib (`barcode-generator.js`)**:
+  - [x] Implement Canvas API generator to compose the final visual frame.
+  - [x] Embed the chosen element (QR code data OR visual signature image).
+  - [x] Omit Barcode 128 if Image Signature is used.
+  - [x] Embed output onto the PDF via `pdf-lib`.generateSignatureFrame` instead of generating only QR Base64.
 - [x] Test end-to-end embedding process using local storage values.
 
 ### Task 3.3: Web Verify Camera Scanner (Headless Mode)
@@ -65,7 +62,7 @@
 - [x] Handle Camera Permissions and Error state gracefully.
 
 ### Task 3.4: Signing Workflow Harmonization
-- [ ] Document the workflow changes in SDP
+- [x] Document the workflow changes in SDP
 
 ---
 

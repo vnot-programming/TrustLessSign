@@ -42,6 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const previewContainer = document.getElementById('pdf-preview-container');
   const pdfCanvas = document.getElementById('pdf-canvas');
   const qrDragBox = document.getElementById('qr-drag-box');
+  const signatureTypeContainer = document.getElementById('signature-type-container');
+  const signatureTypeSelect = document.getElementById('signature-type');
+  const qrDragText = document.getElementById('qr-drag-text');
+  const qrDragImg = document.getElementById('qr-drag-img');
   
   // Keygen tab fields
   const certStatusBadge = document.getElementById('cert-status-badge');
@@ -894,10 +898,46 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             
             item.innerHTML = `
+              <div class="del-btn" style="position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; background: rgba(0,0,0,0.6); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; z-index: 10;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </div>
               <img src="${file.dataUrl}" alt="${file.name}" style="width: 100%; height: 50px; object-fit: contain; border-radius: 4px; background: white;">
               <span style="font-size: 0.65rem; margin-top: 4px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">${file.name}</span>
-              ${isDefault ? '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' : ''}
+              ${isDefault ? '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; z-index: 10;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>' : ''}
             `;
+
+            // Hover effects for delete button
+            item.addEventListener('mouseenter', () => {
+              const delBtn = item.querySelector('.del-btn');
+              if (delBtn) delBtn.style.opacity = '1';
+            });
+            item.addEventListener('mouseleave', () => {
+              const delBtn = item.querySelector('.del-btn');
+              if (delBtn) delBtn.style.opacity = '0';
+            });
+
+            // Delete button click
+            const delBtnEl = item.querySelector('.del-btn');
+            if (delBtnEl) {
+              delBtnEl.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (confirm('Delete this visual signature?')) {
+                  item.style.opacity = '0.5';
+                  try {
+                    await deleteImageSignatureLocal(file.id);
+                    chrome.storage.local.get(['default_image_signature_id'], (s) => {
+                      if (s.default_image_signature_id === file.id) {
+                        chrome.storage.local.remove('default_image_signature_id');
+                      }
+                    });
+                    refreshImageSignatures();
+                  } catch (err) {
+                    item.style.opacity = '1';
+                    alert('Error deleting: ' + err.message);
+                  }
+                }
+              });
+            }
 
             // Click to set as default - NO FLICKERING
             item.addEventListener('click', () => {
@@ -912,7 +952,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 item.style.border = '1px solid var(--accent-primary)';
                 item.style.background = 'var(--accent-primary-soft)';
-                item.insertAdjacentHTML('beforeend', '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>');
+                item.insertAdjacentHTML('beforeend', '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; z-index: 10;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>');
               });
             });
 
@@ -1065,6 +1105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const file = e.target.files[0];
     if (!file || file.type !== 'application/pdf') {
       previewContainer.classList.add('hidden');
+      if (signatureTypeContainer) signatureTypeContainer.classList.add('hidden');
       return;
     }
 
@@ -1074,7 +1115,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const pdfUint8 = new Uint8Array(currentFileBytes.slice(0));
       
       previewContainer.classList.remove('hidden');
+      if (signatureTypeContainer) signatureTypeContainer.classList.remove('hidden');
       signSuccessCard.classList.add('hidden');
+
+      // reset signature type preview
+      if (signatureTypeSelect) {
+        if (signatureTypeSelect.value === 'image') {
+          // manually trigger change event if it's already image
+          signatureTypeSelect.dispatchEvent(new Event('change'));
+        } else {
+          if (qrDragImg) qrDragImg.classList.add('hidden');
+          if (qrDragText) qrDragText.classList.remove('hidden');
+        }
+      }
 
       // Load and render PDF using PDFJS
       try {
@@ -1144,6 +1197,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.addEventListener('mouseup', () => {
     isDragging = false;
   });
+
+  if (signatureTypeSelect) {
+    signatureTypeSelect.addEventListener('change', async (e) => {
+      const type = e.target.value;
+      if (type === 'image') {
+        chrome.storage.local.get(['default_image_signature_id'], async (storage) => {
+          if (!storage.default_image_signature_id) {
+            alert('Please upload a visual signature first.');
+            signatureTypeSelect.value = 'qr';
+            if (qrDragImg) qrDragImg.classList.add('hidden');
+            if (qrDragText) qrDragText.classList.remove('hidden');
+            tabKeys.click();
+          } else {
+            try {
+              const imgSig = await getImageSignatureLocal(storage.default_image_signature_id);
+              if (imgSig && imgSig.dataUrl) {
+                if (qrDragImg) {
+                  qrDragImg.src = imgSig.dataUrl;
+                  qrDragImg.classList.remove('hidden');
+                }
+                if (qrDragText) qrDragText.classList.add('hidden');
+              } else {
+                throw new Error("Not found");
+              }
+            } catch (err) {
+              alert('Failed to load visual signature. Please re-upload.');
+              signatureTypeSelect.value = 'qr';
+              if (qrDragImg) qrDragImg.classList.add('hidden');
+              if (qrDragText) qrDragText.classList.remove('hidden');
+            }
+          }
+        });
+      } else {
+        if (qrDragImg) qrDragImg.classList.add('hidden');
+        if (qrDragText) qrDragText.classList.remove('hidden');
+      }
+    });
+  }
 
   // 8. Sign and Seal Submit
   btnSignSubmit.addEventListener('click', async () => {
@@ -1217,19 +1308,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         const verifyUrl = `${baseUrl}/verify/${verifyToken}`;
         const shortId = `TLS-${verifyToken.substring(0, 8).toUpperCase()}`;
 
-        // Get default image signature
-        const st = await chrome.storage.local.get('default_image_signature_id');
         let uploadedImageBase64 = null;
-        let isQrCode = true;
+        let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
 
-        if (st.default_image_signature_id) {
-            try {
-                const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
-                if (imgSig && imgSig.dataUrl) {
-                    uploadedImageBase64 = imgSig.dataUrl;
-                    isQrCode = false; 
+        if (!isQrCode) {
+            const st = await chrome.storage.local.get('default_image_signature_id');
+            if (st.default_image_signature_id) {
+                try {
+                    const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
+                    if (imgSig && imgSig.dataUrl) {
+                        uploadedImageBase64 = imgSig.dataUrl;
+                    } else {
+                        isQrCode = true;
+                    }
+                } catch (err) { 
+                    console.error("Error loading image signature", err); 
+                    isQrCode = true;
                 }
-            } catch (err) { console.error("Error loading image signature", err); }
+            } else {
+                isQrCode = true;
+            }
         }
 
         if (isQrCode) {
