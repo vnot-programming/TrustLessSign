@@ -410,7 +410,7 @@ export default function SignDocument() {
             page: pageNumber,
             x: qrPosition.x,
             y: qrPosition.y,
-            size: 320
+            size: 160
           },
           reason_sub_category_id: selectedSubCategoryId ? parseInt(selectedSubCategoryId) : null,
           reason_final: reason_final,
@@ -715,7 +715,7 @@ export default function SignDocument() {
                       onStop={handleDragStop}
                       nodeRef={nodeRef}
                     >
-                      <div ref={nodeRef} className="absolute top-0 left-0 w-[320px] h-[186px] border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
+                      <div ref={nodeRef} className="absolute top-0 left-0 w-[160px] h-[93px] border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                           Drag to place the signature that appears on the Document
                         </div>
