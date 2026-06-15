@@ -243,7 +243,11 @@ export default function SignDocument() {
 
       // Automatically refresh GDrive token to prevent 401 Unauthenticated errors
       try {
-        const refreshRes = await axios.post('/api/gdrive/refresh');
+        const refreshRes = await axios.post('/api/gdrive/refresh', {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (refreshRes.data && refreshRes.data.gdrive_token) {
           gdrive_token = refreshRes.data.gdrive_token;
         }
