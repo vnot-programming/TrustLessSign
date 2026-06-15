@@ -3,6 +3,7 @@
  * Composes the signature frame using Canvas API.
  * Adheres to Zero-Trust architecture and Bio-Digital Minimalism.
  */
+import QRCodeStyling from 'qr-code-styling';
 
 export async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:") {
     // Zero-Trust Validation is handled by Sanctum tokens in the Web Dashboard.
@@ -22,9 +23,9 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     
     ctx.scale(scaleFactor, scaleFactor);
 
-    // Background
-    ctx.fillStyle = '#FAFAFA'; 
-    ctx.fillRect(0, 0, logicalWidth, logicalHeight);
+    // 3. Draw Main Background
+    // Made transparent as per user request
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const padding = 6; 
     const width = logicalWidth;
@@ -149,10 +150,60 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.fillText(t2, bodyStartX + w1, footerY);
     }
 
-    return canvas.toDataURL("image/png");
+    return canvas.toDataURL('image/png');
+}
+
+/**
+ * Generate a standalone modern QR Code using qr-code-styling.
+ * Contains no external borders, text, or meta info.
+ */
+export async function generateModernTSignQR(verifyUrl) {
+    const qrCode = new QRCodeStyling({
+        width: 600,
+        height: 600,
+        type: "canvas",
+        data: verifyUrl,
+        image: "/logo-tSign.svg",
+        margin: 0,
+        qrOptions: {
+            typeNumber: 0,
+            mode: "Byte",
+            errorCorrectionLevel: "H"
+        },
+        imageOptions: {
+            hideBackgroundDots: true,
+            imageSize: 0.3,
+            margin: 10,
+            crossOrigin: "anonymous"
+        },
+        dotsOptions: {
+            color: "#000000",
+            type: "rounded"
+        },
+        backgroundOptions: {
+            color: "#FFFFFF"
+        },
+        cornersSquareOptions: {
+            color: "#000000",
+            type: "extra-rounded"
+        },
+        cornersDotOptions: {
+            color: "#000000",
+            type: "dot"
+        }
+    });
+
+    const blob = await qrCode.getRawData("png");
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 }
 
 // Export for module systems or global window
 if (typeof window !== 'undefined') {
     window.generateSignatureFrame = generateSignatureFrame;
+    window.generateModernTSignQR = generateModernTSignQR;
 }
