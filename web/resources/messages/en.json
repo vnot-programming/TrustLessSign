@@ -44,7 +44,9 @@
     "sign_another": "Sign another document",
     "back_to_dashboard": "Back to Dashboard",
     "extension_required": "TrustlessSign Extension Required",
-    "extension_desc": "Please download and install our browser extension to secure and sign your PDFs offline."
+    "extension_desc": "Please download and install our browser extension to secure and sign your PDFs offline.",
+    "signed_by": "Signed by:",
+    "verify_at": "Verify at:"
   },
   "Dashboard": {
     "welcome_back": "Welcome Back",

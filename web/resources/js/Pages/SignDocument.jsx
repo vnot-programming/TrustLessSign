@@ -279,7 +279,9 @@ export default function SignDocument() {
             shortId,
             verifyUrlShort,
             imageSigDataUrl,
-            false // isQrCode = false
+            false, // isQrCode = false
+            t.signed_by,
+            t.verify_at
         );
       } else {
         // Generate visual QR code PNG using qrious
@@ -294,7 +296,9 @@ export default function SignDocument() {
             shortId,
             verifyUrlShort,
             baseQr,
-            true // isQrCode = true
+            true, // isQrCode = true
+            t.signed_by,
+            t.verify_at
         );
       }
 

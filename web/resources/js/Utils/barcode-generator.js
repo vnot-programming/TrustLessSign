@@ -4,7 +4,7 @@
  * Adheres to Zero-Trust architecture and Bio-Digital Minimalism.
  */
 
-export async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64, isQrCode) {
+export async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:") {
     // Zero-Trust Validation is handled by Sanctum tokens in the Web Dashboard.
 
     // 2. Set up Canvas
@@ -62,7 +62,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`Signed by: ${signerName}`, bodyStartX + 16, padding + 5);
+    ctx.fillText(`${textSignedBy} ${signerName}`, bodyStartX + 16, padding + 5);
 
     // Body: Image or Cursive Text
     const bodyStartY = padding + 14; 
@@ -136,7 +136,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
         
-        const t1 = "Verifikasi di: ";
+        const t1 = `${textVerifyAt} `;
         const t2 = verifyUrl;
         
         ctx.font = '9px sans-serif';

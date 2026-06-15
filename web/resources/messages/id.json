@@ -44,7 +44,9 @@
     "sign_another": "Tanda tangani dokumen lain",
     "back_to_dashboard": "Kembali ke Dasbor",
     "extension_required": "Ekstensi TrustlessSign Diperlukan",
-    "extension_desc": "Silakan unduh dan instal ekstensi browser kami untuk mengamankan dan menandatangani PDF Anda secara offline."
+    "extension_desc": "Silakan unduh dan instal ekstensi browser kami untuk mengamankan dan menandatangani PDF Anda secara offline.",
+    "signed_by": "Ditandatangani oleh:",
+    "verify_at": "Verifikasi di:"
   },
   "Dashboard": {
     "welcome_back": "Selamat Datang Kembali",
