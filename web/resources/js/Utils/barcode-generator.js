@@ -202,8 +202,55 @@ export async function generateModernTSignQR(verifyUrl) {
     });
 }
 
+/**
+ * Generate a Marginal Page Stamp (Horizontal Ribbon)
+ * to be placed vertically on the PDF to prevent page swapping.
+ */
+export async function generatePageStamp(shortId, pageNum, totalPages, timestamp) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const width = 800;
+    const height = 40;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Background: transparent
+    ctx.clearRect(0, 0, width, height);
+
+    const barcodeData = `${shortId}-P${String(pageNum).padStart(2, '0')}`;
+    
+    // Draw Barcode using JsBarcode
+    // Create a temporary canvas for the barcode since JsBarcode replaces canvas sizes sometimes
+    const barcodeCanvas = document.createElement("canvas");
+    JsBarcode(barcodeCanvas, barcodeData, {
+        format: "CODE128",
+        height: 30,
+        displayValue: false,
+        margin: 0,
+        background: "rgba(0,0,0,0)",
+        lineColor: "#000000"
+    });
+
+    // Draw the barcode onto the main canvas, vertically centered
+    ctx.drawImage(barcodeCanvas, 0, 5);
+
+    // Draw Metadata Text
+    const textX = barcodeCanvas.width + 20; // 20px padding after barcode
+    ctx.font = '12px Courier New';
+    ctx.fillStyle = '#555555';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    
+    const textContent = `tSign ID: ${shortId} | Page ${pageNum} of ${totalPages} | Time: ${timestamp}`;
+    ctx.fillText(textContent, textX, height / 2);
+
+    return canvas.toDataURL('image/png');
+}
+
 // Export for module systems or global window
 if (typeof window !== 'undefined') {
     window.generateSignatureFrame = generateSignatureFrame;
     window.generateModernTSignQR = generateModernTSignQR;
+    window.generatePageStamp = generatePageStamp;
 }

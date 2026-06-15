@@ -170,7 +170,8 @@ async function handleSignDocument(payload, baseUrl) {
     reason_final, 
     notes, 
     password,
-    qrPngBase64
+    qrPngBase64,
+    pageStamps
   } = payload;
 
   // 1. Retrieve & decrypt private key
@@ -211,8 +212,8 @@ async function handleSignDocument(payload, baseUrl) {
     signed_at: new Date().toISOString()
   };
 
-  // 4. Embed QR & metadata using signer helper
-  const stampResult = await embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata);
+  // 4. Embed QR, metadata, and marginal page stamps using signer helper
+  const stampResult = await embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, pageStamps);
   const { signedPdfStr, hash, targetX, targetY, qrSize, targetPageIdx } = stampResult;
 
   // 5. Sign final PDF hash

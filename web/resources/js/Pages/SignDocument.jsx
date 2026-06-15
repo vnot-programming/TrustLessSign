@@ -7,7 +7,7 @@ import LanguageSwitcher from '../Components/LanguageSwitcher';
 import ThemeToggle from '../Components/ThemeToggle';
 import axios from 'axios';
 import JsBarcode from 'jsbarcode';
-import { generateSignatureFrame, generateModernTSignQR } from '../Utils/barcode-generator.js';
+import { generateSignatureFrame, generateModernTSignQR, generatePageStamp } from '../Utils/barcode-generator.js';
 
 // Make JsBarcode available globally for barcode-generator.js
 if (typeof window !== 'undefined') {
@@ -403,6 +403,13 @@ export default function SignDocument() {
       const prefixedFilename = `signed_web_${timestamp}-${file.name}`;
       setFinalFileName(prefixedFilename);
 
+      // Generate pageStamps array for marginal stamping
+      const pageStamps = [];
+      for (let i = 1; i <= numPages; i++) {
+        const stampStr = await generatePageStamp(shortId, i, numPages, timestamp);
+        pageStamps.push(stampStr);
+      }
+
       window.postMessage({
         type: 'TRUSTLESS_SIGN_REQUEST',
         payload: {
@@ -410,6 +417,7 @@ export default function SignDocument() {
           filename: prefixedFilename,
           gdriveToken: gdrive_token,
           apiToken: token,
+          pageStamps: pageStamps,
           qrPosition: {
             page: pageNumber,
             x: qrPosition.x,

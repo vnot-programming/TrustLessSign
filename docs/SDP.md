@@ -2,6 +2,9 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **2026-06-15 20:00**:
+  - Implementasi Marginal Page Stamp (Page Swapping Protection)
+  - Web UI mengirimkan array base64 stamp image (`pageStamps`) ke ekstensi, dirotasi 90 CCW di ekstensi untuk semua halaman.
 - **2026-06-09 18:22**: 
   - Shared Postgres network `vnot_shared_net` and container created.
   - `trustlesssign` database created.
@@ -604,4 +607,13 @@
 - **File yang diubah/dibuat:**
   - `web/resources/js/Pages/SignDocument.jsx`
 - **Status saat ini:** Selesai
-- **Catatan untuk AI selanjutnya:** Karena ukuran ukuran `size: 320` terlalu memakan tempat pada PDF, dikembalikan setengahnya menjadi `size: 160`, dengan _bounding box_ responsif UI `160x93px`. Resolusi _canvas_ tetap tajam (2400x1400).
+  - `web/resources/js/Pages/SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Kanvas direvisi menjadi `400x300` (rasio 4:3). Tanda tangan gambar kini berada rata tengah secara absolut dengan `max-height: 140px` dan `object-fit: contain` logic, sehingga mengisi ruang kosong mendatar secara efisien. Kotak pratinjau Web disesuaikan menjadi `160x120px`.
+
+- **Tanggal/Waktu:** 2026-06-15T17:29:00Z
+- **Tugas yang diselesaikan:** Optimalisasi Ruang Kosong (Dead Space) pada Visual Signature
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Utils/barcode-generator.js`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Sesuai *mockup* pengguna, *padding* global dikurangi menjadi `12px`. Jarak antar elemen dipersempit. Limitasi buatan *max-height: 140px* pada gambar tanda tangan dihilangkan, sehingga gambar kini dapat membesar secara leluasa memenuhi seluruh area ruang kosong (Body) seluas `366x205px` tanpa merusak *aspect ratio*.

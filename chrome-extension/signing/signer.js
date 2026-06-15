@@ -47,7 +47,7 @@ function generateCSR(keypair, email) {
 /**
  * Embed QR code visual signature into PDF and set metadata subject
  */
-async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
+async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, pageStamps = []) {
   const pdfDoc = await PDFLib.PDFDocument.load(pdfUint8);
   const pages = pdfDoc.getPages();
   const targetPageIdx = Math.min((qrPosition?.page || 1) - 1, pages.length - 1);
@@ -85,6 +85,46 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
     width: qrSize,
     height: drawHeight
   });
+
+  // Inject Marginal Page Stamps on EVERY page to prevent page swapping
+  if (pageStamps && pageStamps.length > 0) {
+    for (let i = 0; i < pages.length; i++) {
+      if (pageStamps[i]) {
+        const stampBytes = forge.util.decode64(pageStamps[i].replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, ''));
+        const stampUint8 = new Uint8Array(stampBytes.length);
+        for (let j = 0; j < stampBytes.length; j++) {
+          stampUint8[j] = stampBytes.charCodeAt(j);
+        }
+        
+        let stampImage;
+        if (stampUint8[0] === 0xFF && stampUint8[1] === 0xD8) {
+          stampImage = await pdfDoc.embedJpg(stampUint8);
+        } else {
+          stampImage = await pdfDoc.embedPng(stampUint8);
+        }
+
+        const stampAspect = stampImage.height / stampImage.width;
+        // In Web UI we set width 800px, height 40px (aspect = 40/800 = 0.05)
+        // Let's set a standard physical size for the margin ribbon. 
+        // e.g. width = 400 points, height = 400 * 0.05 = 20 points
+        const ribbonWidth = 400;
+        const ribbonHeight = ribbonWidth * stampAspect;
+
+        // Draw it vertically: x=15, y=50, rotate=-90 degrees (or 90 counter-clockwise)
+        // In pdf-lib, degrees(90) rotates counter-clockwise.
+        // If we rotate 90 CCW, the top-left becomes bottom-left. 
+        // We want the text reading from bottom to top. 
+        // To read from bottom to top, it means rotating 90 degrees CCW.
+        pages[i].drawImage(stampImage, {
+          x: 15,
+          y: 50,
+          width: ribbonWidth,
+          height: ribbonHeight,
+          rotate: PDFLib.degrees(90)
+        });
+      }
+    }
+  }
 
   pdfDoc.setTitle(metadata.original_filename);
   pdfDoc.setAuthor(metadata.author || 'TrustlessSign User');
