@@ -27,7 +27,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.fillStyle = '#FAFAFA'; 
     ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
-    const padding = 16;
+    const padding = 12; // Tighter global padding
     const width = logicalWidth;
     const height = logicalHeight;
 
@@ -49,9 +49,9 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     // Header: Check icon + "Signed by: [signerName]"
     // Draw Checkmark
     ctx.beginPath();
-    ctx.moveTo(padding + 15, padding + 6);
-    ctx.lineTo(padding + 20, padding + 12);
-    ctx.lineTo(padding + 30, padding + 2);
+    ctx.moveTo(padding + 12, padding + 5);
+    ctx.lineTo(padding + 18, padding + 11);
+    ctx.lineTo(padding + 28, padding + 1);
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#3B935D';
     ctx.stroke();
@@ -60,12 +60,12 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.font = 'bold 16px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`Signed by: ${signerName}`, padding + 40, padding + 7);
+    ctx.fillText(`Signed by: ${signerName}`, padding + 35, padding + 6);
 
-    // Body: Image or Cursive Text (Center-Focused)
-    const bodyStartY = padding + 25;
-    const bodyHeight = height - padding - 25 - (isQrCode ? 0 : 75); 
-    const maxImgWidth = width - padding * 2 - 20; // available width inside border
+    // Body: Image or Cursive Text (Super Compact)
+    const bodyStartY = padding + 18; // Start right under the header
+    const bodyHeight = height - padding - 18 - (isQrCode ? 0 : 70); // 70px reserved for meta+barcode+footer
+    const maxImgWidth = width - padding * 2 - 15; // available width inside border
     
     if (uploadedImageBase64) {
         const img = new Image();
@@ -75,17 +75,16 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
             img.onerror = reject;
         });
         
-        // maintain aspect ratio
+        // Let the image grow as much as possible inside the body area (No artificial max-height limitation!)
         const scale = Math.min(
             maxImgWidth / img.width,
-            140 / img.height, // max height 140px
             bodyHeight / img.height
         );
         const drawWidth = img.width * scale;
         const drawHeight = img.height * scale;
-        // Center horizontally in the available space
-        const drawX = padding + 15 + (maxImgWidth - drawWidth) / 2;
-        // Center vertically in the body area
+        // Center horizontally
+        const drawX = padding + 12 + (maxImgWidth - drawWidth) / 2;
+        // Center vertically
         const drawY = bodyStartY + (bodyHeight - drawHeight) / 2;
         
         ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -95,19 +94,19 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.font = 'italic 36px cursive, serif'; 
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const drawX = padding + 15 + maxImgWidth / 2;
+        const drawX = padding + 12 + maxImgWidth / 2;
         ctx.fillText(signerName, drawX, bodyStartY + bodyHeight / 2);
     }
 
     if (!isQrCode) {
         // Meta Info
-        const metaY = height - padding - 45;
+        const metaY = height - padding - 40; // Tighter vertical spacing
         
         ctx.font = 'bold 12px sans-serif';
         ctx.fillStyle = '#3B935D';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
-        ctx.fillText("TrustLessSign Zero Trust", padding + 15, metaY);
+        ctx.fillText("TrustLessSign Zero Trust", padding + 12, metaY);
 
         ctx.font = 'bold 12px monospace';
         ctx.fillStyle = '#111111';
@@ -122,16 +121,16 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
                 displayValue: false,
                 margin: 0,
                 width: 2,
-                height: 30, // 30px height for 4:3
+                height: 28, // compact barcode height
                 lineColor: "#111111"
             });
-            const barcodeX = padding + 15;
-            const barcodeWidth = width - padding * 2 - 15;
-            ctx.drawImage(barcodeCanvas, barcodeX, metaY + 3, barcodeWidth, 30);
+            const barcodeX = padding + 12;
+            const barcodeWidth = width - padding * 2 - 12;
+            ctx.drawImage(barcodeCanvas, barcodeX, metaY + 2, barcodeWidth, 28);
         }
 
         // Footer
-        const footerY = height - padding;
+        const footerY = height - padding + 2;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
         
@@ -140,12 +139,12 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         
         ctx.font = '11px sans-serif';
         ctx.fillStyle = '#111111';
-        ctx.fillText(t1, padding + 15, footerY);
+        ctx.fillText(t1, padding + 12, footerY);
         
         const w1 = ctx.measureText(t1).width;
         ctx.fillStyle = '#3B935D';
         ctx.font = 'bold 11px sans-serif';
-        ctx.fillText(t2, padding + 15 + w1, footerY);
+        ctx.fillText(t2, padding + 12 + w1, footerY);
     }
 
     return canvas.toDataURL("image/png");
