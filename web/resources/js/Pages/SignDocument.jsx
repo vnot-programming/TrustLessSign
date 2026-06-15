@@ -707,13 +707,21 @@ export default function SignDocument() {
                       bounds="parent"
                       size={{ width: qrSize.width, height: qrSize.height }}
                       position={{ x: qrPosition.x, y: qrPosition.y }}
-                      onDragStop={(e, d) => setQrPosition({ x: d.x, y: d.y })}
+                      onDragStop={(e, d) => {
+                        setQrPosition({ x: d.x, y: d.y });
+                        console.log(`Ukuran : ${qrSize.width} x ${qrSize.height}`);
+                        console.log(`Posisi : x=${Math.round(d.x)}, y=${Math.round(d.y)}`);
+                      }}
                       onResizeStop={(e, direction, ref, delta, position) => {
+                        const newWidth = parseInt(ref.style.width, 10);
+                        const newHeight = parseInt(ref.style.height, 10);
                         setQrSize({
-                          width: parseInt(ref.style.width, 10),
-                          height: parseInt(ref.style.height, 10)
+                          width: newWidth,
+                          height: newHeight
                         });
                         setQrPosition(position);
+                        console.log(`Ukuran : ${newWidth} x ${newHeight}`);
+                        console.log(`Posisi : x=${Math.round(position.x)}, y=${Math.round(position.y)}`);
                       }}
                       lockAspectRatio={signatureType === 'qr' ? true : true}
                       className="absolute top-0 left-0 border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden"
