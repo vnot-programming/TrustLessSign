@@ -43,7 +43,7 @@ export default function SignDocument() {
 
   // Draggable QR Position and Size
   const [qrPosition, setQrPosition] = useState({ x: 50, y: 50 });
-  const [qrSize, setQrSize] = useState({ width: 160, height: 106 });
+  const [qrSize, setQrSize] = useState({ width: 115, height: 76 });
 
   // Status and result states
   const [extensionInstalled, setExtensionInstalled] = useState(false);
@@ -198,6 +198,15 @@ export default function SignDocument() {
       return () => window.removeEventListener('message', handleFetchImage);
     }
   }, [signatureType, imageSigDataUrl]);
+
+  // Handle Default Size when switching Signature Type
+  useEffect(() => {
+    if (signatureType === 'image') {
+      setQrSize({ width: 115, height: 76 });
+    } else {
+      setQrSize({ width: 72, height: 46 });
+    }
+  }, [signatureType]);
 
   const currentCategory = categories.find(c => c.id.toString() === selectedCategoryId);
   const subCategories = currentCategory?.sub_categories || [];
