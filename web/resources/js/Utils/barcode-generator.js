@@ -26,13 +26,12 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.fillStyle = '#FAFAFA'; 
     ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
-    const padding = 8; 
+    const padding = 6; 
     const width = logicalWidth;
     const height = logicalHeight;
 
-    // We want the content to start closer to the green line.
-    // Green line is at X = padding (8). Let's set bodyStartX to 16.
-    const bodyStartX = 16; 
+    const bodyStartX = 12; // super tight to the green line
+    const rightPadding = 6;
 
     // Artistic Green Border (Left)
     ctx.strokeStyle = '#3B935D';
@@ -53,8 +52,8 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     // Check mark
     ctx.beginPath();
     ctx.moveTo(bodyStartX, padding + 5);
-    ctx.lineTo(bodyStartX + 6, padding + 11);
-    ctx.lineTo(bodyStartX + 14, padding + 1);
+    ctx.lineTo(bodyStartX + 5, padding + 10);
+    ctx.lineTo(bodyStartX + 12, padding + 1);
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#3B935D';
     ctx.stroke();
@@ -63,12 +62,13 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(`Signed by: ${signerName}`, bodyStartX + 20, padding + 6);
+    ctx.fillText(`Signed by: ${signerName}`, bodyStartX + 16, padding + 5);
 
     // Body: Image or Cursive Text
-    const bodyStartY = padding + 16; 
-    const bodyHeight = height - padding - 16 - (isQrCode ? 0 : 55); 
-    const maxImgWidth = width - 8 - bodyStartX; 
+    const bodyStartY = padding + 14; 
+    // Give image more vertical space
+    const bodyHeight = height - padding - 14 - (isQrCode ? 0 : 45); 
+    const maxImgWidth = width - rightPadding - bodyStartX; 
     
     if (uploadedImageBase64) {
         const img = new Image();
@@ -103,7 +103,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
 
     if (!isQrCode) {
         // Meta Info
-        const metaY = height - padding - 35; 
+        const metaY = height - padding - 28; 
         
         ctx.font = 'bold 10px sans-serif';
         ctx.fillStyle = '#3B935D';
@@ -114,7 +114,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.font = 'bold 10px monospace';
         ctx.fillStyle = '#111111';
         ctx.textAlign = 'right';
-        ctx.fillText(shortId, width - 8, metaY);
+        ctx.fillText(shortId, width - rightPadding, metaY);
 
         // Barcode 1D
         if (typeof JsBarcode !== 'undefined') {
@@ -124,15 +124,15 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
                 displayValue: false,
                 margin: 0,
                 width: 2,
-                height: 22, 
+                height: 18, 
                 lineColor: "#111111"
             });
-            const barcodeWidth = width - 8 - bodyStartX;
-            ctx.drawImage(barcodeCanvas, bodyStartX, metaY + 2, barcodeWidth, 22);
+            const barcodeWidth = width - rightPadding - bodyStartX;
+            ctx.drawImage(barcodeCanvas, bodyStartX, metaY + 2, barcodeWidth, 18);
         }
 
         // Footer
-        const footerY = height - padding + 2; 
+        const footerY = height - padding; 
         ctx.textAlign = 'left';
         ctx.textBaseline = 'bottom';
         
