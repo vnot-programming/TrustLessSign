@@ -11,17 +11,25 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Define dimensions
-    const width = 600;
-    const height = 350; 
-    canvas.width = width;
-    canvas.height = height;
+    // Define logical dimensions
+    const logicalWidth = 600;
+    const logicalHeight = 350; 
+    const scaleFactor = 4;
+    
+    // Set actual canvas size (4x larger for high DPI)
+    canvas.width = logicalWidth * scaleFactor;
+    canvas.height = logicalHeight * scaleFactor;
+
+    // Scale the context so drawing commands remain exactly the same
+    ctx.scale(scaleFactor, scaleFactor);
 
     // Background
     ctx.fillStyle = '#FAFAFA'; 
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
     const padding = 24;
+    const width = logicalWidth;
+    const height = logicalHeight;
 
     // Artistic Green Border (Left)
     ctx.strokeStyle = '#3B935D';

@@ -100,7 +100,7 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 - [ ] **Canvas Rendering & PDF Lib (`barcode-generator.js`)**:
   - Implement Canvas API generator to compose the final visual frame (green border, check icon, "Signed by: [Name]").
   - Embed the chosen element (QR code data OR visual signature image) into the center of the Canvas.
-  - If an Image Signature is used, omit the Barcode 128 (as per standard).
+  - Include the Barcode 128 (Short ID) ONLY on Image Signature (omit for QR Code).
   - Embed the composed Canvas output onto the PDF via `pdf-lib` at the exact coordinates recorded by the `qr-drag-box`.
 ### Phase 4: Web Verify Scanner Integration
 - [ ] Update `web/resources/js/Pages/Verify.jsx` to include an EditText for manual Short ID entry.

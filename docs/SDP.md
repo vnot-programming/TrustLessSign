@@ -582,3 +582,19 @@
   - `safari-extension/Resources/signing/signer.js`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Telah diselesaikan tahap integrasi Web Dashboard (Phase 3 Image Signature). Halaman Web Dashboard `SignDocument.jsx` kini dapat mengambil `Visual Signature` langsung dari Extension lewat IndexedDB menggunakan Cross-Origin message (via `content.js` dan `background.js`). Fitur selector 'Signature Type' telah diimplementasikan, fallback alert telah disediakan jika user belum men-set default image, dan UI Draggable node otomatis me-render image preview. Safari Extension juga telah disinkronisasi.
+
+- **Tanggal/Waktu:** 2026-06-15T15:14:50Z
+- **Tugas yang diselesaikan:** Perbaikan Resolusi & Ukuran Visual Signature (Diperbesar 4x lipat untuk scan QR yang lebih mudah)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `docs/new/image-signature-implementation_plan.md`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Resolusi kanvas diperbesar 4x lipat (2400x1400) dan physical PDF box diubah dari 80 menjadi 320.
+
+- **Tanggal/Waktu:** 2026-06-15T15:36:17Z
+- **Tugas yang diselesaikan:** Bugfix GDrive Authentication Error (Invalid Credentials / 401)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Menambahkan fungsi Auto-Refresh GDrive Token sebelum proses eksekusi tanda tangan (melalui `/api/gdrive/refresh`) untuk mencegah token kedaluwarsa.

@@ -7,7 +7,14 @@ import LanguageSwitcher from '../Components/LanguageSwitcher';
 import ThemeToggle from '../Components/ThemeToggle';
 import QRious from '../Utils/qrious.min.js';
 import axios from 'axios';
+import JsBarcode from 'jsbarcode';
 import { generateSignatureFrame } from '../Utils/barcode-generator.js';
+
+// Make JsBarcode available globally for barcode-generator.js
+if (typeof window !== 'undefined') {
+  window.JsBarcode = JsBarcode;
+}
+
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -232,14 +239,30 @@ export default function SignDocument() {
     try {
       // 1. Fetch Sanctum API token and GDrive credentials
       const credsRes = await axios.get('/user/credentials');
-      const { token, gdrive_token } = credsRes.data;
+      let { token, gdrive_token } = credsRes.data;
+
+      // Automatically refresh GDrive token to prevent 401 Unauthenticated errors
+      try {
+        const refreshRes = await axios.post('/api/gdrive/refresh');
+        if (refreshRes.data && refreshRes.data.gdrive_token) {
+          gdrive_token = refreshRes.data.gdrive_token;
+        }
+      } catch (refreshErr) {
+        if (refreshErr.response && (refreshErr.response.status === 401 || refreshErr.response.status === 400)) {
+          setErrorMsg("Google Drive Session Expired. Please sign out and sign in again to reconnect your account.");
+          setSigningStatus({ isActive: false, stage: 'ERROR', percentage: 0, message: '' });
+          return;
+        }
+        console.warn('Failed to refresh GDrive token. Proceeding with existing token.', refreshErr);
+      }
 
       // Convert PDF to Base64
       const pdfBase64 = await fileToBase64(file);
 
       // Generate verification token client-side
       const verifyToken = crypto.randomUUID();
-      const verifyUrl = `${window.location.origin}/verify/${verifyToken}`;
+      const verifyUrlFull = `${window.location.origin}/verify/${verifyToken}`;
+      const verifyUrlShort = `${window.location.origin}/verify`;
       const shortId = verifyToken.split('-')[0].toUpperCase();
 
       let finalQrPngBase64 = '';
@@ -247,22 +270,22 @@ export default function SignDocument() {
         finalQrPngBase64 = await generateSignatureFrame(
             user.name,
             shortId,
-            verifyUrl,
+            verifyUrlShort,
             imageSigDataUrl,
             false // isQrCode = false
         );
       } else {
         // Generate visual QR code PNG using qrious
         const qr = new QRious({
-          value: verifyUrl,
-          size: 150,
+          value: verifyUrlFull,
+          size: 600,
           level: 'H'
         });
         const baseQr = qr.toDataURL('image/png');
         finalQrPngBase64 = await generateSignatureFrame(
             user.name,
             shortId,
-            verifyUrl,
+            verifyUrlShort,
             baseQr,
             true // isQrCode = true
         );
@@ -318,7 +341,7 @@ export default function SignDocument() {
                 verifyToken: result.verifyToken,
                 hash: result.hash,
                 gdriveUrl: result.gdriveUrl,
-                verifyUrl: verifyUrl,
+                verifyUrl: verifyUrlFull,
                 pdfBase64: result.pdfBase64,
                 isWarning: result.status === 'warning',
                 warningMessage: result.message
@@ -383,7 +406,7 @@ export default function SignDocument() {
             page: pageNumber,
             x: qrPosition.x,
             y: qrPosition.y,
-            size: 80
+            size: 320
           },
           reason_sub_category_id: selectedSubCategoryId ? parseInt(selectedSubCategoryId) : null,
           reason_final: reason_final,
@@ -688,7 +711,7 @@ export default function SignDocument() {
                       onStop={handleDragStop}
                       nodeRef={nodeRef}
                     >
-                      <div ref={nodeRef} className="absolute top-0 left-0 w-32 h-20 border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
+                      <div ref={nodeRef} className="absolute top-0 left-0 w-[320px] h-[186px] border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden">
                         <div className="absolute -top-8 bg-surface-elevated text-xs px-2 py-1 rounded shadow-md border border-border-subtle opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                           Drag to place the signature that appears on the Document
                         </div>
