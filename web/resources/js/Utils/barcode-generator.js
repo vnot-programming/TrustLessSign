@@ -82,8 +82,8 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         );
         const drawWidth = img.width * scale;
         const drawHeight = img.height * scale;
-        // Left aligned to hug the green line closely!
-        const drawX = padding + 8;
+        // Center horizontally
+        const drawX = padding + 8 + (maxImgWidth - drawWidth) / 2;
         // Center vertically
         const drawY = bodyStartY + (bodyHeight - drawHeight) / 2;
         
@@ -92,9 +92,9 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         // Cursive fallback
         ctx.fillStyle = '#111111';
         ctx.font = 'italic 30px cursive, serif'; 
-        ctx.textAlign = 'left';
+        ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const drawX = padding + 8;
+        const drawX = padding + 8 + maxImgWidth / 2;
         ctx.fillText(signerName, drawX, bodyStartY + bodyHeight / 2);
     }
 
