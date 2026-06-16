@@ -4,7 +4,7 @@
  * Adheres to Zero-Trust architecture and Bio-Digital Minimalism.
  */
 
-export async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:") {
+async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:") {
     // Zero-Trust Validation is handled by Sanctum tokens in the Web Dashboard.
 
     // 2. Set up Canvas
@@ -156,7 +156,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
  * Generate a standalone modern QR Code using qr-code-styling.
  * Contains no external borders, text, or meta info.
  */
-export async function generateModernTSignQR(verifyUrl) {
+async function generateModernTSignQR(verifyUrl) {
     const qrCode = new QRCodeStyling({
         width: 600,
         height: 600,
@@ -205,7 +205,7 @@ export async function generateModernTSignQR(verifyUrl) {
  * Generate a Marginal Page Stamp (Horizontal Ribbon)
  * to be placed vertically on the PDF to prevent page swapping.
  */
-export async function generatePageStamp(shortId, pageNum, totalPages, timestamp) {
+async function generatePageStamp(shortId, pageNum, totalPages, timestamp) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
