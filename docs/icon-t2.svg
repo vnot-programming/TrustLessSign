@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
+  <defs>
+    <linearGradient id="tSignNode" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B935D" />
+      <stop offset="100%" stop-color="#2a6942" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="22" cy="22" r="20" fill="none" stroke="url(#tSignNode)" stroke-width="1.5" stroke-dasharray="4 6" opacity="0.6" />
+
+  <circle cx="22" cy="22" r="12" fill="url(#tSignNode)" />
+
+  <text x="22" y="29.5" font-family="'Courier New', monospace" font-size="24" font-weight="bold" fill="#FFFFFF" text-anchor="middle">t</text>
+
+  <circle cx="36" cy="8" r="4.5" fill="#3B935D" />
+</svg>
