@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-16T14:09:00Z
+- **Tugas yang diselesaikan:** Memicu CI/CD Web dan Ekstensi melalui git tag push.
+- **File yang diubah/dibuat:** `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Versi Web naik ke `web-v1.3.21`, Ekstensi ke `ext-v1.4.12`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Version bump telah dilakukan secara manual pada environment Web (1.3.21) dan Ekstensi (1.4.12) sesuai prinsip SSOT monorepo. Tag `web-v1.3.21` dan `ext-v1.4.12` telah dibuat dan didorong (pushed) ke remote `origin` bersamaan dengan commit yang menyertakan perubahan UI pada `SignDocument.jsx` dan file terkait image signature/pagination lainnya, yang mana akan otomatis memicu pipeline Github Actions untuk deployment sinkronisasi ke server dan kompresi `.crx` ke perangkat lokal Macbook/Windows.
+
 - **Tanggal/Waktu:** 2026-06-16T09:03:00Z
 - **Tugas yang diselesaikan:** Mengubah Background QR Code menjadi Transparan
 - **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`, `web/resources/js/Utils/barcode-generator.js`
