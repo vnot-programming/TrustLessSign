@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-16T04:30:00Z
+- **Tugas yang diselesaikan:** Migrasi (Duplikasi) Visual Image Signature & Modern QR Code ke Extension
+- **File yang diubah/dibuat:** `chrome-extension/assets/qr-code-styling.js`, `chrome-extension/assets/logo-tSign.svg`, `chrome-extension/popup/popup.html`, `chrome-extension/popup/popup.js`, `chrome-extension/signing/barcode-generator.js`, beserta file-file paralel di `safari-extension`. `qrious.min.js` dihapus.
+- **Status saat ini:** Selesai (Menunggu pengujian lokal)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Logika `barcode-generator.js` dari Web Dashboard telah diduplikasi sepenuhnya ke Ekstensi. Ekstensi kini menggunakan pustaka `qr-code-styling` untuk QR Code mandiri dengan logo (`logo-tSign.svg`). Logika *Marginal Page Stamp* juga telah dimasukkan ke dalam `popup.js`, di mana ekstensi kini akan mencetak barcode melintang -90 derajat pada margin halaman asalkan jumlah halamannya > 1. Jika pengguna menandatangani dokumen 1 halaman, ekstensi akan mem-bypass (mengosongkan array) stamp tersebut. Eksekusi ini sudah selesai dan menunggu *build/compile* `.crx` dan tes akhir.
+
 - **Tanggal/Waktu:** 2026-06-16T03:52:00Z
 - **Tugas yang diselesaikan:** Fix Zero-Trust Auth Error in barcode-generator.js
 - **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`

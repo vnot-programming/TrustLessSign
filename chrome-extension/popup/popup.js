@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let signedPdfBase64 = null;
   let finalFileName = null;
   let reasonsCategories = [];
+  let currentPdfNumPages = 1;
 
   // Translation dictionary
   const dictionary = {
@@ -1133,6 +1134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         const loadingTask = pdfjsLib.getDocument({ data: pdfUint8 });
         const pdf = await loadingTask.promise;
+        currentPdfNumPages = pdf.numPages;
         const page = await pdf.getPage(1);
 
         const viewport = page.getViewport({ scale: 0.6 }); // Scale down for preview
@@ -1330,15 +1332,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        if (isQrCode) {
-            const qr = new QRious({
-              value: verifyUrl,
-              size: 150,
-              level: 'H'
-            });
-            uploadedImageBase64 = qr.toDataURL('image/png');
-        }
-
         let signerName = document.getElementById('user-name-text').textContent || 'TrustlessSign User';
         if (signerName === 'Authenticated User' || !signerName) {
             const certData = await fetch(`${baseUrl}/api/certificates/me`, {
@@ -1350,13 +1343,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        const qrPng = await window.generateSignatureFrame(
-            signerName,
-            shortId,
-            verifyUrl,
-            uploadedImageBase64,
-            isQrCode
-        );
+        let qrPng;
+        if (isQrCode) {
+            qrPng = await window.generateModernTSignQR(verifyUrl);
+        } else {
+            qrPng = await window.generateSignatureFrame(
+                signerName,
+                shortId,
+                verifyUrl,
+                uploadedImageBase64,
+                false
+            );
+        }
 
         // Compile final reason text
         const selectedSubId = subcategorySelect.value;
@@ -1405,12 +1403,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             String(now.getSeconds()).padStart(2, '0');
         finalFileName = `signed_ext_${timestamp}-${file.name}`;
 
+        const pageStamps = [];
+        if (currentPdfNumPages > 1) {
+            for (let i = 1; i <= currentPdfNumPages; i++) {
+                const stampStr = await window.generatePageStamp(shortId, i, currentPdfNumPages, timestamp);
+                pageStamps.push(stampStr);
+            }
+        }
+
         // Call background worker to sign & upload
         chrome.runtime.sendMessage({
           type: 'SIGN_DOCUMENT',
           payload: {
             pdfBase64: fileBase64,
             filename: finalFileName,
+            pageStamps: pageStamps,
             gdriveToken: gdriveToken,
             apiToken: token,
             qrPosition: {
