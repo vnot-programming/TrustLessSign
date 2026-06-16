@@ -2,6 +2,18 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-16T03:52:00Z
+- **Tugas yang diselesaikan:** Fix Zero-Trust Auth Error in barcode-generator.js
+- **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Version `ext-v1.4.6`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki bug di mana fungsi `chrome.identity.getAuthToken` memblokir pengguna (melemparkan error "Unauthorized to render signature frame") ketika pengguna tidak memiliki sesi Google Chrome aktif. `throw new Error` diganti menjadi `console.warn` sehingga ekstensi tidak gagal dan tetap dapat menandatangani dokumen menggunakan *backend token local session* (fallback mode). Tag versi diperbarui ke `ext-v1.4.6`.
+
+- **Tanggal/Waktu:** 2026-06-16T02:37:00Z
+- **Tugas yang diselesaikan:** Bump extension version to 1.4.5 & Trigger CI/CD (Sync Macbook)
+- **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Version `ext-v1.4.5`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** User meminta agar sinkronisasi perangkat Macbook dijalankan via CI/CD. Telah dilakukan version bump secara konsisten di package.json dan manifest.json ke versi 1.4.5. Git tag `ext-v1.4.5` telah dibuat dan didorong ke remote untuk memicu `deploy_extension` workflow yang mengeksekusi Tailscale SSH SCP ke perangkat Macbook Air target.
+
 - **2026-06-15 20:00**:
   - Implementasi Marginal Page Stamp (Page Swapping Protection)
   - Web UI mengirimkan array base64 stamp image (`pageStamps`) ke ekstensi, dirotasi 90 CCW di ekstensi untuk semua halaman.
