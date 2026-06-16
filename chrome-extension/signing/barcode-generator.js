@@ -224,6 +224,7 @@ async function generatePageStamp(shortId, pageNum, totalPages, timestamp) {
     const barcodeCanvas = document.createElement("canvas");
     JsBarcode(barcodeCanvas, barcodeData, {
         format: "CODE128",
+        width: 1.5, // Explicitly set width to prevent overflow
         height: 30,
         displayValue: false,
         margin: 0,
@@ -236,8 +237,8 @@ async function generatePageStamp(shortId, pageNum, totalPages, timestamp) {
 
     // Draw Metadata Text
     const textX = barcodeCanvas.width + 20; // 20px padding after barcode
-    ctx.font = '12px Courier New';
-    ctx.fillStyle = '#555555';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#444444';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     

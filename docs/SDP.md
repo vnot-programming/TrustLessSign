@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-16T07:08:00Z
+- **Tugas yang diselesaikan:** Memperbaiki teks Marginal Page Stamp yang terpotong (Missing Text)
+- **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`, `web/resources/js/Utils/barcode-generator.js`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `ext-v1.4.10`, Web `web-v1.3.19`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Teks pada *Marginal Page Stamp* ("tSign ID: ...") sebelumnya tidak tercetak secara penuh (terpotong atau hilang dari kanvas) akibat lebar *barcode* secara otomatis melebar (skala default `JsBarcode`), yang mana menabrak batas maksimal *canvas.width = 800*. Solusinya: menetapkan `width: 1.5` pada konfigurasi *JsBarcode* dan mengganti *font* menjadi `12px monospace` tebal agar cukup muat di dalam kanvas 800px dan memiliki tingkat keterbacaan (*legibility*) tinggi saat di-*scale down* pada *ribbon width* 400px.
+
 - **Tanggal/Waktu:** 2026-06-16T05:25:00Z
 - **Tugas yang diselesaikan:** Memperbaiki Akurasi Ukuran & Skala Koordinat Drag and Drop pada Ekstensi
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`
