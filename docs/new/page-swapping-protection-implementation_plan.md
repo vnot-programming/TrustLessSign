@@ -1,4 +1,5 @@
 # Marginal Page Stamp (Page Swapping Protection)
+**Status:** Completed (v1.4.10)
 
 A Marginal Page Stamp will be generated for every page of the PDF and injected vertically on the left margin. This ensures every page is cryptographically tied to the document ID and its specific page number.
 

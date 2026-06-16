@@ -710,7 +710,51 @@ export default function SignDocument() {
                     <p>{t.preview_hint}</p>
                   </div>
                 ) : (
-                  <div className="relative border border-border-default shadow-md bg-white select-none" ref={containerRef}>
+                  <div className="w-full flex flex-col items-center">
+                    {numPages > 1 && (
+                      <div className="flex items-center gap-3 bg-surface-elevated p-2 rounded-lg border border-border-default shadow-sm mb-4">
+                        <button 
+                          onClick={() => setPageNumber(p => Math.max(1, p - 1))}
+                          disabled={pageNumber <= 1}
+                          className="px-3 py-1 bg-surface-primary border border-border-subtle rounded text-sm text-text-primary disabled:opacity-50 hover:bg-surface-secondary transition-colors cursor-pointer"
+                          type="button"
+                        >
+                          Prev
+                        </button>
+                        <span className="text-sm font-semibold text-text-secondary whitespace-nowrap">
+                          Page {pageNumber} of {numPages}
+                        </span>
+                        <button 
+                          onClick={() => setPageNumber(p => Math.min(numPages, p + 1))}
+                          disabled={pageNumber >= numPages}
+                          className="px-3 py-1 bg-surface-primary border border-border-subtle rounded text-sm text-text-primary disabled:opacity-50 hover:bg-surface-secondary transition-colors cursor-pointer"
+                          type="button"
+                        >
+                          Next
+                        </button>
+                        <div className="flex items-center gap-2 ml-2 pl-2 border-l border-border-subtle">
+                          <span className="text-xs text-text-tertiary">Go to:</span>
+                          <input 
+                            type="number" 
+                            min="1" 
+                            max={numPages}
+                            placeholder="#"
+                            className="w-16 px-2 py-1 text-sm border border-border-default rounded bg-surface-primary text-text-primary focus:outline-none focus:border-accent-primary"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const val = parseInt(e.target.value, 10);
+                                if (!isNaN(val) && val >= 1 && val <= numPages) {
+                                  setPageNumber(val);
+                                  e.target.value = '';
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                    <div className="relative border border-border-default shadow-md bg-white select-none" ref={containerRef}>
                     <Document 
                       file={file} 
                       onLoadSuccess={({ numPages }) => setNumPages(numPages)}

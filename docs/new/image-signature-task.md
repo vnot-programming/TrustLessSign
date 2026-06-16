@@ -29,8 +29,8 @@
 
 ---
 
-## Sprint 3: PDF Embedding & Barcode Framing (UPCOMING)
-**STATUS:** PENDING  
+## Sprint 3: PDF Embedding & Barcode Framing (COMPLETED)
+**STATUS:** DONE  
 **Assigned to:** Frontend/Extension Team
 
 ### Task 3.1: Signature Type Selector & Dynamic Drag Box Integration
@@ -66,9 +66,12 @@
 
 ---
 
-## Sprint 4: Testing & Polish (UPCOMING)
+## Sprint 4: Testing & Polish (COMPLETED)
+**STATUS:** DONE
 
 ### Task 4.1: Quality Assurance
-- [ ] E2E Testing: Complete signing flow with visual image
-- [ ] Verify aspect ratio preservation across different PDF sizes
-- [ ] Validate Safari and Chrome functional parity
+- [x] E2E Testing: Complete signing flow with visual image
+- [x] Verify aspect ratio preservation across different PDF sizes (Fixed coordinates mapping bug in popup.js)
+- [x] Validate Safari and Chrome functional parity
+- [x] Ensure QR Code and Image Signature backgrounds are transparent
+- [x] Fix Marginal Page Stamp text truncation bug

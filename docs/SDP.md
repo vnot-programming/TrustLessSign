@@ -26,7 +26,20 @@
 - **Status saat ini:** Selesai (Versi Ekstensi naik ke `ext-v1.4.8` dan Web ke `web-v1.3.18`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki bug di mana `barcode-generator.js` yang diduplikasi dari web secara tidak sengaja mempertahankan *keyword* `export async function...`. Karena ekstensi menggunakan *script* ini secara klasik di dalam *popup.html* tanpa tipe *module*, ini menyebabkan *Uncaught SyntaxError*. *Keyword* `export` telah dihapus sehingga semua fungsi diregistrasi langsung pada tingkat global secara implisit.
 
-- **Tanggal/Waktu:** 2026-06-16T04:30:00Z
+- **Tanggal/Waktu:** 2026-06-16 10:40 UTC
+- **Tugas yang diselesaikan:** Implementasi PDF Pagination & Specific Page Selection (Sprint 5)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `chrome-extension/popup/popup.html`
+  - `chrome-extension/popup/popup.js`
+  - `safari-extension/Resources/popup.html`
+  - `safari-extension/Resources/popup.js`
+  - `docs/new/pdf-pagination-implementation_plan.md` (NEW)
+  - `docs/new/pdf-pagination-task.md` (NEW)
+- **Status saat ini:** Selesai (Menunggu QA / Verifikasi Manual).
+- **Catatan untuk AI selanjutnya:** Fitur navigasi halaman (Prev, Next, Go To) telah di-implementasikan dan terhubung dengan metadata payload `qrPosition.page` agar tanda tangan disisipkan tepat di halaman yang dipilih pengguna. Tolong lanjutkan ke CI/CD build untuk extension jika QA manual sudah diverifikasi pengguna.
+
+- **Tanggal/Waktu:** 2026-06-16 04:30 UTC:00Z
 - **Tugas yang diselesaikan:** Migrasi (Duplikasi) Visual Image Signature & Modern QR Code ke Extension
 - **File yang diubah/dibuat:** `chrome-extension/assets/qr-code-styling.js`, `chrome-extension/assets/logo-tSign.svg`, `chrome-extension/popup/popup.html`, `chrome-extension/popup/popup.js`, `chrome-extension/signing/barcode-generator.js`, beserta file-file paralel di `safari-extension`. `qrious.min.js` dihapus.
 - **Status saat ini:** Selesai (Menunggu pengujian lokal)
