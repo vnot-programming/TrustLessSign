@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-16T05:25:00Z
+- **Tugas yang diselesaikan:** Memperbaiki Akurasi Ukuran & Skala Koordinat Drag and Drop pada Ekstensi
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `ext-v1.4.9`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Koordinat sumbu Y (`relativeY`) pada ekstensi sebelumnya dikalkulasi menggunakan estimasi kasar tinggi `800px` yang merusak rasio aspek PDF asli. Ini telah diperbaiki dengan menghitung `displayScale = 600 / canvasRect.width` dan mengalikannya pada koordinat `qrX` maupun `qrY`. Selain itu, ukuran payload (`size`) dan ukuran *visual container drag box* (`qrDragBox`) sekarang berubah dinamis bergantung pada *signatureType* (QR = 72, Image = 115) untuk menyamakan proporsi dan akurasi dengan Web Dashboard.
+
 - **Tanggal/Waktu:** 2026-06-16T05:16:00Z
 - **Tugas yang diselesaikan:** Fix SyntaxError 'Unexpected token export' di barcode-generator.js Ekstensi
 - **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`

@@ -1158,6 +1158,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         qrX = 10;
         qrY = 10;
 
+        // Size adjustment for drag box based on scale
+        const canvasRect = pdfCanvas.getBoundingClientRect();
+        if (canvasRect.width > 0) {
+            const displayScale = 600 / canvasRect.width;
+            let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
+            qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
+            qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
+        }
+
       } catch (err) {
         console.error('Failed to render PDF preview:', err);
       }
@@ -1234,6 +1243,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         if (qrDragImg) qrDragImg.classList.add('hidden');
         if (qrDragText) qrDragText.classList.remove('hidden');
+      }
+      
+      // Update visual size of drag box
+      const canvasRect = pdfCanvas.getBoundingClientRect();
+      if (canvasRect.width > 0) {
+          const displayScale = 600 / canvasRect.width;
+          let isQrCode = (type === 'qr');
+          qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
+          qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
       }
     });
   }
@@ -1389,10 +1407,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }, 300);
 
-        // Map coordinates from preview to page size points (scaled to 600px width standard)
+        // Map coordinates from preview to page size points (scaled to exactly 600px width standard, keeping aspect ratio)
         const canvasRect = pdfCanvas.getBoundingClientRect();
-        const relativeX = (qrX / canvasRect.width) * 600;
-        const relativeY = (qrY / canvasRect.height) * 800; // standard approx
+        const displayScale = 600 / canvasRect.width;
+        const relativeX = qrX * displayScale;
+        const relativeY = qrY * displayScale;
 
         const now = new Date();
         const timestamp = now.getFullYear() + '.' + 
@@ -1424,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               page: 1,
               x: relativeX,
               y: relativeY,
-              size: 80
+              size: isQrCode ? 72 : 115
             },
             reason_sub_category_id: selectedSubId ? parseInt(selectedSubId) : null,
             reason_final: reasonFinal,
