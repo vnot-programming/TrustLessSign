@@ -181,7 +181,7 @@ export async function generateModernTSignQR(verifyUrl) {
             type: "rounded"
         },
         backgroundOptions: {
-            color: "#FFFFFF"
+            color: "transparent"
         },
         cornersSquareOptions: {
             color: "#000000",

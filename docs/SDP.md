@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-16T09:03:00Z
+- **Tugas yang diselesaikan:** Mengubah Background QR Code menjadi Transparan
+- **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`, `web/resources/js/Utils/barcode-generator.js`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `ext-v1.4.11`, Web `web-v1.3.20`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Sesuai catatan pengguna, *backgroundOptions.color* pada fungsi `generateModernTSignQR` telah diubah dari `#FFFFFF` menjadi `transparent`. Hal ini memastikan bahwa baik kode QR maupun bingkai *Image Signature* (yang sebelumnya sudah transparan via `ctx.clearRect`) dapat menyatu tanpa *block* putih solid saat disematkan di atas PDF, menjaga estetika dokumen.
+
 - **Tanggal/Waktu:** 2026-06-16T07:08:00Z
 - **Tugas yang diselesaikan:** Memperbaiki teks Marginal Page Stamp yang terpotong (Missing Text)
 - **File yang diubah/dibuat:** `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`, `web/resources/js/Utils/barcode-generator.js`
