@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let finalFileName = null;
   let reasonsCategories = [];
   let currentPdfNumPages = 1;
+  let currentLoadedPdf = null;
+  let currentPageNumber = 1;
 
   // Translation dictionary
   const dictionary = {
@@ -1102,10 +1104,93 @@ document.addEventListener('DOMContentLoaded', async () => {
   categorySelect.addEventListener('change', updateSubcategories);
 
   // 7. PDF Upload and Preview Rendering
+  const btnPagePrev = document.getElementById('btn-page-prev');
+  const btnPageNext = document.getElementById('btn-page-next');
+  const pageIndicator = document.getElementById('page-indicator');
+  const inputPageGoto = document.getElementById('input-page-goto');
+  const paginationControls = document.getElementById('pdf-pagination-controls');
+
+  const renderPdfPage = async (pageNum) => {
+    if (!currentLoadedPdf) return;
+    try {
+      const page = await currentLoadedPdf.getPage(pageNum);
+      const viewport = page.getViewport({ scale: 0.6 }); // Scale down for preview
+      const context = pdfCanvas.getContext('2d');
+      pdfCanvas.height = viewport.height;
+      pdfCanvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+      await page.render(renderContext).promise;
+
+      // Save sizes
+      pdfPageWidthPoints = viewport.width;
+      pdfPageHeightPoints = viewport.height;
+
+      // Reset QR Position when page changes
+      qrDragBox.style.top = '10px';
+      qrDragBox.style.left = '10px';
+      qrX = 10;
+      qrY = 10;
+
+      // Size adjustment for drag box based on scale
+      const canvasRect = pdfCanvas.getBoundingClientRect();
+      if (canvasRect.width > 0) {
+          const displayScale = 600 / canvasRect.width;
+          let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
+          qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
+          qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
+      }
+
+      // Update UI
+      currentPageNumber = pageNum;
+      if (pageIndicator) {
+        pageIndicator.textContent = `Page ${pageNum} of ${currentPdfNumPages}`;
+      }
+      if (btnPagePrev) btnPagePrev.disabled = (pageNum <= 1);
+      if (btnPageNext) btnPageNext.disabled = (pageNum >= currentPdfNumPages);
+      if (inputPageGoto) inputPageGoto.value = '';
+
+    } catch (err) {
+      console.error('Failed to render PDF page:', err);
+    }
+  };
+
+  if (btnPagePrev) {
+    btnPagePrev.addEventListener('click', () => {
+      if (currentPageNumber > 1) {
+        renderPdfPage(currentPageNumber - 1);
+      }
+    });
+  }
+
+  if (btnPageNext) {
+    btnPageNext.addEventListener('click', () => {
+      if (currentPageNumber < currentPdfNumPages) {
+        renderPdfPage(currentPageNumber + 1);
+      }
+    });
+  }
+
+  if (inputPageGoto) {
+    inputPageGoto.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = parseInt(e.target.value, 10);
+        if (!isNaN(val) && val >= 1 && val <= currentPdfNumPages) {
+          renderPdfPage(val);
+        }
+      }
+    });
+  }
+
   signFileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file || file.type !== 'application/pdf') {
       previewContainer.classList.add('hidden');
+      if (paginationControls) paginationControls.classList.add('hidden');
       if (signatureTypeContainer) signatureTypeContainer.classList.add('hidden');
       return;
     }
@@ -1133,42 +1218,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Load and render PDF using PDFJS
       try {
         const loadingTask = pdfjsLib.getDocument({ data: pdfUint8 });
-        const pdf = await loadingTask.promise;
-        currentPdfNumPages = pdf.numPages;
-        const page = await pdf.getPage(1);
-
-        const viewport = page.getViewport({ scale: 0.6 }); // Scale down for preview
-        const context = pdfCanvas.getContext('2d');
-        pdfCanvas.height = viewport.height;
-        pdfCanvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
-        await page.render(renderContext).promise;
-
-        // Save sizes
-        pdfPageWidthPoints = viewport.width;
-        pdfPageHeightPoints = viewport.height;
-
-        // Reset QR Position
-        qrDragBox.style.top = '10px';
-        qrDragBox.style.left = '10px';
-        qrX = 10;
-        qrY = 10;
-
-        // Size adjustment for drag box based on scale
-        const canvasRect = pdfCanvas.getBoundingClientRect();
-        if (canvasRect.width > 0) {
-            const displayScale = 600 / canvasRect.width;
-            let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
-            qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
-            qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
+        currentLoadedPdf = await loadingTask.promise;
+        currentPdfNumPages = currentLoadedPdf.numPages;
+        
+        if (paginationControls) {
+          if (currentPdfNumPages > 1) {
+            paginationControls.classList.remove('hidden');
+          } else {
+            paginationControls.classList.add('hidden');
+          }
         }
 
+        await renderPdfPage(1);
+
       } catch (err) {
-        console.error('Failed to render PDF preview:', err);
+        console.error('Failed to load PDF:', err);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -1440,7 +1504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             gdriveToken: gdriveToken,
             apiToken: token,
             qrPosition: {
-              page: 1,
+              page: currentPageNumber,
               x: relativeX,
               y: relativeY,
               size: isQrCode ? 72 : 115
