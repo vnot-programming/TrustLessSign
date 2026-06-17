@@ -1146,12 +1146,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Update UI
       currentPageNumber = pageNum;
-      if (pageIndicator) {
-        pageIndicator.textContent = `Page ${pageNum} of ${currentPdfNumPages}`;
+      if (inputPageGoto) {
+        inputPageGoto.value = pageNum;
+        inputPageGoto.max = currentPdfNumPages;
+      }
+      const pageIndicatorTotal = document.getElementById('page-indicator-total');
+      if (pageIndicatorTotal) {
+        pageIndicatorTotal.textContent = currentPdfNumPages;
       }
       if (btnPagePrev) btnPagePrev.disabled = (pageNum <= 1);
       if (btnPageNext) btnPageNext.disabled = (pageNum >= currentPdfNumPages);
-      if (inputPageGoto) inputPageGoto.value = '';
 
     } catch (err) {
       console.error('Failed to render PDF page:', err);
@@ -1175,13 +1179,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (inputPageGoto) {
+    const handleGoto = (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (!isNaN(val) && val >= 1 && val <= currentPdfNumPages && val !== currentPageNumber) {
+        renderPdfPage(val);
+      } else {
+        e.target.value = currentPageNumber;
+      }
+    };
+    inputPageGoto.addEventListener('change', handleGoto);
     inputPageGoto.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        const val = parseInt(e.target.value, 10);
-        if (!isNaN(val) && val >= 1 && val <= currentPdfNumPages) {
-          renderPdfPage(val);
-        }
+        handleGoto(e);
       }
     });
   }

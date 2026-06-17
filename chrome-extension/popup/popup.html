@@ -852,12 +852,10 @@
         </div>
         <div id="pdf-pagination-controls" class="hidden" style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 12px; background: var(--surface-elevated); padding: 6px; border-radius: 8px; border: 1px solid var(--border-default);">
           <button id="btn-page-prev" class="btn-secondary" style="margin: 0; padding: 4px 8px; font-size: 0.7rem; min-height: 24px;">Prev</button>
-          <span id="page-indicator" style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap;">Page 1 of 1</span>
+          <span style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; display: flex; align-items: center; gap: 4px;">
+            Page <input type="number" id="input-page-goto" min="1" style="width: 36px; padding: 2px; font-size: 0.7rem; font-weight: 600; border: 1px solid var(--border-default); border-radius: 4px; background: var(--surface-primary); color: var(--text-primary); text-align: center; outline: none;" value="1"> of <span id="page-indicator-total">1</span>
+          </span>
           <button id="btn-page-next" class="btn-secondary" style="margin: 0; padding: 4px 8px; font-size: 0.7rem; min-height: 24px;">Next</button>
-          <div style="border-left: 1px solid var(--border-subtle); padding-left: 8px; margin-left: 4px; display: flex; align-items: center; gap: 4px;">
-            <span style="font-size: 0.65rem; color: var(--text-tertiary);">Go to:</span>
-            <input type="number" id="input-page-goto" min="1" placeholder="#" style="width: 40px; padding: 2px 4px; font-size: 0.7rem; border: 1px solid var(--border-default); border-radius: 4px; background: var(--surface-primary); color: var(--text-primary); text-align: center; outline: none;">
-          </div>
         </div>
 
         <!-- Reason Container Placeholder -->
