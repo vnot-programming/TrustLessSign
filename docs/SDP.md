@@ -2,6 +2,19 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-17T08:55:00Z
+- **Tugas yang diselesaikan:** Fixing Error "Input document to PDFDocument.load is encrypted"
+- **File yang diubah/dibuat:** `chrome-extension/signing/signer.js`, `safari-extension/Resources/signing/signer.js`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `ext-v1.4.13`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan opsi `{ ignoreEncryption: true }` pada `PDFLib.PDFDocument.load` di file `signer.js` untuk mengabaikan error apabila user mencoba me-load PDF yang memiliki properti enkripsi/password proteksi (sering terjadi pada PDF _readonly_). Melakukan version bump untuk ekstensi ke 1.4.13, membuat tag, dan memicu CI/CD.
+
+
+- **Tanggal/Waktu:** 2026-06-17T08:38:00Z
+- **Tugas yang diselesaikan:** Fixing Error 502 Bad Gateway pada Web UI (Cloudflare Tunnel)
+- **File yang diubah/dibuat:** `/home/vnot/docker/shared/docker-compose.yml`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menganalisis penyebab error 502 pada domain `tsign.vnot.my.id`. Melalui log kontainer `cloudflared-tunnel`, diketahui bahwa Cloudflare mencoba menghubungi *origin service* di `127.0.0.1:8101`, sedangkan `shared-nginx` sebelumnya terekspos pada port `8081`. Port di `docker-compose.yml` (shared network) telah diperbaiki menjadi `8101:80` dan kontainer di-*restart*. Akses web sekarang sudah normal (HTTP 200 OK).
+
 - **Tanggal/Waktu:** 2026-06-16T14:09:00Z
 - **Tugas yang diselesaikan:** Memicu CI/CD Web dan Ekstensi melalui git tag push.
 - **File yang diubah/dibuat:** `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`

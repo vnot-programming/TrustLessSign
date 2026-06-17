@@ -48,7 +48,7 @@ function generateCSR(keypair, email) {
  * Embed QR code visual signature into PDF and set metadata subject
  */
 async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, pageStamps = []) {
-  const pdfDoc = await PDFLib.PDFDocument.load(pdfUint8);
+  const pdfDoc = await PDFLib.PDFDocument.load(pdfUint8, { ignoreEncryption: true });
   const pages = pdfDoc.getPages();
   const targetPageIdx = Math.min((qrPosition?.page || 1) - 1, pages.length - 1);
   const targetPage = pages[targetPageIdx];
