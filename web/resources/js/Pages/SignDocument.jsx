@@ -415,6 +415,13 @@ export default function SignDocument() {
         pageStamps.push(stampStr);
       }
 
+      const footerTranslations = {
+        en: "This document has been electronically signed. To Verify visit: ",
+        id: "Dokumen ini ditandatangani secara elektronik. Verifikasi di: ",
+        th: "เอกสารนี้ได้รับการลงนามทางอิเล็กทรอนิกส์แล้ว ตรวจสอบได้ที่: "
+      };
+      const footerPrefix = footerTranslations[locale] || footerTranslations.en;
+
       window.postMessage({
         type: 'TRUSTLESS_SIGN_REQUEST',
         payload: {
@@ -423,6 +430,8 @@ export default function SignDocument() {
           gdriveToken: gdrive_token,
           apiToken: token,
           pageStamps: pageStamps,
+          footerPrefix: footerPrefix,
+          verifyUrlShort: verifyUrlShort,
           qrPosition: {
             page: pageNumber,
             x: qrPosition.x,
