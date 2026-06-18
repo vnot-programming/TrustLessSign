@@ -239,22 +239,22 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp,
     // Draw Metadata Text
     const textX = barcodeCanvas.width + 20; // 20px padding after barcode
     
-    // Line 1: Verify at
+    // Line 1: tSign ID
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
     ctx.fillStyle = '#444444';
-    ctx.fillText('Verify at: ', textX, height / 2 - 2);
-    
-    const w1 = ctx.measureText('Verify at: ').width;
-    ctx.fillStyle = '#3B935D'; // Green color for URL
-    ctx.fillText(verifyUrl, textX + w1, height / 2 - 2);
+    const textContent = `tSign ID: ${shortId} | Page ${pageNum} of ${totalPages} | Time: ${timestamp}`;
+    ctx.fillText(textContent, textX, height / 2 - 2);
 
-    // Line 2: tSign ID
+    // Line 2: Verify At
     ctx.textBaseline = 'top';
     ctx.fillStyle = '#444444';
-    const textContent = `tSign ID: ${shortId} | Page ${pageNum} of ${totalPages} | Time: ${timestamp}`;
-    ctx.fillText(textContent, textX, height / 2 + 2);
+    ctx.fillText('Verify At: ', textX, height / 2 + 2);
+    
+    const w1 = ctx.measureText('Verify At: ').width;
+    ctx.fillStyle = '#3B935D'; // Green color for URL
+    ctx.fillText(verifyUrl, textX + w1, height / 2 + 2);
 
     return canvas.toDataURL('image/png');
 }
