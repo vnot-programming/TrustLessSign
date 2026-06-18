@@ -3,6 +3,7 @@ name: 🚀 CI/CD — TrustlessSign (Monorepo)
 on:
   push:
     tags:
+      - 'web-v*'   # Trigger khusus untuk rilis Web
       - 'ext-v*'   # Trigger khusus untuk rilis Extension
   # (Opsional) Uncomment di bawah ini jika Anda tetap ingin menjalankan PHPUnit saat Pull Request
   # pull_request:
