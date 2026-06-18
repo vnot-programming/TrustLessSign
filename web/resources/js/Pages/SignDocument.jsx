@@ -411,7 +411,7 @@ export default function SignDocument() {
       // Generate pageStamps array for marginal stamping
       const pageStamps = [];
       for (let i = 1; i <= numPages; i++) {
-        const stampStr = await generatePageStamp(shortId, i, numPages, timestamp);
+        const stampStr = await generatePageStamp(shortId, i, numPages, timestamp, verifyUrlShort);
         pageStamps.push(stampStr);
       }
 

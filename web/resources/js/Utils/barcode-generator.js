@@ -206,7 +206,7 @@ export async function generateModernTSignQR(verifyUrl) {
  * Generate a Marginal Page Stamp (Horizontal Ribbon)
  * to be placed vertically on the PDF to prevent page swapping.
  */
-export async function generatePageStamp(shortId, pageNum, totalPages, timestamp) {
+export async function generatePageStamp(shortId, pageNum, totalPages, timestamp, verifyUrl) {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
@@ -238,13 +238,23 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp)
 
     // Draw Metadata Text
     const textX = barcodeCanvas.width + 20; // 20px padding after barcode
-    ctx.font = 'bold 12px monospace';
-    ctx.fillStyle = '#444444';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
     
+    // Line 1: Verify at
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = '#444444';
+    ctx.fillText('Verify at: ', textX, height / 2 - 2);
+    
+    const w1 = ctx.measureText('Verify at: ').width;
+    ctx.fillStyle = '#3B935D'; // Green color for URL
+    ctx.fillText(verifyUrl, textX + w1, height / 2 - 2);
+
+    // Line 2: tSign ID
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#444444';
     const textContent = `tSign ID: ${shortId} | Page ${pageNum} of ${totalPages} | Time: ${timestamp}`;
-    ctx.fillText(textContent, textX, height / 2);
+    ctx.fillText(textContent, textX, height / 2 + 2);
 
     return canvas.toDataURL('image/png');
 }
