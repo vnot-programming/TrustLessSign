@@ -1,7 +1,7 @@
 {
   "name": "trustlesssign-chrome-extension",
-  "version": "1.4.19",
-  "version_name": "1.4.19",
+  "version": "1.4.20",
+  "version_name": "1.4.20",
   "description": "Browser extension for cryptographic signing using TrustLessSign.",
   "main": "background/service-worker.js",
   "scripts": {
