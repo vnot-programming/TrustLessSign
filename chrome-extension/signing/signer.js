@@ -86,43 +86,48 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, p
     height: drawHeight
   });
 
-  // Inject Marginal Page Stamps on EVERY page to prevent page swapping
-  if (pageStamps && pageStamps.length > 0) {
-    for (let i = 0; i < pages.length; i++) {
-      if (pageStamps[i]) {
-        const stampBytes = forge.util.decode64(pageStamps[i].replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, ''));
-        const stampUint8 = new Uint8Array(stampBytes.length);
-        for (let j = 0; j < stampBytes.length; j++) {
-          stampUint8[j] = stampBytes.charCodeAt(j);
-        }
-        
-        let stampImage;
-        if (stampUint8[0] === 0xFF && stampUint8[1] === 0xD8) {
-          stampImage = await pdfDoc.embedJpg(stampUint8);
-        } else {
-          stampImage = await pdfDoc.embedPng(stampUint8);
-        }
+  // Add Footer and Marginal Page Stamps on EVERY page to prevent page swapping
+  const shortcode = metadata.verify_token ? metadata.verify_token.substring(0, 8).toUpperCase() : 'UNKNOWN';
+  const footerText = `This document has been electronically signed. To Verify visit : https://tsign.vnot.my.id/verify/${shortcode}`;
+  const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-        const stampAspect = stampImage.height / stampImage.width;
-        // In Web UI we set width 800px, height 40px (aspect = 40/800 = 0.05)
-        // Let's set a standard physical size for the margin ribbon. 
-        // e.g. width = 400 points, height = 400 * 0.05 = 20 points
-        const ribbonWidth = 400;
-        const ribbonHeight = ribbonWidth * stampAspect;
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i];
+    
+    // Draw Footer at bottom left
+    page.drawText(footerText, {
+      x: 30,
+      y: 15,
+      size: 9,
+      font: helveticaFont,
+      color: PDFLib.rgb(0.3, 0.3, 0.3)
+    });
 
-        // Draw it vertically: x=15, y=50, rotate=-90 degrees (or 90 counter-clockwise)
-        // In pdf-lib, degrees(90) rotates counter-clockwise.
-        // If we rotate 90 CCW, the top-left becomes bottom-left. 
-        // We want the text reading from bottom to top. 
-        // To read from bottom to top, it means rotating 90 degrees CCW.
-        pages[i].drawImage(stampImage, {
-          x: 15,
-          y: 50,
-          width: ribbonWidth,
-          height: ribbonHeight,
-          rotate: PDFLib.degrees(90)
-        });
+    if (pageStamps && pageStamps[i]) {
+      const stampBytes = forge.util.decode64(pageStamps[i].replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, ''));
+      const stampUint8 = new Uint8Array(stampBytes.length);
+      for (let j = 0; j < stampBytes.length; j++) {
+        stampUint8[j] = stampBytes.charCodeAt(j);
       }
+      
+      let stampImage;
+      if (stampUint8[0] === 0xFF && stampUint8[1] === 0xD8) {
+        stampImage = await pdfDoc.embedJpg(stampUint8);
+      } else {
+        stampImage = await pdfDoc.embedPng(stampUint8);
+      }
+
+      const stampAspect = stampImage.height / stampImage.width;
+      const ribbonWidth = 400;
+      const ribbonHeight = ribbonWidth * stampAspect;
+
+      page.drawImage(stampImage, {
+        x: 15,
+        y: 50,
+        width: ribbonWidth,
+        height: ribbonHeight,
+        rotate: PDFLib.degrees(90)
+      });
     }
   }
 
