@@ -619,7 +619,7 @@ export default function SignDocument() {
                           onChange={(e) => {
                             setSignerMode(e.target.value);
                             if (e.target.value === 'username') {
-                              alert(`Penandatangan atau Signer adalah ${user.name}`);
+                              alert("Penandatangan atau Signer adalah " + user.name);
                             }
                           }}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
@@ -835,6 +835,7 @@ export default function SignDocument() {
                           <img src="/logo-tSign.svg" alt="QR Code" className="w-1/3 h-1/3 opacity-50 pointer-events-none select-none" />
                         )}
                     </Rnd>
+                  </div>
                   </div>
                 )}
               </section>
