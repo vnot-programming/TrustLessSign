@@ -509,8 +509,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (apiCookie && apiCookie.value) {
           await chrome.storage.local.set({
-            sanctumToken: apiCookie.value,
-            gdriveToken: gdriveCookie ? gdriveCookie.value : '',
+            sanctumToken: decodeURIComponent(apiCookie.value),
+            gdriveToken: gdriveCookie ? decodeURIComponent(gdriveCookie.value) : '',
             baseUrl: baseUrlInput
           });
         } else {

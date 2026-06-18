@@ -778,7 +778,17 @@
 
       <button id="btn-login-web" class="btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
         Login via
-        <img src="../assets/logo-tSign.svg" alt="TrustLessSign Logo" style="height: 18px;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 118 42" style="height: 18px;">
+          <defs>
+            <linearGradient id="tSignGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3B935D" />
+              <stop offset="100%" stop-color="#2a6942" />
+            </linearGradient>
+          </defs>
+          <text x="0" y="33" font-family="'Courier New', monospace" font-size="44" font-weight="bold" fill="url(#tSignGrad)">t</text>
+          <text x="24" y="33" font-family="'Inter', 'Arial', sans-serif" font-size="38" font-weight="900" fill="currentColor" letter-spacing="-1">Sign</text>
+          <circle cx="113" cy="33" r="4.5" fill="#3B935D" />
+        </svg>
       </button>
       
       <div id="login-status" style="margin-top: 12px; text-align: center;"></div>
