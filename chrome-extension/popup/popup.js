@@ -786,7 +786,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'GENERATE_KEY',
           payload: {
             password:         password,
-            email:            userEmail.textContent,
+            email:            userEmail.textContent.replace(/\s+/g, '').trim(),
             apiToken:         token,
             deviceName:       deviceName || 'This Device',
             deviceIdentifier: deviceIdentifier,
@@ -877,8 +877,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           // Upload to Google Drive folder TrustLessSign/Certificated/
           if (storage.gdriveToken) {
             const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            const safeEmail = (storage.trustless_email || 'user').split('@')[0];
-            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0].replace(/\s+/g, '');
+            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
             const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
             chrome.runtime.sendMessage({
@@ -906,8 +906,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Fallback: trigger local download if no Drive token
             const url = URL.createObjectURL(new Blob([tsignBlob], { type: 'application/octet-stream' }));
             const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            const safeEmail = (storage.trustless_email || 'user').split('@')[0];
-            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0].replace(/\s+/g, '');
+            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
             const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
             chrome.downloads.download({ url, filename: fileName, saveAs: true });
             keysStatus.classList.remove('hidden', 'alert-danger');

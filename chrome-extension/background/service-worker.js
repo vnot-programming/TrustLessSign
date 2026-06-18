@@ -130,8 +130,8 @@ async function handleGenerateKey(payload, baseUrl) {
     tsignBase64Local = arrayBufferToBase64(tsignBuffer);
     
     const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const safeEmail = email ? email.split('@')[0] : 'user';
-    const safeDeviceName = (deviceName || 'Dashboard').replace(/[^a-zA-Z0-9]/g, '_');
+    const safeEmail = email ? email.split('@')[0].replace(/\s+/g, '') : 'user';
+    const safeDeviceName = (deviceName || 'Dashboard').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
     fileNameLocal = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
     const token = await new Promise((resolve) => {

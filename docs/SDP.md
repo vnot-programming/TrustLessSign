@@ -805,3 +805,8 @@
 - **Tugas yang diselesaikan:** Memperbaiki Base URL yang kurang /<shortcode> di ujungnya, dan memperbaiki metadata kosong di Acrobat akibat pikepdf `open_metadata()` secara *default* menginjeksi XMP *stream* kosong yang menghapus Info Dictionary dari pdf-lib.
 - **File yang diubah:** chrome-extension/signing/signer.js, web/app/Scripts/seal_pdf.py
 - **Status:** Selesai
+
+### 2026-06-18 — Fix Double Underscores in Extension Backup Naming
+- **Tugas yang diselesaikan:** Memperbaiki bug string filename *backup* di Chrome Extension yang menghasilkan spasi berlebih dan *double underscore* (`__`) akibat membaca `.textContent` yang menyertakan spasi di elemen Skeleton DOM. Semua string spasi telah di-`trim` dan dibersihkan dari *device name* serta *email*.
+- **File yang diubah:** chrome-extension/popup/popup.js, chrome-extension/background/service-worker.js
+- **Status:** Selesai
