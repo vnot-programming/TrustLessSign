@@ -214,7 +214,9 @@ async function handleSignDocument(payload, baseUrl) {
     original_filename: filename,
     author: payload.author || 'TrustlessSign User',
     reason: reason_final || 'Digital Verification',
-    signed_at: new Date().toISOString()
+    signed_at: new Date().toISOString(),
+    footerPrefix: payload.footerPrefix || "This document has been electronically signed. To Verify visit: ",
+    verifyUrlShort: payload.verifyUrlShort || `https://tsign.vnot.my.id/verify`
   };
 
   // 4. Embed QR, metadata, and marginal page stamps using signer helper

@@ -88,19 +88,36 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, p
 
   // Add Footer and Marginal Page Stamps on EVERY page to prevent page swapping
   const shortcode = metadata.verify_token ? metadata.verify_token.substring(0, 8).toUpperCase() : 'UNKNOWN';
-  const footerText = `This document has been electronically signed. To Verify visit : https://tsign.vnot.my.id/verify/${shortcode}`;
-  const helveticaFont = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+  const footerPrefix = metadata.footerPrefix || "This document has been electronically signed. To Verify visit: ";
+  const verifyUrl = `${metadata.verifyUrlShort}/${shortcode}`;
+  
+  const courierFont = await pdfDoc.embedFont(PDFLib.StandardFonts.CourierBold);
+  const fontSize = 8;
+  const prefixWidth = courierFont.widthOfTextAtSize(footerPrefix, fontSize);
+  const urlWidth = courierFont.widthOfTextAtSize(verifyUrl, fontSize);
+  const totalWidth = prefixWidth + urlWidth;
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
+    const { width } = page.getSize();
     
-    // Draw Footer at bottom left
-    page.drawText(footerText, {
-      x: 30,
+    // Draw Footer at bottom right
+    const startX = width - totalWidth - 30;
+
+    page.drawText(footerPrefix, {
+      x: startX,
       y: 15,
-      size: 9,
-      font: helveticaFont,
+      size: fontSize,
+      font: courierFont,
       color: PDFLib.rgb(0.3, 0.3, 0.3)
+    });
+
+    page.drawText(verifyUrl, {
+      x: startX + prefixWidth,
+      y: 15,
+      size: fontSize,
+      font: courierFont,
+      color: PDFLib.rgb(0.23, 0.58, 0.36) // Green matching the accent
     });
 
     if (pageStamps && pageStamps[i]) {
