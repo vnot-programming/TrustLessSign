@@ -1630,11 +1630,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         finalFileName = `signed_ext_${timestamp}-${file.name}`;
 
         const pageStamps = [];
-        if (currentPdfNumPages > 1) {
-            for (let i = 1; i <= currentPdfNumPages; i++) {
-                const stampStr = await window.generatePageStamp(shortId, i, currentPdfNumPages, timestamp);
-                pageStamps.push(stampStr);
-            }
+        for (let i = 1; i <= currentPdfNumPages; i++) {
+            const stampStr = await window.generatePageStamp(shortId, i, currentPdfNumPages, timestamp);
+            pageStamps.push(stampStr);
         }
 
         console.log("[DEBUG] Hide Frame:", optHideFrame);
