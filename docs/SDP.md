@@ -810,3 +810,8 @@
 - **Tugas yang diselesaikan:** Memperbaiki bug string filename *backup* di Chrome Extension yang menghasilkan spasi berlebih dan *double underscore* (`__`) akibat membaca `.textContent` yang menyertakan spasi di elemen Skeleton DOM. Semua string spasi telah di-`trim` dan dibersihkan dari *device name* serta *email*.
 - **File yang diubah:** chrome-extension/popup/popup.js, chrome-extension/background/service-worker.js
 - **Status:** Selesai
+
+### 2026-06-18 — Sync Local Visual Signatures to Drive
+- **Tugas yang diselesaikan:** Menambahkan mekanisme sinkronisasi di latar belakang pada fungsi `refreshImageSignatures` untuk mendeteksi *visual signature* di IndexedDB lokal yang belum ter-upload (tidak punya `driveId`) dan langsung meng-upload-nya ke Google Drive jika `gdriveToken` tersedia.
+- **File yang diubah:** chrome-extension/popup/popup.js
+- **Status:** Selesai

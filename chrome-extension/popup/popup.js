@@ -981,12 +981,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgSigLoading = document.getElementById('img-sig-loading');
 
   const refreshImageSignatures = async () => {
-    chrome.storage.local.get(['default_image_signature_id'], async (storage) => {
+    chrome.storage.local.get(['default_image_signature_id', 'gdriveToken'], async (storage) => {
       imgSigLoading.style.display = 'inline-block';
       
       try {
         const files = await getAllImageSignaturesLocal();
         const defaultId = storage.default_image_signature_id;
+
+        // Sync un-uploaded visual signatures to Drive in background
+        if (storage.gdriveToken && typeof uploadImageSignature === 'function') {
+          files.forEach(file => {
+            if (!file.driveId) {
+              const filename = file.name.includes('.') ? file.name : (file.name + (file.mimeType === 'image/png' ? '.png' : '.jpg'));
+              uploadImageSignature(file.dataUrl, filename, file.mimeType, storage.gdriveToken)
+                .then(uploadData => {
+                  if (uploadData && uploadData.id) {
+                    updateImageSignatureDriveIdLocal(file.id, uploadData.id).catch(e => console.error(e));
+                  }
+                }).catch(e => console.error("Drive sync error", e));
+            }
+          });
+        }
         
         imgSigList.innerHTML = '';
         
