@@ -126,8 +126,11 @@ async function handleGenerateKey(payload, baseUrl) {
     
     const tsignBuffer = await encryptIdentityToTsign(identityObj, password);
     tsignBase64Local = arrayBufferToBase64(tsignBuffer);
-    const ts = new Date().toISOString().replace(/[:.]/g, '-');
-    fileNameLocal = `trustlesssign_identity_${ts}.tsign`;
+    
+    const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    const safeEmail = email ? email.split('@')[0] : 'user';
+    const safeDeviceName = (deviceName || 'Dashboard').replace(/[^a-zA-Z0-9]/g, '_');
+    fileNameLocal = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
     const token = await new Promise((resolve) => {
       chrome.identity.getAuthToken({ interactive: false }, (t) => {
