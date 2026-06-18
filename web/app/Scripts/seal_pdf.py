@@ -64,7 +64,7 @@ def seal_pdf(pdf_bytes: bytes, owner_password: str, perms_dict: dict) -> bytes:
 
     pdf.docinfo.update({
         '/Creator': 'TrustlessSign Zero-Trust',
-        '/Producer': 'TrustlessSign Sealed Engine v1.0'
+        '/Producer': 'TrustlessSign Crypto-Engine (Web3)'
     })
 
     # Save with AES-256 encryption:

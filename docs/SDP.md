@@ -795,3 +795,8 @@
 - **Tugas yang diselesaikan:** Memperbaiki bug Python script (seal_pdf.py) yang gagal karena argumen pikepdf yang usang (extract_accessibility diubah menjadi accessibility).
 - **File yang diubah:** web/app/Scripts/seal_pdf.py
 - **Status:** Selesai
+
+### 2026-06-18 — Update PDF Metadata consistency
+- **Tugas yang diselesaikan:** Memperbaiki bug metadata (Title, Author, Subject, dll) yang selalu ter-*reset* atau tertimpa oleh Metadata XMP PDF bawaan yang lama. Kini _pdf-lib_ akan menghapus data XMP lama sehingga memaksa Acrobat membaca data Metadata _Dictionary_ baru yang sudah di-*set* (Title = Nama Asli, Subject = Reason Final, dll). Dan untuk *Producer* telah dikembalikan menggunakan 'TrustlessSign Crypto-Engine (Web3)' sesuai _request_ konsistensi.
+- **File yang diubah:** chrome-extension/signing/signer.js, web/app/Scripts/seal_pdf.py
+- **Status:** Selesai

@@ -163,6 +163,16 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, p
   pdfDoc.setKeywords(['TrustlessSign', 'Digital Signature', 'Zero-Trust']);
   pdfDoc.setCreator('TrustlessSign Zero-Trust Seal');
   pdfDoc.setProducer('TrustlessSign Crypto-Engine (Web3)');
+
+  // Remove old XMP metadata so PDF viewers fallback to the Info dict we just set
+  pdfDoc.catalog.delete(PDFLib.PDFName.of('Metadata'));
+
+  // Set the Base URL in the PDF Catalog's URI dictionary
+  if (metadata.verifyUrlShort) {
+    const uriDict = pdfDoc.context.obj({ Base: PDFLib.PDFString.of(metadata.verifyUrlShort) });
+    pdfDoc.catalog.set(PDFLib.PDFName.of('URI'), uriDict);
+  }
+
   const signedPdfBytes = await pdfDoc.save();
 
   // Compute SHA-256 of final signed PDF
