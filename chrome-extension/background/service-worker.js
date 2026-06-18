@@ -263,7 +263,10 @@ async function handleSignDocument(payload, baseUrl) {
   let finalPdfStr = signedPdfStr;
   if (sealedPerms) {
     try {
-      const signedB64 = forge.util.encode64(signedPdfStr);
+      const signedB64 = btoa(signedPdfStr);
+      console.log("[DEBUG] Sending PDF to /api/pdf/seal. Base64 length:", signedB64.length);
+      console.log("[DEBUG] Sealed Perms:", JSON.stringify(sealedPerms));
+      
       const sealRes = await fetch(`${baseUrl}/api/pdf/seal`, {
         method: 'POST',
         headers: {
@@ -280,11 +283,14 @@ async function handleSignDocument(payload, baseUrl) {
       if (sealRes.ok) {
         const sealData = await sealRes.json();
         if (sealData.status === 'success' && sealData.pdf_base64) {
+          console.log("[DEBUG] Seal Success! Received base64 length:", sealData.pdf_base64.length);
           // Decode sealed PDF back to binary string for GDrive upload
-          finalPdfStr = forge.util.decode64(sealData.pdf_base64);
+          finalPdfStr = atob(sealData.pdf_base64);
+        } else {
+          console.warn("[DEBUG] PDF seal response error format:", sealData);
         }
       } else {
-        console.warn('PDF sealing failed, continuing with unsigned-sealed PDF:', await sealRes.text());
+        console.warn('[DEBUG] PDF sealing API failed, continuing with un-sealed PDF:', await sealRes.text());
       }
     } catch (sealErr) {
       console.warn('PDF seal API error, skipping seal step:', sealErr.message);

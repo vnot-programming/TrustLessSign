@@ -1632,6 +1632,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
+        console.log("[DEBUG] Hide Frame:", optHideFrame);
+        console.log("[DEBUG] Sealed Enabled:", optSealedEnabled, sealedPermsState);
+
         // Call background worker to sign & upload
         chrome.runtime.sendMessage({
           type: 'SIGN_DOCUMENT',

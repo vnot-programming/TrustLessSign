@@ -52,16 +52,23 @@ class PdfSealController extends Controller
         $tmpOut = tempnam(sys_get_temp_dir(), 'tsign_out_');
 
         try {
+            Log::info("PDF Seal requested. Base64 length: " . strlen($pdfBase64));
+            
+            // Clean up any potential data URI prefix if it exists
+            $cleanBase64 = preg_replace('#^data:application/pdf;base64,#i', '', $pdfBase64);
+            $cleanBase64 = str_replace(["\r", "\n", " "], '', $cleanBase64);
+
             // Decode and write input PDF
-            $pdfBytes = base64_decode($pdfBase64);
+            $pdfBytes = base64_decode($cleanBase64);
             if ($pdfBytes === false || strlen($pdfBytes) < 5) {
+                Log::error("Base64 decode failed. Resulting length: " . ($pdfBytes === false ? 'false' : strlen($pdfBytes)));
                 throw new \InvalidArgumentException('Invalid base64 PDF data.');
             }
             file_put_contents($tmpIn, $pdfBytes);
 
             // 4. Build JSON config for the Python script
             $config = json_encode([
-                'pdf_base64'     => $pdfBase64,
+                'pdf_base64'     => $cleanBase64,
                 'owner_password' => $ownerPassword,
                 'permissions'    => $this->sanitizePermissions($permissions),
             ]);
