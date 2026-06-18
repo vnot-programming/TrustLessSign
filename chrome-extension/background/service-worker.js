@@ -104,7 +104,9 @@ async function handleGenerateKey(payload, baseUrl) {
     chrome.storage.local.set({
       'trustless_private_key_enc': encryptedPrivateKeyPem,
       'trustless_certificate':     certificatePem,
-      'trustless_cert_serial':     serialNumber
+      'trustless_cert_serial':     serialNumber,
+      'trustless_device_name':     deviceName || 'Unknown Device',
+      'trustless_email':           email
     }, () => {
       if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
       else resolve();

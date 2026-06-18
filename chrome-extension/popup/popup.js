@@ -744,7 +744,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnBackupDrive) {
     btnBackupDrive.addEventListener('click', async () => {
-      chrome.storage.local.get(['trustless_private_key_enc', 'trustless_certificate', 'trustless_cert_serial', 'gdriveToken'], async (storage) => {
+      chrome.storage.local.get(['trustless_private_key_enc', 'trustless_certificate', 'trustless_cert_serial', 'gdriveToken', 'trustless_email', 'trustless_device_name'], async (storage) => {
         if (!storage.trustless_private_key_enc || !storage.trustless_certificate) {
           showKeysError('No identity found on this device. Generate a certificate first.');
           return;
@@ -768,9 +768,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           // Upload to Google Drive folder TrustLessSign/Certificated/
           if (storage.gdriveToken) {
-            const now       = new Date();
-            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            const fileName  = `trustlesssign_identity_${timestamp}.tsign`;
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0];
+            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_');
+            const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
             chrome.runtime.sendMessage({
               type:    'UPLOAD_IDENTITY',
@@ -796,9 +797,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           } else {
             // Fallback: trigger local download if no Drive token
             const url = URL.createObjectURL(new Blob([tsignBlob], { type: 'application/octet-stream' }));
-            const now = new Date();
-            const ts  = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            chrome.downloads.download({ url, filename: `trustlesssign_identity_${ts}.tsign`, saveAs: true });
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0];
+            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_');
+            const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
+            chrome.downloads.download({ url, filename: fileName, saveAs: true });
             keysStatus.classList.remove('hidden', 'alert-danger');
             keysStatus.classList.add('alert-success');
             keysStatus.textContent = 'Identity downloaded locally (no Drive token found).';
