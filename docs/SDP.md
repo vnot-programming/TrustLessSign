@@ -697,3 +697,10 @@
   - `web/resources/js/Utils/barcode-generator.js`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya:** Sesuai *mockup* pengguna, *padding* global dikurangi menjadi `12px`. Jarak antar elemen dipersempit. Limitasi buatan *max-height: 140px* pada gambar tanda tangan dihilangkan, sehingga gambar kini dapat membesar secara leluasa memenuhi seluruh area ruang kosong (Body) seluas `366x205px` tanpa merusak *aspect ratio*.
+
+- **Tanggal/Waktu:** 2026-06-18T14:21:24Z
+- **Tugas yang diselesaikan:** Penyesuaian UI Penanda tangan & Signature Type di Web Dashboard
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya:** Memindahkan dropdown Signature Type tepat di bawah Upload PDF agar sinkron dengan Extension. Menambahkan opsi Signer (Penanda Tangan) dengan mode 'username (Google)' yang memunculkan alert, dan mode 'Custom' yang akan mewajibkan pengguna mengetik nama manual agar tombol Sign & Seal bisa di-klik.

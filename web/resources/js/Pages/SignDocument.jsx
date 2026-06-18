@@ -41,6 +41,10 @@ export default function SignDocument() {
   const [notes, setNotes] = useState('');
   const [password, setPassword] = useState('dr4gonlistio');
 
+  // Signer states
+  const [signerMode, setSignerMode] = useState('username');
+  const [customSigner, setCustomSigner] = useState('');
+
   // Draggable QR Position and Size
   const [qrPosition, setQrPosition] = useState({ x: 50, y: 50 });
   const [qrSize, setQrSize] = useState({ width: 115, height: 76 });
@@ -284,9 +288,10 @@ export default function SignDocument() {
       const shortId = verifyToken.split('-')[0].toUpperCase();
 
       let finalQrPngBase64 = '';
+      const actualSigner = signerMode === 'custom' ? customSigner : user.name;
       if (signatureType === 'image') {
         finalQrPngBase64 = await generateSignatureFrame(
-            user.name,
+            actualSigner,
             shortId,
             verifyUrlShort,
             imageSigDataUrl,
@@ -429,7 +434,7 @@ export default function SignDocument() {
           notes: notes,
           password: password,
           qrPngBase64: finalQrPngBase64,
-          author: user.name,
+          author: actualSigner,
           verifyToken: verifyToken
         }
       }, '*');
@@ -593,6 +598,52 @@ export default function SignDocument() {
 
                   {file && (
                     <>
+                      {/* Signature Type Selector */}
+                      <div className="space-y-1">
+                        <label className="block text-xs font-semibold text-text-secondary">Signature Type</label>
+                        <select 
+                          value={signatureType} 
+                          onChange={(e) => setSignatureType(e.target.value)}
+                          className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
+                        >
+                          <option value="qr">Cryptographic QR Code</option>
+                          <option value="image">Visual Signature (Image)</option>
+                        </select>
+                      </div>
+
+                      {/* Penanda tangan (Signer) Selector */}
+                      <div className="space-y-1">
+                        <label className="block text-xs font-semibold text-text-secondary">Penanda tangan (Signer)</label>
+                        <select 
+                          value={signerMode} 
+                          onChange={(e) => {
+                            setSignerMode(e.target.value);
+                            if (e.target.value === 'username') {
+                              alert(`Penandatangan atau Signer adalah ${user.name}`);
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
+                        >
+                          <option value="username">{user.name} (Google)</option>
+                          <option value="custom">Custom</option>
+                        </select>
+                      </div>
+
+                      {/* Custom Signer Input */}
+                      {signerMode === 'custom' && (
+                        <div className="space-y-1 animate-fade-in">
+                          <label className="block text-xs font-semibold text-text-secondary">Nama Penanda tangan</label>
+                          <input 
+                            type="text" 
+                            value={customSigner}
+                            onChange={(e) => setCustomSigner(e.target.value)}
+                            placeholder="Masukkan nama penanda tangan..."
+                            className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
+                            required
+                          />
+                        </div>
+                      )}
+
                       {/* Reason Category dropdown */}
                       <div className="space-y-1">
                         <label className="block text-xs font-semibold text-text-secondary">{t.reason_category}</label>
@@ -652,18 +703,6 @@ export default function SignDocument() {
                         />
                       </div>
 
-                      {/* Signature Type Selector */}
-                      <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Signature Type</label>
-                        <select 
-                          value={signatureType} 
-                          onChange={(e) => setSignatureType(e.target.value)}
-                          className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
-                        >
-                          <option value="qr">Cryptographic QR Code</option>
-                          <option value="image">Visual Signature (Image)</option>
-                        </select>
-                      </div>
 
                       {/* Password input */}
                       <div className="space-y-1">
@@ -695,7 +734,7 @@ export default function SignDocument() {
 
                   <button 
                     type="submit"
-                    disabled={!file || !extensionInstalled || !password || hasCert === false}
+                    disabled={!file || !extensionInstalled || !password || hasCert === false || (signerMode === 'custom' && !customSigner.trim())}
                     className="w-full bg-text-primary text-surface-primary py-3 rounded-lg font-semibold disabled:opacity-50 transition-colors cursor-pointer hover:bg-opacity-90 shadow-sm"
                   >
                     {t.sign_and_seal}
