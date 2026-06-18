@@ -704,3 +704,61 @@
   - `web/resources/js/Pages/SignDocument.jsx`
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya:** Memindahkan dropdown Signature Type tepat di bawah Upload PDF agar sinkron dengan Extension. Menambahkan opsi Signer (Penanda Tangan) dengan mode 'username (Google)' yang memunculkan alert, dan mode 'Custom' yang akan mewajibkan pengguna mengetik nama manual agar tombol Sign & Seal bisa di-klik.
+
+- **Tanggal/Waktu:** 2026-06-18T14:31:00Z
+- **Tugas yang diselesaikan:** Fix Build Syntax Error & Version Bump (Web)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `web/package.json`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.25`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki syntax error (missing closing tag div) pada `SignDocument.jsx` yang menyebabkan kegagalan pipeline build Vite akibat bug esbuild parsing. Melakukan bump versi web ke `1.3.25` di `web/package.json` dan memicu build produksi kembali melalui CI/CD.
+
+- **Tanggal/Waktu:** 2026-06-18T14:47:00Z
+- **Tugas yang diselesaikan:** Fix API Verification untuk QR Scanner
+- **File yang diubah/dibuat:**
+  - `web/app/Http/Controllers/VerificationController.php`
+  - `web/package.json`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.26`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Memperbaiki *bug* 404 (Not Found) pada rute verifikasi `api/verify/`. URL hasil pemindaian kode QR mengirimkan Short ID yang tidak selalu memiliki *prefix* `TLS-` (misal: `/verify/7EBF782B`). Backend kini secara otomatis mendukung pencarian `LIKE` untuk *Short ID* yang berjumlah 8 karakter tanpa *prefix* tersebut, tidak lagi melakukan pencarian absolut `uuid` yang berakibat gagal ditemukannya data. Kenaikan versi dilakukan ke `1.3.26`.
+
+- **Tanggal/Waktu:** 2026-06-18T14:55:00Z
+- **Tugas yang diselesaikan:** Remove Redundant Badge di Verify.jsx
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/Verify.jsx`
+  - `web/package.json`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.27`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menghapus badge `Certificate Valid/inValid` yang dirasa repetitif di halaman `Verify.jsx`, sesuai instruksi bahwa status sertifikat sudah terwakilkan pada bagian teks Capitalize berwarna yang berada tepat di bawahnya. Kenaikan versi ke `1.3.27` dan *push* telah dieksekusi.
+
+- **Tanggal/Waktu:** 2026-06-18T15:00:30Z
+- **Tugas yang diselesaikan:** Menambahkan "Verify at" URL di Barcode Samping PDF
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `web/package.json`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.28`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Telah memodifikasi fungsi `generatePageStamp` untuk menerima parameter URL verifikasi (`verifyUrlShort`) dari komponen utama. URL (berwarna hijau) dicetak satu baris di atas metadata *tSign ID* pada kanvas stempel margin PDF (ribbon horizontal yang akan diputar -90 derajat pada dokumen hasil penandatanganan). Kenaikan versi ke `1.3.28` beserta rilis tag sudah berhasil.
+
+- **Tanggal/Waktu:** 2026-06-18T15:12:00Z
+- **Tugas yang diselesaikan:** Update nama file backup extension & posisi watermark Verify At (PDF)
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `chrome-extension/popup/popup.js`
+  - `chrome-extension/background/service-worker.js`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** File backup ekstensi sekarang menggunakan format <DeviceName>_<username email>-yyyymmdd.tsign dan posisi "Verify At" di PDF sudah pindah ke bawah tSign ID.
+
+- **Tanggal/Waktu:** 2026-06-18T15:34:00Z
+- **Tugas yang diselesaikan:** Perbaikan teks terpotong di marginal stamp & Tambah alasan tanda tangan
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `web/database/seeders/ReasonCategorySeeder.php`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.30`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menambahkan ruang ekstra dengan memperlebar canvas marginal stamp dari 40px ke 48px agar teks "Verify At" tidak terpotong saat dirender. Selain itu, mengubah seeder alasan tanda tangan untuk menyertakan alasan Legal & Official serta Administrative yang diminta pengguna, kemudian melakukan *force seed* ulang ke DB di production container.
+
+- **Tanggal/Waktu:** 2026-06-18T15:52:00Z
+- **Tugas yang diselesaikan:** Mengembalikan format marginal stamp dan menambahkan footer verifikasi di PDF
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `chrome-extension/signing/signer.js`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.31`, Extension `ext-v1.4.19`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah kembali stamp marginal barcode ke mode 1 baris (ketinggian 40px) dan memindahkan kalimat verifikasi "This document has been electronically signed. To Verify visit..." menjadi footer pada setiap halaman PDF melalui `signer.js` di extension menggunakan `pdf-lib`.
