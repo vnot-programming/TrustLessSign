@@ -762,3 +762,12 @@
   - `chrome-extension/signing/signer.js`
 - **Status saat ini:** Selesai (Version Web `web-v1.3.31`, Extension `ext-v1.4.19`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Mengubah kembali stamp marginal barcode ke mode 1 baris (ketinggian 40px) dan memindahkan kalimat verifikasi "This document has been electronically signed. To Verify visit..." menjadi footer pada setiap halaman PDF melalui `signer.js` di extension menggunakan `pdf-lib`.
+
+- **Tanggal/Waktu:** 2026-06-18T16:07:00Z
+- **Tugas yang diselesaikan:** Menyesuaikan style footer verifikasi (CourierBold, rata kanan, warna hijau URL) dan integrasi translasi dinamis dari Web UI
+- **File yang diubah/dibuat:**
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `chrome-extension/background/service-worker.js`
+  - `chrome-extension/signing/signer.js`
+- **Status saat ini:** Selesai (Version Web `web-v1.3.32`, Extension `ext-v1.4.21`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Teks footer di PDF telah diatur agar rata kanan. Prefix footer kini mendukung bahasa dinamis (EN/ID/TH) yang dikirimkan via payload dari Web UI. URL kini berwarna hijau.
