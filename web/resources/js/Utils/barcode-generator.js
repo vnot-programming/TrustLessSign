@@ -211,7 +211,7 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp,
     const ctx = canvas.getContext("2d");
 
     const width = 800;
-    const height = 48;
+    const height = 40;
     canvas.width = width;
     canvas.height = height;
 
@@ -234,7 +234,7 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp,
     });
 
     // Draw the barcode onto the main canvas, vertically centered
-    ctx.drawImage(barcodeCanvas, 0, 9);
+    ctx.drawImage(barcodeCanvas, 0, 5);
 
     // Draw Metadata Text
     const textX = barcodeCanvas.width + 20; // 20px padding after barcode
@@ -242,21 +242,12 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp,
     // Line 1: tSign ID
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'left';
-    ctx.textBaseline = 'bottom';
+    ctx.textBaseline = 'middle';
     ctx.fillStyle = '#444444';
     const textContent = `tSign ID: ${shortId} | Page ${pageNum} of ${totalPages} | Time: ${timestamp}`;
-    ctx.fillText(textContent, textX, height / 2 - 2);
+    ctx.fillText(textContent, textX, height / 2 + 1);
 
-    // Line 2: Verify At
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = '#444444';
-    ctx.fillText('Verify At: ', textX, height / 2 + 2);
-    
-    const w1 = ctx.measureText('Verify At: ').width;
-    ctx.fillStyle = '#3B935D'; // Green color for URL
-    ctx.fillText(verifyUrl, textX + w1, height / 2 + 2);
-
-    return canvas.toDataURL('image/png');
+    return canvas.toDataURL("image/png");
 }
 
 // Export for module systems or global window
