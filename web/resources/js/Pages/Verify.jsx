@@ -238,10 +238,6 @@ export default function Verify({ token }) {
                         {t.sig_verified}
                       </div>
                     )}
-                    <div className="badge-premium bg-surface-secondary shadow-none border-border-default">
-                      <span className={`pulsing-dot bg-accent-${themeColor}`}></span>
-                      Certificate {isVerified ? 'Valid' : 'inValid'}
-                    </div>
                   </div>
                 </div>
 
