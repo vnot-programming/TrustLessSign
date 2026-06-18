@@ -790,3 +790,8 @@
 - **File yang diubah:** `web/app/Http/Controllers/PdfSealController.php`, `chrome-extension/popup/popup.js`
 - **Status:** Selesai
 - **Handoff Note:** Silakan periksa kembali Sealed PDF Permissions, seharusnya data base64 sudah di-process ke python backend dengan benar.
+
+### 2026-06-18 — Bugfix Pikepdf Permissions
+- **Tugas yang diselesaikan:** Memperbaiki bug Python script (seal_pdf.py) yang gagal karena argumen pikepdf yang usang (extract_accessibility diubah menjadi accessibility).
+- **File yang diubah:** web/app/Scripts/seal_pdf.py
+- **Status:** Selesai

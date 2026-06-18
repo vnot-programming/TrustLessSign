@@ -51,7 +51,7 @@ def seal_pdf(pdf_bytes: bytes, owner_password: str, perms_dict: dict) -> bytes:
         modify_form=bool(perms_dict.get('modify_form', False)),
         extract=bool(perms_dict.get('extract', False)),
         # Note: accessibility extract is always allowed for screen readers
-        extract_accessibility=True,
+        accessibility=True,
     )
 
     # Open PDF from bytes
