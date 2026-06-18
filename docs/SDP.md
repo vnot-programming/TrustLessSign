@@ -784,3 +784,9 @@
   - `messages/*.json`: Integrasi bahasa (i18n).
 - **Status saat ini:** Selesai (Menunggu User me-rebuild Docker dan Vite).
 - **Catatan untuk AI selanjutnya (Handoff Note):** Fungsionalitas sudah selesai. Python + Pikepdf di backend kini melakukan sealing AES-256 dan derivasi sandi pemilik otomatis berdasarkan Token verifikasi dan Serial. Tunggu konfirmasi User telah build ulang container dengan dependency baru tersebut.
+
+### 2026-06-18 — Bugfix PDF Seal Invalid Base64
+- **Tugas yang diselesaikan:** Memperbaiki bug "Invalid base64 PDF data" akibat model yang salah di-import (`App\Models\SignedDocument` yang seharusnya `App\Models\Document`) pada `PdfSealController.php`. Selain itu juga menambahkan debug console saat checkbox permission ditekan pada extension `popup.js`.
+- **File yang diubah:** `web/app/Http/Controllers/PdfSealController.php`, `chrome-extension/popup/popup.js`
+- **Status:** Selesai
+- **Handoff Note:** Silakan periksa kembali Sealed PDF Permissions, seharusnya data base64 sudah di-process ke python backend dengan benar.

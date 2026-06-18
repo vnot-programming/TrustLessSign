@@ -126,7 +126,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       cb.type = 'checkbox';
       cb.style.cssText = 'accent-color:var(--accent-primary);flex-shrink:0;';
       cb.checked = sealedPermsState[item.key];
-      cb.addEventListener('change', () => { sealedPermsState[item.key] = cb.checked; });
+      cb.addEventListener('change', () => { 
+        sealedPermsState[item.key] = cb.checked; 
+        console.log(`[DEBUG] Permission changed: ${item.key} = ${cb.checked}`);
+      });
       label.appendChild(spanText);
       label.appendChild(cb);
       listEl.appendChild(label);

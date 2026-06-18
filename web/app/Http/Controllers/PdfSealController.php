@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use App\Models\SignedDocument;
+use App\Models\Document;
 
 class PdfSealController extends Controller
 {
@@ -32,16 +32,16 @@ class PdfSealController extends Controller
         $permissions = $validated['permissions'];
 
         // 1. Lookup the document by verify_token to get cert_serial
-        $doc = SignedDocument::where('verify_token', $verifyToken)->first();
+        $doc = Document::with('certificate')->where('verify_token', $verifyToken)->first();
 
-        if (!$doc) {
+        if (!$doc || !$doc->certificate) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Document record not found for given verify_token.',
+                'message' => 'Document or Certificate record not found for given verify_token.',
             ], 404);
         }
 
-        $certSerial = $doc->certificate_serial;
+        $certSerial = $doc->certificate->serial_number;
 
         // 2. Derive owner_password: SHA256(verify_token + "::" + cert_serial)
         // This is the same formula that can be reconstructed any time from DB.
