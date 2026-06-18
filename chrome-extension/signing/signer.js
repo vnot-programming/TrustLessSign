@@ -169,7 +169,7 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, p
 
   // Set the Base URL in the PDF Catalog's URI dictionary
   if (metadata.verifyUrlShort) {
-    const uriDict = pdfDoc.context.obj({ Base: PDFLib.PDFString.of(metadata.verifyUrlShort) });
+    const uriDict = pdfDoc.context.obj({ Base: PDFLib.PDFString.of(verifyUrl) });
     pdfDoc.catalog.set(PDFLib.PDFName.of('URI'), uriDict);
   }
 

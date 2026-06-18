@@ -59,9 +59,6 @@ def seal_pdf(pdf_bytes: bytes, owner_password: str, perms_dict: dict) -> bytes:
     pdf = pikepdf.Pdf.open(pdf_stream)
 
     # Overwrite Creator/Producer metadata to mark as TrustlessSign-sealed
-    with pdf.open_metadata(set_pikepdf_as_editor=False) as meta:
-        pass  # just open to ensure metadata block exists
-
     pdf.docinfo.update({
         '/Creator': 'TrustlessSign Zero-Trust',
         '/Producer': 'TrustlessSign Crypto-Engine (Web3)'

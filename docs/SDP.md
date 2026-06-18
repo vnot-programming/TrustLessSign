@@ -800,3 +800,8 @@
 - **Tugas yang diselesaikan:** Memperbaiki bug metadata (Title, Author, Subject, dll) yang selalu ter-*reset* atau tertimpa oleh Metadata XMP PDF bawaan yang lama. Kini _pdf-lib_ akan menghapus data XMP lama sehingga memaksa Acrobat membaca data Metadata _Dictionary_ baru yang sudah di-*set* (Title = Nama Asli, Subject = Reason Final, dll). Dan untuk *Producer* telah dikembalikan menggunakan 'TrustlessSign Crypto-Engine (Web3)' sesuai _request_ konsistensi.
 - **File yang diubah:** chrome-extension/signing/signer.js, web/app/Scripts/seal_pdf.py
 - **Status:** Selesai
+
+### 2026-06-18 — Fix Pikepdf Empty Metadata and Shortcode Base URL
+- **Tugas yang diselesaikan:** Memperbaiki Base URL yang kurang /<shortcode> di ujungnya, dan memperbaiki metadata kosong di Acrobat akibat pikepdf `open_metadata()` secara *default* menginjeksi XMP *stream* kosong yang menghapus Info Dictionary dari pdf-lib.
+- **File yang diubah:** chrome-extension/signing/signer.js, web/app/Scripts/seal_pdf.py
+- **Status:** Selesai
