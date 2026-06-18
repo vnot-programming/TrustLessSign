@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <title>TrustlessSign</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="assets/pdf.min.js"></script>
-  <script src="assets/qr-code-styling.js"></script>
-  <script src="assets/jsbarcode.min.js"></script>
-  <script src="signing/barcode-generator.js"></script>
+  <script src="../assets/pdf.min.js"></script>
+  <script src="../assets/qr-code-styling.js"></script>
+  <script src="../assets/jsbarcode.min.js"></script>
+  <script src="../signing/barcode-generator.js"></script>
   <style>
     /* Bio-Digital Minimalism Design Tokens (HSL calibrated) */
     :root {
@@ -776,15 +776,9 @@
         <input type="text" id="login-url" class="form-control" value="https://tsign.vnot.my.id">
       </div>
 
-      <button id="btn-login-google" class="btn-google">
-        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 18px; height: 18px; background-color: white; border-radius: 50%; padding: 2px;">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-          <path fill="none" d="M0 0h48v48H0z"></path>
-        </svg>
-        Sign in with Google
+      <button id="btn-login-web" class="btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+        Login via
+        <img src="../assets/logo-tSign.svg" alt="TrustLessSign Logo" style="height: 18px;">
       </button>
       
       <div id="login-status" style="margin-top: 12px; text-align: center;"></div>
@@ -875,6 +869,44 @@
           <div class="form-group">
             <label>Notes Tambahan (Opsional)</label>
             <textarea id="reason-notes" class="form-control" placeholder="Catatan..." style="height: 40px; resize: none;"></textarea>
+          </div>
+        </div>
+
+        <!-- Advanced Options Accordion -->
+        <div class="form-group" id="advanced-options-group" style="margin-bottom: 6px;">
+          <button type="button" id="btn-toggle-advanced" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--surface-secondary);color:var(--text-secondary);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
+            <span style="display:flex;align-items:center;gap:6px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+              <span id="advanced-btn-label">Fitur Lanjutan</span>
+            </span>
+            <svg id="advanced-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+
+          <div id="advanced-options-panel" style="display:none;margin-top:6px;padding:10px;border:1px solid var(--border-subtle);border-radius:8px;background:var(--surface-primary);">
+
+            <!-- Hide Frame -->
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:10px;">
+              <input type="checkbox" id="opt-hide-frame" style="margin-top:2px;accent-color:var(--accent-primary);">
+              <div>
+                <span id="lbl-hide-frame" style="font-size:0.75rem;font-weight:600;color:var(--text-primary);display:block;">Hilangkan Frame</span>
+                <span id="lbl-hide-frame-desc" style="font-size:0.65rem;color:var(--text-tertiary);display:block;margin-top:2px;">Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai.</span>
+              </div>
+            </label>
+
+            <!-- Sealed -->
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+              <input type="checkbox" id="opt-sealed" style="margin-top:2px;accent-color:var(--accent-primary);">
+              <div>
+                <span id="lbl-sealed" style="font-size:0.75rem;font-weight:600;color:var(--text-primary);display:block;">Sealed (permanent)</span>
+                <span id="lbl-sealed-desc" style="font-size:0.65rem;color:var(--text-tertiary);display:block;margin-top:2px;">Mengunci permission PDF. Dapat dibuka semua orang, namun tidak dapat diubah tanpa TrustlessSign.</span>
+              </div>
+            </label>
+
+            <!-- Sealed Permissions Panel -->
+            <div id="sealed-perms-panel" style="display:none;margin-top:8px;margin-left:20px;padding:8px;background:var(--surface-secondary);border-radius:6px;border:1px solid var(--border-subtle);">
+              <p id="lbl-perms-title" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:6px;">Izin Dokumen</p>
+              <div id="sealed-perms-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+            </div>
           </div>
         </div>
 

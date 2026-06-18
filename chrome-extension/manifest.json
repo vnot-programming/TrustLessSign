@@ -7,7 +7,7 @@
   "description": "Zero-Trust PDF Digital Signature",
   "permissions": [
     "storage",
-    "identity",
+    "cookies",
     "downloads",
     "activeTab",
     "scripting",

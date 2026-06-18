@@ -2,6 +2,11 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-18T20:00:00Z
+- **Tugas yang diselesaikan:** Implement Seamless SSO (Web-Only Auth) untuk Ekstensi
+- **File yang diubah/dibuat:** `popup.js`, `popup.html`, `manifest.json` (Chrome & Safari), `Welcome.jsx`, `SocialiteController.php`, `web.php`.
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Auth flow ekstensi telah dimigrasikan dari `chrome.identity` menjadi berbasis cookie untuk SSO yang seamless dengan Web Dashboard, menghindari email persetujuan Google ganda. Ekstensi menggunakan `chrome.cookies.get` untuk memonitor token `tsign_api_token` dan `tsign_gdrive_token` yang diisukan oleh `SocialiteController` (Sanctum) dengan attribute `SameSite=None` dan `Secure=true`. Web Dashboard hanya memunculkan "Login Via TrustlessSign" tanpa branding Google di ekstensi. Pengecekan auth telah disinkronkan.
 - **Tanggal/Waktu:** 2026-06-17T09:05:00Z
 - **Tugas yang diselesaikan:** Refactoring UI navigasi halaman PDF di Browser Extension: Mengganti input "Go to" terpisah dengan inline pagination di antara label "Page X of Y", dan menjawab status enkripsi PDF (`ignoreEncryption`).
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.html`, `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.html`, `safari-extension/Resources/popup.js`, `chrome-extension/package.json`, `safari-extension/Resources/manifest.json`.
@@ -771,6 +776,16 @@
   - `chrome-extension/signing/signer.js`
 - **Status saat ini:** Selesai (Version Web `web-v1.3.32`, Extension `ext-v1.4.21`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Teks footer di PDF telah diatur agar rata kanan. Prefix footer kini mendukung bahasa dinamis (EN/ID/TH) yang dikirimkan via payload dari Web UI. URL kini berwarna hijau.
+
+### [2026-06-19] — Core Bug Fixes & Metadata Enforcement
+- **Tugas:** Debugging kegagalan Document Permissions (Sealed) PDF, Sinkronisasi Metadata PDF-lib ke Pikepdf, dan Perbaikan Google Drive Upload (Sanctum/Gdrive Encrypted Cookie issue).
+- **File diubah:** 
+  - `web/bootstrap/app.php`: Menonaktifkan enkripsi cookie untuk `tsign_api_token` dan `tsign_gdrive_token` agar bisa dibaca oleh extension via `chrome.cookies.get`.
+  - `web/app/Http/Controllers/PdfSealController.php` & `web/app/Scripts/seal_pdf.py`: Menyuntikkan langsung `metadata` (Title, Author, Subject, Base URL) ke Python script agar Pikepdf tidak me-reset metadata ke Author "Yoke" atau metadata asli PDF sebelumnya.
+  - `chrome-extension/background/service-worker.js`: Meneruskan `metadata` ke `/api/pdf/seal`.
+  - Sinkronisasi ulang file ekstensi ke Safari (`safari-extension/Resources/`).
+- **Status:** Selesai.
+- **Handoff Note:** PDF Sealed sekarang akan secara paksa menimpa metadata sesuai input (Author custom/email, Base URL verify) sebelum dienkripsi AES-256. Masalah upload Visual Signatures ke Google Drive teratasi karena token tidak lagi terenktipsi Laravel secara default. User harus relogin sekali untuk mendapatkan un-encrypted cookie.
 
 ### 2026-06-18 — Advanced Options & Sealed PDF Server Implementation
 - **Tugas yang diselesaikan:** Implementasi *Advanced Options* (Fitur Lanjutan) termasuk Hide Frame dan penguncian hak akses PDF (Sealed).

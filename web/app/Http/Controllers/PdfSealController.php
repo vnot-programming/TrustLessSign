@@ -25,11 +25,13 @@ class PdfSealController extends Controller
             'pdf_base64'   => 'required|string',
             'verify_token' => 'required|string|uuid',
             'permissions'  => 'required|array',
+            'metadata'     => 'nullable|array',
         ]);
 
         $pdfBase64   = $validated['pdf_base64'];
         $verifyToken = $validated['verify_token'];
         $permissions = $validated['permissions'];
+        $metadata    = $validated['metadata'] ?? [];
 
         // 1. Lookup the document by verify_token to get cert_serial
         $doc = Document::with('certificate')->where('verify_token', $verifyToken)->first();
@@ -71,6 +73,7 @@ class PdfSealController extends Controller
                 'pdf_base64'     => $cleanBase64,
                 'owner_password' => $ownerPassword,
                 'permissions'    => $this->sanitizePermissions($permissions),
+                'metadata'       => $metadata,
             ]);
 
             // 5. Call the Python seal_pdf.py script
@@ -106,15 +109,15 @@ class PdfSealController extends Controller
             $exitCode = proc_close($process);
 
             if ($exitCode !== 0) {
-                Log::error('seal_pdf.py exited with code ' . $exitCode . ': ' . $stderr);
-                throw new \RuntimeException('PDF sealing script failed: ' . $stderr);
+                Log::error('seal_pdf.py exited with code ' . $exitCode . ': ' . $stderr . ' | stdout: ' . $stdout);
+                throw new \RuntimeException('PDF sealing script failed: ' . $stderr . ' | ' . $stdout);
             }
 
             // 6. Parse Python output
             $result = json_decode($stdout, true);
 
             if (!$result || ($result['status'] ?? '') !== 'success') {
-                $msg = $result['message'] ?? 'Unknown error from seal script.';
+                $msg = $result['message'] ?? 'Unknown error from seal script. Output: ' . $stdout;
                 throw new \RuntimeException('PDF sealing failed: ' . $msg);
             }
 

@@ -38,8 +38,11 @@ import io
 import pikepdf
 from pikepdf import Permissions
 
-def seal_pdf(pdf_bytes: bytes, owner_password: str, perms_dict: dict) -> bytes:
+def seal_pdf(pdf_bytes: bytes, owner_password: str, perms_dict: dict, metadata_dict: dict = None) -> bytes:
     """Apply AES-256 permission restrictions to a PDF in memory."""
+
+    if metadata_dict is None:
+        metadata_dict = {}
 
     # Map request permissions to pikepdf.Permissions
     perms = Permissions(
@@ -58,11 +61,31 @@ def seal_pdf(pdf_bytes: bytes, owner_password: str, perms_dict: dict) -> bytes:
     pdf_stream = io.BytesIO(pdf_bytes)
     pdf = pikepdf.Pdf.open(pdf_stream)
 
-    # Overwrite Creator/Producer metadata to mark as TrustlessSign-sealed
-    pdf.docinfo.update({
+    # Set Custom Metadata if provided
+    new_docinfo = {
         '/Creator': 'TrustlessSign Zero-Trust',
         '/Producer': 'TrustlessSign Crypto-Engine (Web3)'
-    })
+    }
+    
+    metadata = metadata_dict
+    if metadata:
+        if metadata.get('original_filename'):
+            new_docinfo['/Title'] = metadata['original_filename']
+        if metadata.get('author'):
+            new_docinfo['/Author'] = metadata['author']
+        if metadata.get('reason'):
+            new_docinfo['/Subject'] = metadata['reason']
+        new_docinfo['/Keywords'] = 'TrustlessSign, Digital Signature, Zero-Trust'
+        
+        if metadata.get('verifyUrlShort') and metadata.get('verify_token'):
+            shortcode = metadata['verify_token'][:8].upper()
+            verify_url = f"{metadata['verifyUrlShort']}/{shortcode}"
+            if '/URI' not in pdf.Root:
+                pdf.Root['/URI'] = pikepdf.Dictionary()
+            pdf.Root['/URI']['/Base'] = verify_url
+
+    # Overwrite docinfo to mark as TrustlessSign-sealed
+    pdf.docinfo.update(new_docinfo)
 
     # Save with AES-256 encryption:
     # user="" → anyone can open/read (no password required)
@@ -92,17 +115,23 @@ def main():
         pdf_b64 = config.get('pdf_base64', '')
         owner_password = config.get('owner_password', '')
         perms_dict = config.get('permissions', {})
+        metadata_dict = config.get('metadata', {})
 
         if not pdf_b64:
             raise ValueError("Missing pdf_base64 in input")
         if not owner_password:
             raise ValueError("Missing owner_password in input")
 
+        # Fix incorrect padding just in case
+        missing_padding = len(pdf_b64) % 4
+        if missing_padding:
+            pdf_b64 += '=' * (4 - missing_padding)
+
         # Decode the input PDF
         pdf_bytes = base64.b64decode(pdf_b64)
 
         # Seal it
-        sealed_bytes = seal_pdf(pdf_bytes, owner_password, perms_dict)
+        sealed_bytes = seal_pdf(pdf_bytes, owner_password, perms_dict, metadata_dict)
 
         # Encode output
         sealed_b64 = base64.b64encode(sealed_bytes).decode('utf-8')

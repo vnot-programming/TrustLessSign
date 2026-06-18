@@ -6,10 +6,11 @@
   "description": "Safari Web Extension for TrustlessSign Offline PDF Cryptographic Signature",
   "permissions": [
     "storage",
-    "identity",
+    "cookies",
     "downloads",
     "activeTab",
-    "scripting"
+    "scripting",
+    "windows"
   ],
   "host_permissions": [
     "https://www.googleapis.com/*",

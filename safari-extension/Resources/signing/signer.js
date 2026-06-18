@@ -47,7 +47,7 @@ function generateCSR(keypair, email) {
 /**
  * Embed QR code visual signature into PDF and set metadata subject
  */
-async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
+async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, pageStamps = []) {
   const pdfDoc = await PDFLib.PDFDocument.load(pdfUint8, { ignoreEncryption: true });
   const pages = pdfDoc.getPages();
   const targetPageIdx = Math.min((qrPosition?.page || 1) - 1, pages.length - 1);
@@ -86,6 +86,68 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
     height: drawHeight
   });
 
+  // Add Footer and Marginal Page Stamps on EVERY page to prevent page swapping
+  const shortcode = metadata.verify_token ? metadata.verify_token.substring(0, 8).toUpperCase() : 'UNKNOWN';
+  const footerPrefix = metadata.footerPrefix || "This document has been electronically signed. To Verify visit: ";
+  const verifyUrl = `${metadata.verifyUrlShort}/${shortcode}`;
+  
+  const courierFont = await pdfDoc.embedFont(PDFLib.StandardFonts.CourierBold);
+  const fontSize = 8;
+  const prefixWidth = courierFont.widthOfTextAtSize(footerPrefix, fontSize);
+  const urlWidth = courierFont.widthOfTextAtSize(verifyUrl, fontSize);
+  const totalWidth = prefixWidth + urlWidth;
+
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i];
+    const { width } = page.getSize();
+    
+    // Draw Footer at bottom right
+    const startX = width - totalWidth - 30;
+
+    page.drawText(footerPrefix, {
+      x: startX,
+      y: 15,
+      size: fontSize,
+      font: courierFont,
+      color: PDFLib.rgb(0.3, 0.3, 0.3)
+    });
+
+    page.drawText(verifyUrl, {
+      x: startX + prefixWidth,
+      y: 15,
+      size: fontSize,
+      font: courierFont,
+      color: PDFLib.rgb(0.23, 0.58, 0.36) // Green matching the accent
+    });
+
+    if (pageStamps && pageStamps[i]) {
+      const stampBytes = forge.util.decode64(pageStamps[i].replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, ''));
+      const stampUint8 = new Uint8Array(stampBytes.length);
+      for (let j = 0; j < stampBytes.length; j++) {
+        stampUint8[j] = stampBytes.charCodeAt(j);
+      }
+      
+      let stampImage;
+      if (stampUint8[0] === 0xFF && stampUint8[1] === 0xD8) {
+        stampImage = await pdfDoc.embedJpg(stampUint8);
+      } else {
+        stampImage = await pdfDoc.embedPng(stampUint8);
+      }
+
+      const stampAspect = stampImage.height / stampImage.width;
+      const ribbonWidth = 400;
+      const ribbonHeight = ribbonWidth * stampAspect;
+
+      page.drawImage(stampImage, {
+        x: 15,
+        y: 50,
+        width: ribbonWidth,
+        height: ribbonHeight,
+        rotate: PDFLib.degrees(90)
+      });
+    }
+  }
+
   pdfDoc.setTitle(metadata.original_filename);
   pdfDoc.setAuthor(metadata.author || 'TrustlessSign User');
   
@@ -101,6 +163,16 @@ async function embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata) {
   pdfDoc.setKeywords(['TrustlessSign', 'Digital Signature', 'Zero-Trust']);
   pdfDoc.setCreator('TrustlessSign Zero-Trust Seal');
   pdfDoc.setProducer('TrustlessSign Crypto-Engine (Web3)');
+
+  // Remove old XMP metadata so PDF viewers fallback to the Info dict we just set
+  pdfDoc.catalog.delete(PDFLib.PDFName.of('Metadata'));
+
+  // Set the Base URL in the PDF Catalog's URI dictionary
+  if (metadata.verifyUrlShort) {
+    const uriDict = pdfDoc.context.obj({ Base: PDFLib.PDFString.of(verifyUrl) });
+    pdfDoc.catalog.set(PDFLib.PDFName.of('URI'), uriDict);
+  }
+
   const signedPdfBytes = await pdfDoc.save();
 
   // Compute SHA-256 of final signed PDF

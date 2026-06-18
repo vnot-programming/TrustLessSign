@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Login fields
   const loginUrlInput = document.getElementById('login-url');
-  const btnLoginGoogle = document.getElementById('btn-google-login') || document.getElementById('btn-login-google');
+  const btnLoginWeb = document.getElementById('btn-login-web');
   const loginStatus = document.getElementById('login-status');
   
   // User Info
@@ -86,6 +86,56 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentLoadedPdf = null;
   let currentPageNumber = 1;
 
+  // Advanced Options state
+  let advancedOptionsOpen = false;
+  let optHideFrame = false;
+  let optSealedEnabled = false;
+  let sealedPermsState = {
+    print_highres: true,
+    print_lowres: true,
+    modify_other: false,
+    modify_annotation: false,
+    modify_assembly: false,
+    modify_form: false,
+    extract: false,
+    sign: false
+  };
+
+  const permissionItemDefs = [
+    { key: 'print_highres',    labelEn: 'Allow high-res print',       labelId: 'Bisa di-print resolusi tinggi' },
+    { key: 'print_lowres',     labelEn: 'Allow low-res print',        labelId: 'Bisa di-print resolusi rendah' },
+    { key: 'modify_other',     labelEn: 'Allow editing content',      labelId: 'Bisa mengedit isi utama' },
+    { key: 'modify_annotation',labelEn: 'Allow annotations',         labelId: 'Bisa diberi anotasi/komentar' },
+    { key: 'modify_assembly',  labelEn: 'Allow page re-ordering',    labelId: 'Bisa menyusun ulang halaman' },
+    { key: 'modify_form',      labelEn: 'Allow form filling',        labelId: 'Bisa mengisi form' },
+    { key: 'extract',          labelEn: 'Allow text copy',           labelId: 'Bisa di-copy teksnya' },
+    { key: 'sign',             labelEn: 'Allow re-signing',          labelId: 'Bisa ditandatangani ulang' }
+  ];
+
+  // Build Sealed permissions checklist
+  function buildSealedPermsList(lang) {
+    const listEl = document.getElementById('sealed-perms-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    permissionItemDefs.forEach(item => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;justify-content:space-between;font-size:0.7rem;color:var(--text-secondary);cursor:pointer;gap:4px;';
+      const spanText = document.createElement('span');
+      spanText.textContent = lang === 'id' ? item.labelId : item.labelEn;
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.style.cssText = 'accent-color:var(--accent-primary);flex-shrink:0;';
+      cb.checked = sealedPermsState[item.key];
+      cb.addEventListener('change', () => { 
+        sealedPermsState[item.key] = cb.checked; 
+        console.log(`[DEBUG] Permission changed: ${item.key} = ${cb.checked}`);
+      });
+      label.appendChild(spanText);
+      label.appendChild(cb);
+      listEl.appendChild(label);
+    });
+  }
+
   // Translation dictionary
   const dictionary = {
     en: {
@@ -126,7 +176,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_notes: "Notes...",
       placeholder_pwd: "Certificate password...",
       placeholder_keygen_pwd: "Enter key password...",
-      placeholder_keygen_confirm: "Confirm key password..."
+      placeholder_keygen_confirm: "Confirm key password...",
+      advanced_options: "Advanced Options",
+      hide_frame: "Hide Frame",
+      hide_frame_desc: "Only QR Code or signature is embedded, without decorative border.",
+      sealed: "Sealed (permanent)",
+      sealed_desc: "Locks PDF permissions. Anyone can open it, but cannot change settings without TrustlessSign.",
+      perms_title: "Document Permissions"
     },
     id: {
       signin: "Masuk",
@@ -166,7 +222,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_notes: "Catatan...",
       placeholder_pwd: "Kata sandi sertifikat...",
       placeholder_keygen_pwd: "Masukkan kata sandi kunci...",
-      placeholder_keygen_confirm: "Konfirmasi kata sandi kunci..."
+      placeholder_keygen_confirm: "Konfirmasi kata sandi kunci...",
+      advanced_options: "Fitur Lanjutan",
+      hide_frame: "Hilangkan Frame",
+      hide_frame_desc: "Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai.",
+      sealed: "Sealed (permanent)",
+      sealed_desc: "Mengunci permission PDF. Dapat dibuka semua orang, namun tidak bisa diubah tanpa TrustlessSign.",
+      perms_title: "Izin Dokumen"
     },
     th: {
       signin: "เข้าสู่ระบบ",
@@ -206,7 +268,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_notes: "บันทึกย่อ...",
       placeholder_pwd: "รหัสผ่านใบรับรอง...",
       placeholder_keygen_pwd: "ป้อนรหัสผ่านหลัก...",
-      placeholder_keygen_confirm: "ยืนยันรหัสผ่านหลัก..."
+      placeholder_keygen_confirm: "ยืนยันรหัสผ่านหลัก...",
+      advanced_options: "ตัวเลือกขั้นสูง",
+      hide_frame: "ซ่อนกรอบ",
+      hide_frame_desc: "แสดงเฉพาะ QR Code หรือลายเซ็น ไม่มีกรอบตกแต่ง",
+      sealed: "ปิดผนึก (ถาวร)",
+      sealed_desc: "ล็อคสิทธิ์ PDF ทุกคนสามารถเปิดได้ แต่เปลี่ยนการตั้งค่าไม่ได้หากไม่ใช้ TrustlessSign",
+      perms_title: "สิทธิ์เอกสาร"
     }
   };
 
@@ -352,10 +420,50 @@ document.addEventListener('DOMContentLoaded', async () => {
       const newLang = e.target.value;
       chrome.storage.local.set({ extensionLang: newLang }, () => {
         translateUI(newLang);
+        buildSealedPermsList(newLang);
         if (typeof checkAuth === 'function') checkAuth();
       });
     });
   }
+
+  // === Advanced Options event listeners ===
+  const btnToggleAdvanced = document.getElementById('btn-toggle-advanced');
+  const advancedPanel = document.getElementById('advanced-options-panel');
+  const advancedChevron = document.getElementById('advanced-chevron');
+  const optHideFrameEl = document.getElementById('opt-hide-frame');
+  const optSealedEl = document.getElementById('opt-sealed');
+  const sealedPermsPanel = document.getElementById('sealed-perms-panel');
+
+  if (btnToggleAdvanced && advancedPanel) {
+    btnToggleAdvanced.addEventListener('click', () => {
+      advancedOptionsOpen = !advancedOptionsOpen;
+      advancedPanel.style.display = advancedOptionsOpen ? 'block' : 'none';
+      if (advancedChevron) {
+        advancedChevron.style.transform = advancedOptionsOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+    });
+  }
+
+  if (optHideFrameEl) {
+    optHideFrameEl.addEventListener('change', () => {
+      optHideFrame = optHideFrameEl.checked;
+    });
+  }
+
+  if (optSealedEl && sealedPermsPanel) {
+    optSealedEl.addEventListener('change', () => {
+      optSealedEnabled = optSealedEl.checked;
+      sealedPermsPanel.style.display = optSealedEnabled ? 'block' : 'none';
+      if (optSealedEnabled) {
+        // Build the permissions list with current language
+        const currentLang = langSelect ? langSelect.value : 'en';
+        buildSealedPermsList(currentLang);
+      }
+    });
+  }
+
+  // Build initial (default) sealed perms list
+  buildSealedPermsList(langSelect ? langSelect.value : 'en');
 
   // Setup PDFjs
   const pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -391,9 +499,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Check Auth Status
   const checkAuth = async () => {
+    const baseUrlInput = loginUrlInput.value.replace(/\/$/, '');
+    
+    // Seamless SSO: Check web cookie first
+    if (chrome.cookies) {
+      try {
+        const apiCookie = await chrome.cookies.get({ url: baseUrlInput, name: 'tsign_api_token' });
+        const gdriveCookie = await chrome.cookies.get({ url: baseUrlInput, name: 'tsign_gdrive_token' });
+        
+        if (apiCookie && apiCookie.value) {
+          await chrome.storage.local.set({
+            sanctumToken: apiCookie.value,
+            gdriveToken: gdriveCookie ? gdriveCookie.value : '',
+            baseUrl: baseUrlInput
+          });
+        } else {
+          await chrome.storage.local.remove(['sanctumToken', 'gdriveToken']);
+        }
+      } catch (err) {
+        console.error('Error reading cookies:', err);
+      }
+    }
+
     chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl', 'trustless_cert_serial'], async (storage) => {
       const token = storage.sanctumToken;
-      const baseUrl = storage.baseUrl || loginUrlInput.value;
+      const baseUrl = storage.baseUrl || baseUrlInput;
       const localSerial = storage.trustless_cert_serial;
 
       if (!token) {
@@ -558,48 +688,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // Google Login via launchWebAuthFlow
-  btnLoginGoogle.addEventListener('click', () => {
-    const baseUrl = loginUrlInput.value.replace(/\/$/, '');
-    const redirectUrl = chrome.identity.getRedirectURL();
-
-    setLoginStatus('loading', 'Connecting to Google...');
-
-    const authUrl = `${baseUrl}/auth/google/redirect?redirect_to_extension=${encodeURIComponent(redirectUrl)}`;
-
-    chrome.identity.launchWebAuthFlow({
-      url: authUrl,
-      interactive: true
-    }, (callbackUrl) => {
-      if (chrome.runtime.lastError || !callbackUrl) {
-        console.error(chrome.runtime.lastError);
-        setLoginStatus('error', 'Google Sign-in failed.');
-        return;
-      }
-
-      try {
-        const url = new URL(callbackUrl);
-        const token = url.searchParams.get('token');
-        const gdriveToken = url.searchParams.get('gdrive_token');
-
-        if (token) {
-          chrome.storage.local.set({
-            sanctumToken: token,
-            gdriveToken: gdriveToken,
-            baseUrl: baseUrl
-          }, () => {
-            setLoginStatus('clear', '');
-            checkAuth();
-          });
-        } else {
-          setLoginStatus('error', 'Tokens not found in callback.');
-        }
-      } catch (e) {
-        console.error(e);
-        setLoginStatus('error', 'Error parsing login redirect.');
-      }
+  // Web-Only Login
+  if (btnLoginWeb) {
+    btnLoginWeb.addEventListener('click', () => {
+      const baseUrl = loginUrlInput.value.replace(/\/$/, '');
+      window.open(`${baseUrl}/login`, '_blank');
     });
-  });
+  }
 
   // Logout
   btnLogout.addEventListener('click', () => {
@@ -678,7 +773,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'GENERATE_KEY',
           payload: {
             password:         password,
-            email:            userEmail.textContent,
+            email:            userEmail.textContent.replace(/\s+/g, '').trim(),
             apiToken:         token,
             deviceName:       deviceName || 'This Device',
             deviceIdentifier: deviceIdentifier,
@@ -744,7 +839,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnBackupDrive) {
     btnBackupDrive.addEventListener('click', async () => {
-      chrome.storage.local.get(['trustless_private_key_enc', 'trustless_certificate', 'trustless_cert_serial', 'gdriveToken'], async (storage) => {
+      chrome.storage.local.get(['trustless_private_key_enc', 'trustless_certificate', 'trustless_cert_serial', 'gdriveToken', 'trustless_email', 'trustless_device_name'], async (storage) => {
         if (!storage.trustless_private_key_enc || !storage.trustless_certificate) {
           showKeysError('No identity found on this device. Generate a certificate first.');
           return;
@@ -768,9 +863,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           // Upload to Google Drive folder TrustLessSign/Certificated/
           if (storage.gdriveToken) {
-            const now       = new Date();
-            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            const fileName  = `trustlesssign_identity_${timestamp}.tsign`;
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0].trim().replace(/[^a-zA-Z0-9]/g, '');
+            const safeDeviceName = String(storage.trustless_device_name || 'Extension').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+            const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
             chrome.runtime.sendMessage({
               type:    'UPLOAD_IDENTITY',
@@ -796,9 +892,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           } else {
             // Fallback: trigger local download if no Drive token
             const url = URL.createObjectURL(new Blob([tsignBlob], { type: 'application/octet-stream' }));
-            const now = new Date();
-            const ts  = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            chrome.downloads.download({ url, filename: `trustlesssign_identity_${ts}.tsign`, saveAs: true });
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0].trim().replace(/[^a-zA-Z0-9]/g, '');
+            const safeDeviceName = String(storage.trustless_device_name || 'Extension').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+            const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
+            chrome.downloads.download({ url, filename: fileName, saveAs: true });
             keysStatus.classList.remove('hidden', 'alert-danger');
             keysStatus.classList.add('alert-success');
             keysStatus.textContent = 'Identity downloaded locally (no Drive token found).';
@@ -870,12 +968,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   const imgSigLoading = document.getElementById('img-sig-loading');
 
   const refreshImageSignatures = async () => {
-    chrome.storage.local.get(['default_image_signature_id'], async (storage) => {
+    chrome.storage.local.get(['default_image_signature_id', 'gdriveToken'], async (storage) => {
       imgSigLoading.style.display = 'inline-block';
       
       try {
         const files = await getAllImageSignaturesLocal();
         const defaultId = storage.default_image_signature_id;
+
+        // Sync un-uploaded visual signatures to Drive in background
+        if (storage.gdriveToken && typeof uploadImageSignature === 'function') {
+          files.forEach(file => {
+            if (!file.driveId) {
+              const filename = file.name.includes('.') ? file.name : (file.name + (file.mimeType === 'image/png' ? '.png' : '.jpg'));
+              uploadImageSignature(file.dataUrl, filename, file.mimeType, storage.gdriveToken)
+                .then(uploadData => {
+                  if (uploadData && uploadData.id) {
+                    updateImageSignatureDriveIdLocal(file.id, uploadData.id).catch(e => console.error(e));
+                  }
+                }).catch(e => console.error("Drive sync error", e));
+            }
+          });
+        }
         
         imgSigList.innerHTML = '';
         
@@ -970,6 +1083,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     chrome.storage.local.remove('default_image_signature_id');
                   }
                   refreshImageSignatures(); // Full refresh is ok for deletion
+                  
+                  // Background delete from Google Drive
+                  if (file.driveId) {
+                    chrome.storage.local.get(['gdriveToken'], (st) => {
+                      if (st.gdriveToken && typeof deleteImageSignature === 'function') {
+                        deleteImageSignature(file.driveId, st.gdriveToken).catch(err => console.error("Drive delete error", err));
+                      }
+                    });
+                  }
                 } catch (e) {
                   showKeysError('Failed to delete image: ' + e.message);
                   item.style.opacity = '1';
@@ -1022,11 +1144,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await saveImageSignatureLocal(id, fileName, file.type, reader.result);
             
             // If it's the first one, set as default
-            chrome.storage.local.get(['default_image_signature_id'], (st) => {
+            chrome.storage.local.get(['default_image_signature_id', 'gdriveToken'], (st) => {
               if (!st.default_image_signature_id) {
                 chrome.storage.local.set({ 'default_image_signature_id': id }, () => refreshImageSignatures());
               } else {
                 refreshImageSignatures();
+              }
+
+              // Background sync to Google Drive
+              if (st.gdriveToken && typeof uploadImageSignature === 'function') {
+                uploadImageSignature(reader.result, fileName + (file.type === 'image/png' ? '.png' : '.jpg'), file.type, st.gdriveToken)
+                  .then(uploadData => {
+                    if (uploadData && uploadData.id) {
+                      updateImageSignatureDriveIdLocal(id, uploadData.id).catch(err => console.error("Update Drive ID error", err));
+                    }
+                  })
+                  .catch(err => console.error("Drive sync error", err));
               }
             });
           } catch (err) {
@@ -1504,6 +1637,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
+        console.log("[DEBUG] Hide Frame:", optHideFrame);
+        console.log("[DEBUG] Sealed Enabled:", optSealedEnabled, sealedPermsState);
+
         // Call background worker to sign & upload
         chrome.runtime.sendMessage({
           type: 'SIGN_DOCUMENT',
@@ -1524,7 +1660,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             notes: reasonNotesText.value,
             password: password,
             qrPngBase64: qrPng,
-            verifyToken: verifyToken
+            verifyToken: verifyToken,
+            hideFrame: optHideFrame,
+            sealedPerms: optSealedEnabled ? { ...sealedPermsState } : null
           }
         }, (res) => {
           clearInterval(uploadInterval);

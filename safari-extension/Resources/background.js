@@ -1,7 +1,7 @@
 // service-worker.js for TrustlessSign Extension (Manifest V3)
 self.window = self;
 
-importScripts('./assets/forge.min.js', './assets/pdf-lib.min.js', './signing/local-db.js', './signing/signer.js', './signing/gdrive.js');
+importScripts('../assets/forge.min.js', '../assets/pdf-lib.min.js', '../signing/local-db.js', '../signing/signer.js', '../signing/gdrive.js');
 
 // Listen for messages from popup or content script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -104,7 +104,9 @@ async function handleGenerateKey(payload, baseUrl) {
     chrome.storage.local.set({
       'trustless_private_key_enc': encryptedPrivateKeyPem,
       'trustless_certificate':     certificatePem,
-      'trustless_cert_serial':     serialNumber
+      'trustless_cert_serial':     serialNumber,
+      'trustless_device_name':     deviceName || 'Unknown Device',
+      'trustless_email':           email
     }, () => {
       if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
       else resolve();
@@ -126,8 +128,11 @@ async function handleGenerateKey(payload, baseUrl) {
     
     const tsignBuffer = await encryptIdentityToTsign(identityObj, password);
     tsignBase64Local = arrayBufferToBase64(tsignBuffer);
-    const ts = new Date().toISOString().replace(/[:.]/g, '-');
-    fileNameLocal = `trustlesssign_identity_${ts}.tsign`;
+    
+    const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+    const safeEmail = email ? email.split('@')[0].trim().replace(/[^a-zA-Z0-9]/g, '') : 'user';
+    const safeDeviceName = String(deviceName || 'Dashboard').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    fileNameLocal = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
     const token = await new Promise((resolve) => {
       chrome.identity.getAuthToken({ interactive: false }, (t) => {
@@ -170,7 +175,8 @@ async function handleSignDocument(payload, baseUrl) {
     reason_final, 
     notes, 
     password,
-    qrPngBase64
+    qrPngBase64,
+    pageStamps
   } = payload;
 
   // 1. Retrieve & decrypt private key
@@ -208,11 +214,16 @@ async function handleSignDocument(payload, baseUrl) {
     original_filename: filename,
     author: payload.author || 'TrustlessSign User',
     reason: reason_final || 'Digital Verification',
-    signed_at: new Date().toISOString()
+    signed_at: new Date().toISOString(),
+    footerPrefix: payload.footerPrefix || "This document has been electronically signed. To Verify visit: ",
+    verifyUrlShort: payload.verifyUrlShort || `https://tsign.vnot.my.id/verify`
   };
 
-  // 4. Embed QR & metadata using signer helper
-  const stampResult = await embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata);
+  // Sealed permissions (if set by user via Advanced Options)
+  const sealedPerms = payload.sealedPerms || null;
+
+  // 4. Embed QR, metadata, and marginal page stamps using signer helper
+  const stampResult = await embedQrAndMetadata(pdfUint8, qrPngBase64, qrPosition, metadata, pageStamps);
   const { signedPdfStr, hash, targetX, targetY, qrSize, targetPageIdx } = stampResult;
 
   // 5. Sign final PDF hash
@@ -248,7 +259,46 @@ async function handleSignDocument(payload, baseUrl) {
     throw new Error(regError.message || 'Failed to register document metadata on server.');
   }
 
-  // 7. Handle GDrive Upload using gdrive helper if token is present
+  // 7a. If Sealed is enabled, call /api/pdf/seal on the signed PDF
+  let finalPdfStr = signedPdfStr;
+  if (sealedPerms) {
+    try {
+      const signedB64 = btoa(signedPdfStr);
+      console.log("[DEBUG] Sending PDF to /api/pdf/seal. Base64 length:", signedB64.length);
+      console.log("[DEBUG] Sealed Perms:", JSON.stringify(sealedPerms));
+      
+      const sealRes = await fetch(`${baseUrl}/api/pdf/seal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiToken}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          pdf_base64: signedB64,
+          verify_token: verifyToken,
+          permissions: sealedPerms,
+          metadata: metadata
+        })
+      });
+      if (sealRes.ok) {
+        const sealData = await sealRes.json();
+        if (sealData.status === 'success' && sealData.pdf_base64) {
+          console.log("[DEBUG] Seal Success! Received base64 length:", sealData.pdf_base64.length);
+          // Decode sealed PDF back to binary string for GDrive upload
+          finalPdfStr = atob(sealData.pdf_base64);
+        } else {
+          console.warn("[DEBUG] PDF seal response error format:", sealData);
+        }
+      } else {
+        console.warn('[DEBUG] PDF sealing API failed, continuing with un-sealed PDF:', await sealRes.text());
+      }
+    } catch (sealErr) {
+      console.warn('PDF seal API error, skipping seal step:', sealErr.message);
+    }
+  }
+
+  // 7b. Handle GDrive Upload using gdrive helper if token is present
   let gdriveUrl = null;
   let isLocalFallback = false;
   let localFallbackMessage = '';
@@ -258,7 +308,7 @@ async function handleSignDocument(payload, baseUrl) {
     let uploadSuccess = false;
 
     try {
-      gdriveUrl = await uploadToGDrive(filename, signedPdfStr, currentGdriveToken);
+      gdriveUrl = await uploadToGDrive(filename, finalPdfStr, currentGdriveToken);
       uploadSuccess = true;
     } catch (gdriveErr) {
       console.error('Google Drive Upload error:', gdriveErr);
@@ -280,13 +330,11 @@ async function handleSignDocument(payload, baseUrl) {
             if (refreshData.status === 'success' && refreshData.gdrive_token) {
               currentGdriveToken = refreshData.gdrive_token;
               
-              // Update local storage so future calls use the new token
               await new Promise((resolve) => {
                 chrome.storage.local.set({ gdriveToken: currentGdriveToken }, resolve);
               });
               
-              // Retry upload
-              gdriveUrl = await uploadToGDrive(filename, signedPdfStr, currentGdriveToken);
+              gdriveUrl = await uploadToGDrive(filename, finalPdfStr, currentGdriveToken);
               uploadSuccess = true;
             } else {
               throw new Error('Refresh endpoint did not return a token.');
@@ -330,8 +378,8 @@ async function handleSignDocument(payload, baseUrl) {
     }
   }
 
-  // Convert signedPdfBytes back to base64 for local download in UI
-  const signedPdfBase64 = forge.util.encode64(signedPdfStr);
+  // Convert finalPdfBytes (possibly sealed) back to base64 for local download in UI
+  const signedPdfBase64 = forge.util.encode64(finalPdfStr);
 
   return {
     status: isLocalFallback ? 'warning' : 'success',

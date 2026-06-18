@@ -130,8 +130,8 @@ async function handleGenerateKey(payload, baseUrl) {
     tsignBase64Local = arrayBufferToBase64(tsignBuffer);
     
     const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
-    const safeEmail = email ? email.split('@')[0].replace(/\s+/g, '') : 'user';
-    const safeDeviceName = (deviceName || 'Dashboard').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+    const safeEmail = email ? email.split('@')[0].trim().replace(/[^a-zA-Z0-9]/g, '') : 'user';
+    const safeDeviceName = String(deviceName || 'Dashboard').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
     fileNameLocal = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
     const token = await new Promise((resolve) => {
@@ -277,7 +277,8 @@ async function handleSignDocument(payload, baseUrl) {
         body: JSON.stringify({
           pdf_base64: signedB64,
           verify_token: verifyToken,
-          permissions: sealedPerms
+          permissions: sealedPerms,
+          metadata: metadata
         })
       });
       if (sealRes.ok) {

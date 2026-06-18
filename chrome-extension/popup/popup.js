@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Login fields
   const loginUrlInput = document.getElementById('login-url');
-  const btnLoginGoogle = document.getElementById('btn-google-login') || document.getElementById('btn-login-google');
+  const btnLoginWeb = document.getElementById('btn-login-web');
   const loginStatus = document.getElementById('login-status');
   
   // User Info
@@ -499,9 +499,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 2. Check Auth Status
   const checkAuth = async () => {
+    const baseUrlInput = loginUrlInput.value.replace(/\/$/, '');
+    
+    // Seamless SSO: Check web cookie first
+    if (chrome.cookies) {
+      try {
+        const apiCookie = await chrome.cookies.get({ url: baseUrlInput, name: 'tsign_api_token' });
+        const gdriveCookie = await chrome.cookies.get({ url: baseUrlInput, name: 'tsign_gdrive_token' });
+        
+        if (apiCookie && apiCookie.value) {
+          await chrome.storage.local.set({
+            sanctumToken: apiCookie.value,
+            gdriveToken: gdriveCookie ? gdriveCookie.value : '',
+            baseUrl: baseUrlInput
+          });
+        } else {
+          await chrome.storage.local.remove(['sanctumToken', 'gdriveToken']);
+        }
+      } catch (err) {
+        console.error('Error reading cookies:', err);
+      }
+    }
+
     chrome.storage.local.get(['sanctumToken', 'gdriveToken', 'baseUrl', 'trustless_cert_serial'], async (storage) => {
       const token = storage.sanctumToken;
-      const baseUrl = storage.baseUrl || loginUrlInput.value;
+      const baseUrl = storage.baseUrl || baseUrlInput;
       const localSerial = storage.trustless_cert_serial;
 
       if (!token) {
@@ -666,48 +688,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // Google Login via launchWebAuthFlow
-  btnLoginGoogle.addEventListener('click', () => {
-    const baseUrl = loginUrlInput.value.replace(/\/$/, '');
-    const redirectUrl = chrome.identity.getRedirectURL();
-
-    setLoginStatus('loading', 'Connecting to Google...');
-
-    const authUrl = `${baseUrl}/auth/google/redirect?redirect_to_extension=${encodeURIComponent(redirectUrl)}`;
-
-    chrome.identity.launchWebAuthFlow({
-      url: authUrl,
-      interactive: true
-    }, (callbackUrl) => {
-      if (chrome.runtime.lastError || !callbackUrl) {
-        console.error(chrome.runtime.lastError);
-        setLoginStatus('error', 'Google Sign-in failed.');
-        return;
-      }
-
-      try {
-        const url = new URL(callbackUrl);
-        const token = url.searchParams.get('token');
-        const gdriveToken = url.searchParams.get('gdrive_token');
-
-        if (token) {
-          chrome.storage.local.set({
-            sanctumToken: token,
-            gdriveToken: gdriveToken,
-            baseUrl: baseUrl
-          }, () => {
-            setLoginStatus('clear', '');
-            checkAuth();
-          });
-        } else {
-          setLoginStatus('error', 'Tokens not found in callback.');
-        }
-      } catch (e) {
-        console.error(e);
-        setLoginStatus('error', 'Error parsing login redirect.');
-      }
+  // Web-Only Login
+  if (btnLoginWeb) {
+    btnLoginWeb.addEventListener('click', () => {
+      const baseUrl = loginUrlInput.value.replace(/\/$/, '');
+      window.open(`${baseUrl}/login`, '_blank');
     });
-  });
+  }
 
   // Logout
   btnLogout.addEventListener('click', () => {
@@ -877,8 +864,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           // Upload to Google Drive folder TrustLessSign/Certificated/
           if (storage.gdriveToken) {
             const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            const safeEmail = (storage.trustless_email || 'user').split('@')[0].replace(/\s+/g, '');
-            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0].trim().replace(/[^a-zA-Z0-9]/g, '');
+            const safeDeviceName = String(storage.trustless_device_name || 'Extension').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
             const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
             chrome.runtime.sendMessage({
@@ -906,8 +893,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Fallback: trigger local download if no Drive token
             const url = URL.createObjectURL(new Blob([tsignBlob], { type: 'application/octet-stream' }));
             const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            const safeEmail = (storage.trustless_email || 'user').split('@')[0].replace(/\s+/g, '');
-            const safeDeviceName = (storage.trustless_device_name || 'Extension').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+            const safeEmail = (storage.trustless_email || 'user').split('@')[0].trim().replace(/[^a-zA-Z0-9]/g, '');
+            const safeDeviceName = String(storage.trustless_device_name || 'Extension').trim().replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
             const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
             chrome.downloads.download({ url, filename: fileName, saveAs: true });
             keysStatus.classList.remove('hidden', 'alert-danger');

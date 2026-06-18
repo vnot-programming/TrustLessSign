@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'certificates/sync-check',
         ]);
+        $middleware->encryptCookies(except: [
+            'tsign_api_token',
+            'tsign_gdrive_token',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

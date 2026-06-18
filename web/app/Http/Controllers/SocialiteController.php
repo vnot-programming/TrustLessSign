@@ -61,14 +61,22 @@ class SocialiteController extends Controller
 
             Auth::login($user, true);
 
+            $token = $user->createToken('ChromeExtensionToken')->plainTextToken;
+            $gdriveToken = $user->gdrive_token ?? '';
+
+            // Set cookies for 30 days (43200 minutes) to be read by the Chrome Extension
+            // Using httpOnly=true, secure=true, sameSite='None' for cross-domain reading by extension if necessary
+            $cookieApi = cookie('tsign_api_token', $token, 43200, '/', null, true, true, false, 'None');
+            $cookieGdrive = cookie('tsign_gdrive_token', $gdriveToken, 43200, '/', null, true, true, false, 'None');
+
             $redirectToExtension = session()->pull('redirect_to_extension');
             if ($redirectToExtension) {
-                $token = $user->createToken('ChromeExtensionToken')->plainTextToken;
-                $gdriveToken = $user->gdrive_token ?? '';
-                return redirect($redirectToExtension . '?token=' . urlencode($token) . '&gdrive_token=' . urlencode($gdriveToken));
+                return redirect($redirectToExtension . '?token=' . urlencode($token) . '&gdrive_token=' . urlencode($gdriveToken))
+                    ->withCookie($cookieApi)->withCookie($cookieGdrive);
             }
 
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('dashboard'))
+                ->withCookie($cookieApi)->withCookie($cookieGdrive);
 
         } catch (\Exception $e) {
             return redirect(route('home'))->withErrors(['error' => 'Unable to login using ' . ucfirst($provider) . '. Please try again.']);
