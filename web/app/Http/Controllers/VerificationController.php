@@ -21,9 +21,12 @@ class VerificationController extends Controller
      */
     public function getVerificationData($token)
     {
+        // Remove TLS- prefix if present, and convert to lowercase for matching UUID
         $queryToken = strtolower(str_replace('TLS-', '', strtoupper($token)));
         
-        if (str_starts_with(strtoupper($token), 'TLS-')) {
+        // The short ID from QR code is 8 characters (first segment of UUID).
+        // If it's a short ID (with or without TLS-) use LIKE query.
+        if (strlen($queryToken) <= 8 || str_starts_with(strtoupper($token), 'TLS-')) {
             $document = Document::where('verify_token', 'LIKE', $queryToken . '%')
                 ->with(['user', 'certificate'])
                 ->first();
