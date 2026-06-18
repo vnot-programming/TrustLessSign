@@ -211,7 +211,7 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp,
     const ctx = canvas.getContext("2d");
 
     const width = 800;
-    const height = 40;
+    const height = 48;
     canvas.width = width;
     canvas.height = height;
 
@@ -234,7 +234,7 @@ export async function generatePageStamp(shortId, pageNum, totalPages, timestamp,
     });
 
     // Draw the barcode onto the main canvas, vertically centered
-    ctx.drawImage(barcodeCanvas, 0, 5);
+    ctx.drawImage(barcodeCanvas, 0, 9);
 
     // Draw Metadata Text
     const textX = barcodeCanvas.width + 20; // 20px padding after barcode

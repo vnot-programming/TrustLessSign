@@ -19,6 +19,8 @@ class ReasonCategorySeeder extends Seeder
                 'name_th' => 'เอกสารทางกฎหมายและเป็นทางการ',
                 'sort_order' => 1,
                 'sub_categories' => [
+                    ['en' => 'I agree to the terms of this agreement', 'id' => 'Saya setuju dengan syarat dan ketentuan perjanjian ini', 'th' => 'ฉันตกลงตามข้อกำหนดของข้อตกลงนี้'],
+                    ['en' => 'I approve and accept this agreement', 'id' => 'Saya menyetujui dan menerima perjanjian ini', 'th' => 'ฉันอนุมัติและยอมรับข้อตกลงนี้'],
                     ['en' => 'I approve this document', 'id' => 'Saya menyetujui dokumen ini', 'th' => 'ฉันอนุมัติเอกสารนี้'],
                     ['en' => 'I am the author of this document', 'id' => 'Saya adalah penulis dokumen ini', 'th' => 'ฉันเป็นผู้เขียนเอกสารนี้'],
                 ]
@@ -29,6 +31,7 @@ class ReasonCategorySeeder extends Seeder
                 'name_th' => 'ธุรการ',
                 'sort_order' => 2,
                 'sub_categories' => [
+                    ['en' => 'I have reviewed this document', 'id' => 'Saya telah meninjau dokumen ini', 'th' => 'ฉันได้ทบทวนเอกสารนี้แล้ว'],
                     ['en' => 'I acknowledge this document', 'id' => 'Saya mengetahui dokumen ini', 'th' => 'ฉันรับทราบเอกสารนี้'],
                     ['en' => 'Digital Verification', 'id' => 'Verifikasi Digital', 'th' => 'การตรวจสอบแบบดิจิทัล'],
                 ]
