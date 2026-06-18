@@ -88,16 +88,16 @@ Unlike traditional Web2 systems, TrustLessSign does not store user data. The ima
 - [x] Apply Bio-Digital Minimalism aesthetic (Custom modales, Fallbacks, CSS)
 
 ### Phase 3: Signature Type Selector & Dynamic Drag Box Integration (Next)
-- [ ] **Extension Popup UI**:
+- [x] **Extension Popup UI**:
   - Add a "Signature Type" selector (QR Code vs Image Signature) above the PDF preview container.
   - If "Image Signature" is selected but none exists, prompt the user to upload one and redirect them to the "Keys & Cert" tab.
   - Dynamically update the `qr-drag-box` content: If "Image Signature" is selected, render a miniature preview of the default image signature inside the drag box instead of the "QR Code" text.
-- [ ] **Web Dashboard UI (`SignDocument.jsx`)**:
+- [x] **Web Dashboard UI (`SignDocument.jsx`)**:
   - Implement a Cross-Origin messaging bridge to fetch the default Image Signature from the Extension's IndexedDB.
   - Add a "Signature Type" dropdown/selector (QR Code vs Visual Signature).
   - Provide fallback logic: If extension is installed but no visual signature is found, show an alert directing the user to the extension to upload one.
   - Update `Draggable` node: Use a React state to dynamically switch the box content between "QR Code Area" text and a visual `<img src={...} />` preview of the selected visual signature.
-- [ ] **Canvas Rendering & PDF Lib (`barcode-generator.js`)**:
+- [x] **Canvas Rendering & PDF Lib (`barcode-generator.js`)**:
   - Implement Canvas API generator to compose the final visual frame (green border, check icon, "Signed by: [Name]").
   - Embed the chosen element (QR code data OR visual signature image) into the center of the Canvas.
   - Include the Barcode 128 (Short ID) ONLY on Image Signature (omit for QR Code).

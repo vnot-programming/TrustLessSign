@@ -41,6 +41,28 @@ async function saveImageSignatureLocal(id, name, mimeType, dataUrl) {
   });
 }
 
+async function updateImageSignatureDriveIdLocal(id, driveId) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const getReq = store.get(id);
+    
+    getReq.onsuccess = () => {
+      if (!getReq.result) {
+        resolve(false);
+        return;
+      }
+      const record = getReq.result;
+      record.driveId = driveId;
+      const putReq = store.put(record);
+      putReq.onsuccess = () => resolve(true);
+      putReq.onerror = (e) => reject(e.target.error);
+    };
+    getReq.onerror = (e) => reject(e.target.error);
+  });
+}
+
 async function getAllImageSignaturesLocal() {
   const db = await getDB();
   return new Promise((resolve, reject) => {

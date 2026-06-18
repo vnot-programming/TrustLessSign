@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-17T09:05:00Z
+- **Tugas yang diselesaikan:** Refactoring UI navigasi halaman PDF di Browser Extension: Mengganti input "Go to" terpisah dengan inline pagination di antara label "Page X of Y", dan menjawab status enkripsi PDF (`ignoreEncryption`).
+- **File yang diubah/dibuat:** `chrome-extension/popup/popup.html`, `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.html`, `safari-extension/Resources/popup.js`, `chrome-extension/package.json`, `safari-extension/Resources/manifest.json`.
+- **Status saat ini:** Selesai. Melakukan version bump untuk ekstensi dan web menjadi 1.4.14, membuat tag, dan memicu CI/CD.
+- **Catatan untuk AI selanjutnya (Handoff Note):** Input `Go to` di popup kini telah disatukan secara inline dengan teks `Page`. Event listener `change` dan `Enter` telah diaplikasikan. Mengenai error enkripsi, opsi `{ ignoreEncryption: true }` sudah ada di `signer.js` dari sesi sebelumnya.
+
 - **Tanggal/Waktu:** 2026-06-17T08:55:00Z
 - **Tugas yang diselesaikan:** Fixing Error "Input document to PDFDocument.load is encrypted"
 - **File yang diubah/dibuat:** `chrome-extension/signing/signer.js`, `safari-extension/Resources/signing/signer.js`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`

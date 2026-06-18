@@ -970,6 +970,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     chrome.storage.local.remove('default_image_signature_id');
                   }
                   refreshImageSignatures(); // Full refresh is ok for deletion
+                  
+                  // Background delete from Google Drive
+                  if (file.driveId) {
+                    chrome.storage.local.get(['gdriveToken'], (st) => {
+                      if (st.gdriveToken && typeof deleteImageSignature === 'function') {
+                        deleteImageSignature(file.driveId, st.gdriveToken).catch(err => console.error("Drive delete error", err));
+                      }
+                    });
+                  }
                 } catch (e) {
                   showKeysError('Failed to delete image: ' + e.message);
                   item.style.opacity = '1';
@@ -1022,11 +1031,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await saveImageSignatureLocal(id, fileName, file.type, reader.result);
             
             // If it's the first one, set as default
-            chrome.storage.local.get(['default_image_signature_id'], (st) => {
+            chrome.storage.local.get(['default_image_signature_id', 'gdriveToken'], (st) => {
               if (!st.default_image_signature_id) {
                 chrome.storage.local.set({ 'default_image_signature_id': id }, () => refreshImageSignatures());
               } else {
                 refreshImageSignatures();
+              }
+
+              // Background sync to Google Drive
+              if (st.gdriveToken && typeof uploadImageSignature === 'function') {
+                uploadImageSignature(reader.result, fileName + (file.type === 'image/png' ? '.png' : '.jpg'), file.type, st.gdriveToken)
+                  .then(uploadData => {
+                    if (uploadData && uploadData.id) {
+                      updateImageSignatureDriveIdLocal(id, uploadData.id).catch(err => console.error("Update Drive ID error", err));
+                    }
+                  })
+                  .catch(err => console.error("Drive sync error", err));
               }
             });
           } catch (err) {
