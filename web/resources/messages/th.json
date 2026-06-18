@@ -46,7 +46,21 @@
     "extension_required": "จำเป็นต้องใช้ส่วนขยาย TrustlessSign",
     "extension_desc": "โปรดดาวน์โหลดและติดตั้งส่วนขยายเบราว์เซอร์ของเราเพื่อรักษาความปลอดภัยและลงนาม PDF ของคุณแบบออฟไลน์",
     "signed_by": "ลงนามโดย:",
-    "verify_at": "ตรวจสอบได้ที่:"
+    "verify_at": "ตรวจสอบได้ที่:",
+    "advanced_options": "ตัวเลือกขั้นสูง",
+    "hide_frame": "ซ่อนกรอบ",
+    "hide_frame_desc": "แสดงเฉพาะ QR Code หรือลายเซ็น ไม่มีกรอบตกแต่ง",
+    "sealed": "ปิดผนึก (ถาวร)",
+    "sealed_desc": "ล็อคสิทธิ์ PDF ทุกคนสามารถเปิดได้ แต่เปลี่ยนการตั้งค่าไม่ได้หากไม่ใช้ TrustlessSign",
+    "sealed_perms_title": "สิทธิ์เอกสาร",
+    "perm_print_highres": "อนุญาตพิมพ์ความละเอียดสูง",
+    "perm_print_lowres": "อนุญาตพิมพ์ความละเอียดต่ำ",
+    "perm_modify_other": "อนุญาตแก้ไขเนื้อหา",
+    "perm_modify_annotation": "อนุญาตเพิ่มคำอธิบาย",
+    "perm_modify_assembly": "อนุญาตจัดเรียงหน้า",
+    "perm_modify_form": "อนุญาตกรอกฟอร์ม",
+    "perm_extract": "อนุญาตคัดลอกข้อความ",
+    "perm_sign": "อนุญาตลงนามซ้ำ"
   },
   "Dashboard": {
     "welcome_back": "ยินดีต้อนรับกลับมา",

@@ -86,6 +86,53 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentLoadedPdf = null;
   let currentPageNumber = 1;
 
+  // Advanced Options state
+  let advancedOptionsOpen = false;
+  let optHideFrame = false;
+  let optSealedEnabled = false;
+  let sealedPermsState = {
+    print_highres: true,
+    print_lowres: true,
+    modify_other: false,
+    modify_annotation: false,
+    modify_assembly: false,
+    modify_form: false,
+    extract: false,
+    sign: false
+  };
+
+  const permissionItemDefs = [
+    { key: 'print_highres',    labelEn: 'Allow high-res print',       labelId: 'Bisa di-print resolusi tinggi' },
+    { key: 'print_lowres',     labelEn: 'Allow low-res print',        labelId: 'Bisa di-print resolusi rendah' },
+    { key: 'modify_other',     labelEn: 'Allow editing content',      labelId: 'Bisa mengedit isi utama' },
+    { key: 'modify_annotation',labelEn: 'Allow annotations',         labelId: 'Bisa diberi anotasi/komentar' },
+    { key: 'modify_assembly',  labelEn: 'Allow page re-ordering',    labelId: 'Bisa menyusun ulang halaman' },
+    { key: 'modify_form',      labelEn: 'Allow form filling',        labelId: 'Bisa mengisi form' },
+    { key: 'extract',          labelEn: 'Allow text copy',           labelId: 'Bisa di-copy teksnya' },
+    { key: 'sign',             labelEn: 'Allow re-signing',          labelId: 'Bisa ditandatangani ulang' }
+  ];
+
+  // Build Sealed permissions checklist
+  function buildSealedPermsList(lang) {
+    const listEl = document.getElementById('sealed-perms-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    permissionItemDefs.forEach(item => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;justify-content:space-between;font-size:0.7rem;color:var(--text-secondary);cursor:pointer;gap:4px;';
+      const spanText = document.createElement('span');
+      spanText.textContent = lang === 'id' ? item.labelId : item.labelEn;
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.style.cssText = 'accent-color:var(--accent-primary);flex-shrink:0;';
+      cb.checked = sealedPermsState[item.key];
+      cb.addEventListener('change', () => { sealedPermsState[item.key] = cb.checked; });
+      label.appendChild(spanText);
+      label.appendChild(cb);
+      listEl.appendChild(label);
+    });
+  }
+
   // Translation dictionary
   const dictionary = {
     en: {
@@ -126,7 +173,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_notes: "Notes...",
       placeholder_pwd: "Certificate password...",
       placeholder_keygen_pwd: "Enter key password...",
-      placeholder_keygen_confirm: "Confirm key password..."
+      placeholder_keygen_confirm: "Confirm key password...",
+      advanced_options: "Advanced Options",
+      hide_frame: "Hide Frame",
+      hide_frame_desc: "Only QR Code or signature is embedded, without decorative border.",
+      sealed: "Sealed (permanent)",
+      sealed_desc: "Locks PDF permissions. Anyone can open it, but cannot change settings without TrustlessSign.",
+      perms_title: "Document Permissions"
     },
     id: {
       signin: "Masuk",
@@ -166,7 +219,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_notes: "Catatan...",
       placeholder_pwd: "Kata sandi sertifikat...",
       placeholder_keygen_pwd: "Masukkan kata sandi kunci...",
-      placeholder_keygen_confirm: "Konfirmasi kata sandi kunci..."
+      placeholder_keygen_confirm: "Konfirmasi kata sandi kunci...",
+      advanced_options: "Fitur Lanjutan",
+      hide_frame: "Hilangkan Frame",
+      hide_frame_desc: "Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai.",
+      sealed: "Sealed (permanent)",
+      sealed_desc: "Mengunci permission PDF. Dapat dibuka semua orang, namun tidak bisa diubah tanpa TrustlessSign.",
+      perms_title: "Izin Dokumen"
     },
     th: {
       signin: "เข้าสู่ระบบ",
@@ -206,7 +265,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_notes: "บันทึกย่อ...",
       placeholder_pwd: "รหัสผ่านใบรับรอง...",
       placeholder_keygen_pwd: "ป้อนรหัสผ่านหลัก...",
-      placeholder_keygen_confirm: "ยืนยันรหัสผ่านหลัก..."
+      placeholder_keygen_confirm: "ยืนยันรหัสผ่านหลัก...",
+      advanced_options: "ตัวเลือกขั้นสูง",
+      hide_frame: "ซ่อนกรอบ",
+      hide_frame_desc: "แสดงเฉพาะ QR Code หรือลายเซ็น ไม่มีกรอบตกแต่ง",
+      sealed: "ปิดผนึก (ถาวร)",
+      sealed_desc: "ล็อคสิทธิ์ PDF ทุกคนสามารถเปิดได้ แต่เปลี่ยนการตั้งค่าไม่ได้หากไม่ใช้ TrustlessSign",
+      perms_title: "สิทธิ์เอกสาร"
     }
   };
 
@@ -352,10 +417,50 @@ document.addEventListener('DOMContentLoaded', async () => {
       const newLang = e.target.value;
       chrome.storage.local.set({ extensionLang: newLang }, () => {
         translateUI(newLang);
+        buildSealedPermsList(newLang);
         if (typeof checkAuth === 'function') checkAuth();
       });
     });
   }
+
+  // === Advanced Options event listeners ===
+  const btnToggleAdvanced = document.getElementById('btn-toggle-advanced');
+  const advancedPanel = document.getElementById('advanced-options-panel');
+  const advancedChevron = document.getElementById('advanced-chevron');
+  const optHideFrameEl = document.getElementById('opt-hide-frame');
+  const optSealedEl = document.getElementById('opt-sealed');
+  const sealedPermsPanel = document.getElementById('sealed-perms-panel');
+
+  if (btnToggleAdvanced && advancedPanel) {
+    btnToggleAdvanced.addEventListener('click', () => {
+      advancedOptionsOpen = !advancedOptionsOpen;
+      advancedPanel.style.display = advancedOptionsOpen ? 'block' : 'none';
+      if (advancedChevron) {
+        advancedChevron.style.transform = advancedOptionsOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      }
+    });
+  }
+
+  if (optHideFrameEl) {
+    optHideFrameEl.addEventListener('change', () => {
+      optHideFrame = optHideFrameEl.checked;
+    });
+  }
+
+  if (optSealedEl && sealedPermsPanel) {
+    optSealedEl.addEventListener('change', () => {
+      optSealedEnabled = optSealedEl.checked;
+      sealedPermsPanel.style.display = optSealedEnabled ? 'block' : 'none';
+      if (optSealedEnabled) {
+        // Build the permissions list with current language
+        const currentLang = langSelect ? langSelect.value : 'en';
+        buildSealedPermsList(currentLang);
+      }
+    });
+  }
+
+  // Build initial (default) sealed perms list
+  buildSealedPermsList(langSelect ? langSelect.value : 'en');
 
   // Setup PDFjs
   const pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -1547,7 +1652,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             notes: reasonNotesText.value,
             password: password,
             qrPngBase64: qrPng,
-            verifyToken: verifyToken
+            verifyToken: verifyToken,
+            hideFrame: optHideFrame,
+            sealedPerms: optSealedEnabled ? { ...sealedPermsState } : null
           }
         }, (res) => {
           clearInterval(uploadInterval);

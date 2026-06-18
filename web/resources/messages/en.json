@@ -46,7 +46,21 @@
     "extension_required": "TrustlessSign Extension Required",
     "extension_desc": "Please download and install our browser extension to secure and sign your PDFs offline.",
     "signed_by": "Signed by:",
-    "verify_at": "Verify at:"
+    "verify_at": "Verify at:",
+    "advanced_options": "Advanced Options",
+    "hide_frame": "Hide Frame",
+    "hide_frame_desc": "Only QR Code or signature is embedded, without decorative border.",
+    "sealed": "Sealed (permanent)",
+    "sealed_desc": "Locks PDF permissions. Anyone can open it, but cannot change settings without TrustlessSign.",
+    "sealed_perms_title": "Document Permissions",
+    "perm_print_highres": "Allow high-res print",
+    "perm_print_lowres": "Allow low-res print",
+    "perm_modify_other": "Allow editing content",
+    "perm_modify_annotation": "Allow annotations/comments",
+    "perm_modify_assembly": "Allow page re-ordering",
+    "perm_modify_form": "Allow form filling",
+    "perm_extract": "Allow text copy",
+    "perm_sign": "Allow re-signing"
   },
   "Dashboard": {
     "welcome_back": "Welcome Back",

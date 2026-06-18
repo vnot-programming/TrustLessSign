@@ -19,7 +19,7 @@ def secure_pdf(input_path, output_path, owner_password):
             modify_annotation=False, # Tidak bisa diberi anotasi/komentar
             modify_assembly=False,   # Tidak bisa menyusun ulang halaman
             modify_form=False,       # Tidak bisa mengisi form
-            extract=False             # Bisa di-copy teksnya
+            extract=False             # Tidak Bisa di-copy teksnya
         )
         
         # Modifikasi Document Properties (Metadata)

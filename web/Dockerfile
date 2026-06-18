@@ -7,10 +7,19 @@ RUN apk add --no-cache \
     npm \
     postgresql-dev \
     curl \
+    python3 \
+    py3-pip \
+    python3-dev \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    jpeg-dev \
+    zlib-dev \
     $PHPIZE_DEPS \
     && docker-php-ext-install pdo_pgsql pcntl bcmath \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && rm -rf /var/cache/apk/*
+    && pip3 install --no-cache-dir pikepdf --break-system-packages \
+    && rm -rf /var/cache/apk/* /tmp/*
 
 WORKDIR /var/www/html
 COPY . .

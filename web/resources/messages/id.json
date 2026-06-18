@@ -46,7 +46,21 @@
     "extension_required": "Ekstensi TrustlessSign Diperlukan",
     "extension_desc": "Silakan unduh dan instal ekstensi browser kami untuk mengamankan dan menandatangani PDF Anda secara offline.",
     "signed_by": "Ditandatangani oleh:",
-    "verify_at": "Verifikasi di:"
+    "verify_at": "Verifikasi di:",
+    "advanced_options": "Fitur Lanjutan",
+    "hide_frame": "Hilangkan Frame",
+    "hide_frame_desc": "Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai pembungkus.",
+    "sealed": "Sealed (permanent)",
+    "sealed_desc": "Mengunci permission PDF. Dapat dibuka semua orang, namun tidak dapat diubah tanpa TrustlessSign.",
+    "sealed_perms_title": "Izin Dokumen",
+    "perm_print_highres": "Bisa di-print resolusi tinggi",
+    "perm_print_lowres": "Bisa di-print resolusi rendah",
+    "perm_modify_other": "Bisa mengedit isi utama",
+    "perm_modify_annotation": "Bisa diberi anotasi/komentar",
+    "perm_modify_assembly": "Bisa menyusun ulang halaman",
+    "perm_modify_form": "Bisa mengisi form",
+    "perm_extract": "Bisa di-copy teksnya",
+    "perm_sign": "Bisa ditandatangani ulang"
   },
   "Dashboard": {
     "welcome_back": "Selamat Datang Kembali",

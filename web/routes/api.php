@@ -5,6 +5,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PdfSealController;
 use App\Models\ReasonCategory;
 use Illuminate\Http\Request;
 
@@ -47,7 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/gdrive/refresh', [App\Http\Controllers\SocialiteController::class, 'refreshGdriveToken']);
 
-    // Admin-only endpoints (Admin authorization checked in controller methods)
+    // PDF Sealing endpoint — Applies AES-256 permission restrictions after signing
+    // Owner password = SHA256(verify_token + "::" + cert_serial) — reproducible from DB
+    Route::post('/pdf/seal', [PdfSealController::class, 'seal']);
+    Route::post('/certificates/sync-check', [CertificateController::class, 'syncCheck']);
     Route::post('/pki/bootstrap', [CertificateController::class, 'bootstrapCA']);
     Route::post('/certificates/revoke/{serial}', [CertificateController::class, 'revoke']);
 });

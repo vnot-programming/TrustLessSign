@@ -771,3 +771,16 @@
   - `chrome-extension/signing/signer.js`
 - **Status saat ini:** Selesai (Version Web `web-v1.3.32`, Extension `ext-v1.4.21`)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Teks footer di PDF telah diatur agar rata kanan. Prefix footer kini mendukung bahasa dinamis (EN/ID/TH) yang dikirimkan via payload dari Web UI. URL kini berwarna hijau.
+
+### 2026-06-18 — Advanced Options & Sealed PDF Server Implementation
+- **Tugas yang diselesaikan:** Implementasi *Advanced Options* (Fitur Lanjutan) termasuk Hide Frame dan penguncian hak akses PDF (Sealed).
+- **File yang diubah/dibuat:**
+  - `popup.html`, `popup.js`: Menambahkan antarmuka untuk mencentang opsi.
+  - `service-worker.js`: Menyisipkan parameter ke ekstensi.
+  - `SignDocument.jsx`, `barcode-generator.js`: Menangani mode hide frame dan pengiriman parameter ke Service Worker.
+  - `PdfSealController.php` (baru), `api.php`: Backend route untuk proses enkripsi.
+  - `seal_pdf.py` (baru): Skrip Python internal server.
+  - `Dockerfile`: Update package Python3 + pikepdf.
+  - `messages/*.json`: Integrasi bahasa (i18n).
+- **Status saat ini:** Selesai (Menunggu User me-rebuild Docker dan Vite).
+- **Catatan untuk AI selanjutnya (Handoff Note):** Fungsionalitas sudah selesai. Python + Pikepdf di backend kini melakukan sealing AES-256 dan derivasi sandi pemilik otomatis berdasarkan Token verifikasi dan Serial. Tunggu konfirmasi User telah build ulang container dengan dependency baru tersebut.

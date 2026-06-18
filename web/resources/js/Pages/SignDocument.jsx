@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
 import { Rnd } from 'react-rnd';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { ShieldCheck, Upload, Save, Eye, Key, Loader2, CheckCircle2, AlertCircle, FileText, ExternalLink, HelpCircle } from 'lucide-react';
+import { ShieldCheck, Upload, Save, Eye, Key, Loader2, CheckCircle2, AlertCircle, FileText, ExternalLink, HelpCircle, Settings, ChevronDown } from 'lucide-react';
 import LanguageSwitcher from '../Components/LanguageSwitcher';
 import ThemeToggle from '../Components/ThemeToggle';
 import axios from 'axios';
@@ -61,6 +61,33 @@ export default function SignDocument() {
   const [signResult, setSignResult] = useState(null);
   const [finalFileName, setFinalFileName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Advanced Options
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [hideFrame, setHideFrame] = useState(false);
+  const [sealedEnabled, setSealedEnabled] = useState(false);
+  const [sealedPerms, setSealedPerms] = useState({
+    print_highres: true,
+    print_lowres: true,
+    modify_other: false,
+    modify_annotation: false,
+    modify_assembly: false,
+    modify_form: false,
+    extract: false,
+    sign: false
+  });
+
+  // Permission items for Sealed checklist
+  const getPermissionItems = () => [
+    { key: 'print_highres', label: t.perm_print_highres || 'Bisa di-print resolusi tinggi' },
+    { key: 'print_lowres', label: t.perm_print_lowres || 'Bisa di-print resolusi rendah' },
+    { key: 'modify_other', label: t.perm_modify_other || 'Bisa mengedit isi utama' },
+    { key: 'modify_annotation', label: t.perm_modify_annotation || 'Bisa diberi anotasi/komentar' },
+    { key: 'modify_assembly', label: t.perm_modify_assembly || 'Bisa menyusun ulang halaman' },
+    { key: 'modify_form', label: t.perm_modify_form || 'Bisa mengisi form' },
+    { key: 'extract', label: t.perm_extract || 'Bisa di-copy teksnya' },
+    { key: 'sign', label: t.perm_sign || 'Bisa ditandatangani ulang' }
+  ];
 
   // Translation fallbacks
   const t = messages?.Sign || {
@@ -297,11 +324,12 @@ export default function SignDocument() {
             imageSigDataUrl,
             false, // isQrCode = false
             t.signed_by,
-            t.verify_at
+            t.verify_at,
+            hideFrame // ← Advanced: hide decorative frame
         );
       } else {
         // Modern standalone QR Code
-        finalQrPngBase64 = await generateModernTSignQR(verifyUrlFull);
+        finalQrPngBase64 = await generateModernTSignQR(verifyUrlFull, hideFrame);
       }
 
       // Get concatenated final reason text
@@ -444,7 +472,9 @@ export default function SignDocument() {
           password: password,
           qrPngBase64: finalQrPngBase64,
           author: actualSigner,
-          verifyToken: verifyToken
+          verifyToken: verifyToken,
+          hideFrame: hideFrame,
+          sealedPerms: sealedEnabled ? sealedPerms : null
         }
       }, '*');
 
@@ -713,6 +743,72 @@ export default function SignDocument() {
                       </div>
 
 
+                      {/* Advanced Options Accordion */}
+                      <div className="border border-border-subtle rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setAdvancedOpen(v => !v)}
+                          className="w-full flex items-center justify-between px-3 py-2 bg-surface-secondary text-xs font-semibold text-text-secondary hover:bg-surface-elevated transition-colors"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <Settings size={12} />
+                            {t.advanced_options || 'Fitur Lanjutan'}
+                          </span>
+                          <ChevronDown size={12} className={`transition-transform duration-200 ${advancedOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {advancedOpen && (
+                          <div className="p-3 space-y-3 bg-surface-primary border-t border-border-subtle animate-fade-in">
+
+                            {/* Hide Frame */}
+                            <label className="flex items-start gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={hideFrame}
+                                onChange={e => setHideFrame(e.target.checked)}
+                                className="mt-0.5 accent-accent-primary"
+                              />
+                              <div>
+                                <span className="text-xs font-semibold text-text-primary">{t.hide_frame || 'Hilangkan Frame'}</span>
+                                <p className="text-[10px] text-text-tertiary mt-0.5">{t.hide_frame_desc || 'Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai pembungkus.'}</p>
+                              </div>
+                            </label>
+
+                            {/* Sealed */}
+                            <label className="flex items-start gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={sealedEnabled}
+                                onChange={e => setSealedEnabled(e.target.checked)}
+                                className="mt-0.5 accent-accent-primary"
+                              />
+                              <div>
+                                <span className="text-xs font-semibold text-text-primary">{t.sealed || 'Sealed (permanent)'}</span>
+                                <p className="text-[10px] text-text-tertiary mt-0.5">{t.sealed_desc || 'Mengunci permission PDF menggunakan sertifikat Anda. Dapat dibuka semua orang, namun permission tidak bisa diubah tanpa TrustlessSign.'}</p>
+                              </div>
+                            </label>
+
+                            {/* Sealed Permission Checklist */}
+                            {sealedEnabled && (
+                              <div className="ml-5 p-2.5 bg-surface-secondary rounded-md border border-border-subtle space-y-2">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-text-tertiary mb-1">{t.sealed_perms_title || 'Izin Dokumen'}</p>
+                                {getPermissionItems().map(item => (
+                                  <label key={item.key} className="flex items-center justify-between gap-2 cursor-pointer">
+                                    <span className="text-[11px] text-text-secondary">{item.label}</span>
+                                    <input
+                                      type="checkbox"
+                                      checked={sealedPerms[item.key]}
+                                      onChange={e => setSealedPerms(p => ({ ...p, [item.key]: e.target.checked }))}
+                                      className="accent-accent-primary flex-shrink-0"
+                                    />
+                                  </label>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
                       {/* Password input */}
                       <div className="space-y-1">
                         <label className="block text-xs font-semibold text-text-secondary flex items-center gap-1">
@@ -818,8 +914,6 @@ export default function SignDocument() {
                       position={{ x: qrPosition.x, y: qrPosition.y }}
                       onDragStop={(e, d) => {
                         setQrPosition({ x: d.x, y: d.y });
-                        console.log(`Ukuran : ${qrSize.width} x ${qrSize.height}`);
-                        console.log(`Posisi : x=${Math.round(d.x)}, y=${Math.round(d.y)}`);
                       }}
                       onResizeStop={(e, direction, ref, delta, position) => {
                         const newWidth = parseInt(ref.style.width, 10);
@@ -829,8 +923,6 @@ export default function SignDocument() {
                           height: newHeight
                         });
                         setQrPosition(position);
-                        console.log(`Ukuran : ${newWidth} x ${newHeight}`);
-                        console.log(`Posisi : x=${Math.round(position.x)}, y=${Math.round(position.y)}`);
                       }}
                       lockAspectRatio={signatureType === 'qr' ? true : true}
                       className="absolute top-0 left-0 border-2 border-accent-primary bg-white/80 flex items-center justify-center cursor-move shadow-lg backdrop-blur-sm group rounded-md select-none z-55 overflow-hidden"

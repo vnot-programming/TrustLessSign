@@ -5,7 +5,7 @@
  */
 import QRCodeStyling from 'qr-code-styling';
 
-export async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:") {
+export async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:", hideFrame = false) {
     // Zero-Trust Validation is handled by Sanctum tokens in the Web Dashboard.
 
     // 2. Set up Canvas
@@ -24,51 +24,51 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     ctx.scale(scaleFactor, scaleFactor);
 
     // 3. Draw Main Background
-    // Made transparent as per user request
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const padding = 6; 
     const width = logicalWidth;
     const height = logicalHeight;
 
-    const bodyStartX = 12; // super tight to the green line
+    // If hideFrame, use tight layout without any decoration
+    const bodyStartX = hideFrame ? 4 : 12;
     const rightPadding = 6;
 
-    // Artistic Green Border (Left)
-    ctx.strokeStyle = '#3B935D';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    // Top left curve
-    ctx.moveTo(padding + 6, padding);
-    ctx.quadraticCurveTo(padding, padding, padding, padding + 6);
-    // Line down
-    ctx.lineTo(padding, height - padding - 6);
-    // Bottom left curve
-    ctx.quadraticCurveTo(padding, height - padding, padding + 6, height - padding);
-    ctx.stroke();
+    if (!hideFrame) {
+      // Artistic Green Border (Left)
+      ctx.strokeStyle = '#3B935D';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(padding + 6, padding);
+      ctx.quadraticCurveTo(padding, padding, padding, padding + 6);
+      ctx.lineTo(padding, height - padding - 6);
+      ctx.quadraticCurveTo(padding, height - padding, padding + 6, height - padding);
+      ctx.stroke();
 
-    // Header: Check icon + "Signed by: [signerName]"
-    // Check mark
-    ctx.beginPath();
-    ctx.moveTo(bodyStartX, padding + 5);
-    ctx.lineTo(bodyStartX + 5, padding + 10);
-    ctx.lineTo(bodyStartX + 12, padding + 1);
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#3B935D';
-    ctx.stroke();
+      // Check mark
+      ctx.beginPath();
+      ctx.moveTo(bodyStartX, padding + 5);
+      ctx.lineTo(bodyStartX + 5, padding + 10);
+      ctx.lineTo(bodyStartX + 12, padding + 1);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#3B935D';
+      ctx.stroke();
 
-    ctx.fillStyle = '#111111';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${textSignedBy} ${signerName}`, bodyStartX + 16, padding + 5);
+      // "Signed by: [signerName]" header
+      ctx.fillStyle = '#111111';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${textSignedBy} ${signerName}`, bodyStartX + 16, padding + 5);
+    }
 
     // Body: Image or Cursive Text
-    const bodyStartY = padding + 14; 
-    // Give image more vertical space but keep it away from meta
-    const bodyHeight = height - padding - 14 - (isQrCode ? 0 : 50); 
+    const bodyStartY = hideFrame ? padding : padding + 14;
+    const bodyHeight = hideFrame
+      ? height - padding * 2
+      : height - padding - 14 - (isQrCode ? 0 : 50);
     const maxImgWidth = width - rightPadding - bodyStartX; 
     
     if (uploadedImageBase64) {
@@ -86,9 +86,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         const drawWidth = img.width * scale;
         const drawHeight = img.height * scale;
         
-        // Center horizontally in the available space
         const drawX = bodyStartX + (maxImgWidth - drawWidth) / 2;
-        // Center vertically
         const drawY = bodyStartY + (bodyHeight - drawHeight) / 2;
         
         ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
@@ -102,7 +100,7 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
         ctx.fillText(signerName, drawX, bodyStartY + bodyHeight / 2);
     }
 
-    if (!isQrCode) {
+    if (!isQrCode && !hideFrame) {
         // Meta Info
         const metaY = height - padding - 32; 
         
@@ -157,14 +155,14 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
  * Generate a standalone modern QR Code using qr-code-styling.
  * Contains no external borders, text, or meta info.
  */
-export async function generateModernTSignQR(verifyUrl) {
+export async function generateModernTSignQR(verifyUrl, hideFrame = false) {
     const qrCode = new QRCodeStyling({
         width: 600,
         height: 600,
         type: "canvas",
         data: verifyUrl,
-        image: "/logo-tSign.svg",
-        margin: 0,
+        image: hideFrame ? null : "/logo-tSign.svg",
+        margin: hideFrame ? 4 : 0,
         qrOptions: {
             typeNumber: 0,
             mode: "Byte",
