@@ -878,3 +878,16 @@
   - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
 - **Status:** Selesai
 - **Handoff Note:** Telah dicommit. Hanya tag `ext-v1.6.3` yang di-push untuk menghindari CI/CD Web yang tidak perlu.
+### [2026-06-19] — Signer Custom Name Propagation to Backend & Verification
+- **Tugas:** Menambahkan kemampuan backend untuk menyimpan dan frontend (Verify) untuk mempropagasi nama penandatangan kustom (Custom Signer Name) dari input extension/Web Dashboard.
+- **File diubah:** 
+  - `web/database/migrations/2026_06_19_102830_add_signer_name_to_documents_table.php` (baru)
+  - `web/app/Models/Document.php`
+  - `web/app/Http/Controllers/DocumentController.php`
+  - `web/resources/js/Pages/Verify.jsx`
+  - `web/resources/js/Pages/SignDocument.jsx`
+  - `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`
+  - `chrome-extension/background/service-worker.js`, `safari-extension/Resources/background.js`
+- **Status:** Selesai.
+- **Handoff Note:** Kolom `signer_name` telah ditambahkan ke database (PostgreSQL via Docker). Ekstensi sekarang akan mengirimkan nama penandatangan (yang bisa dikustomisasi) ke endpoint `/api/documents/register`. Halaman Verify akan menampilkan `signer_name` jika ada, fallback ke `signer.name` dari sertifikat. Build Web (Vite) dan database migration telah dieksekusi di server VPS secara otomatis. Ekstensi siap di komit dan bump version untuk memicu CI/CD.
+

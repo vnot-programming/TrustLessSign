@@ -176,7 +176,8 @@ async function handleSignDocument(payload, baseUrl) {
     notes, 
     password,
     qrPngBase64,
-    pageStamps
+    pageStamps,
+    signerName
   } = payload;
 
   // 1. Retrieve & decrypt private key
@@ -250,7 +251,8 @@ async function handleSignDocument(payload, baseUrl) {
       qr_position: { page: targetPageIdx + 1, x: targetX, y: targetY, size: qrSize },
       reason_sub_category_id: reason_sub_category_id || null,
       reason_final: reason_final || null,
-      notes: notes || null
+      notes: notes || null,
+      signer_name: signerName || null
     })
   });
 

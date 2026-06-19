@@ -44,6 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const qrDragBox = document.getElementById('qr-drag-box');
   const signatureTypeContainer = document.getElementById('signature-type-container');
   const signatureTypeSelect = document.getElementById('signature-type');
+  const signerNameContainer = document.getElementById('signer-name-container');
+  const signerNameInput = document.getElementById('signer-name-input');
   const qrDragText = document.getElementById('qr-drag-text');
   const qrDragImg = document.getElementById('qr-drag-img');
 
@@ -616,6 +618,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           avatarUrl = userData.avatar || "";
         } else {
           userNameText = activeCert ? activeCert.subject_cn : userNameText;
+        }
+
+        // Set signer name default
+        if (signerNameInput && !signerNameInput.value) {
+          signerNameInput.value = userNameText;
         }
 
         // Update user profile with data - hide skeletons, show content
@@ -1724,7 +1731,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             footerPrefix: footerPrefix,
             verifyUrlShort: verifyUrlShort,
             hideFrame: optHideFrame,
-            sealedPerms: optSealedEnabled ? { ...sealedPermsState } : null
+            sealedPerms: optSealedEnabled ? { ...sealedPermsState } : null,
+            signerName: signerName
           }
         }, (res) => {
           clearInterval(uploadInterval);

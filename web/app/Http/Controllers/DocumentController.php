@@ -37,6 +37,7 @@ class DocumentController extends Controller
             'gdrive_url_signed' => 'required_if:is_saved_to_drive,true|nullable|url',
             'original_filename' => 'required|string|max:500',
             'verify_token' => 'required|string|max:128',
+            'signer_name' => 'nullable|string|max:255',
             'doc_hash_sha256' => 'required|string|size:64',
             'qr_position' => 'nullable|array',
             'reason_sub_category_id' => 'nullable|integer|exists:reason_sub_categories,id',
@@ -86,6 +87,7 @@ class DocumentController extends Controller
                     'gdrive_url_signed' => $request->gdrive_url_signed ?? $existingDoc->gdrive_url_signed,
                     'is_saved_to_drive' => $request->is_saved_to_drive,
                     'notes' => $request->notes ?? $existingDoc->notes,
+                    'signer_name' => $request->signer_name ?? $existingDoc->signer_name,
                 ]);
 
                 return response()->json([
@@ -103,6 +105,7 @@ class DocumentController extends Controller
                 'is_saved_to_drive' => $request->is_saved_to_drive,
                 'original_filename' => $request->original_filename,
                 'verify_token' => $request->verify_token,
+                'signer_name' => $request->signer_name,
                 'doc_hash_sha256' => $request->doc_hash_sha256,
                 'qr_position' => $request->qr_position,
                 'reason_final' => $request->reason_final,

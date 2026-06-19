@@ -474,7 +474,8 @@ export default function SignDocument() {
           author: actualSigner,
           verifyToken: verifyToken,
           hideFrame: hideFrame,
-          sealedPerms: sealedEnabled ? sealedPerms : null
+          sealedPerms: sealedEnabled ? sealedPerms : null,
+          signerName: actualSigner
         }
       }, '*');
 

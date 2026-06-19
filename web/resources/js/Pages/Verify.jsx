@@ -246,7 +246,7 @@ export default function Verify({ token }) {
                   <div className="bg-accent-warning-soft border border-accent-warning text-accent-warning p-4 rounded-lg text-sm leading-relaxed">
                     <p className="font-bold mb-1">⚠️ Catatan Khusus:</p>
                     <p>
-                      "Dokumen ini terbukti asli dan benar ditandatangani oleh <strong>{data.signer.name}</strong>. Namun, sertifikat keamanan yang digunakan pada saat itu kini telah <strong>{certStatus === 'revoked' ? 'dinonaktifkan' : 'kedaluwarsa'}</strong>. Sebagai langkah kehati-hatian, mohon pastikan kembali keabsahan dokumen ini secara langsung kepada pihak yang bersangkutan."
+                      "Dokumen ini terbukti asli dan benar ditandatangani oleh <strong>{data.document.signer_name || data.signer.name}</strong>. Namun, sertifikat keamanan yang digunakan pada saat itu kini telah <strong>{certStatus === 'revoked' ? 'dinonaktifkan' : 'kedaluwarsa'}</strong>. Sebagai langkah kehati-hatian, mohon pastikan kembali keabsahan dokumen ini secara langsung kepada pihak yang bersangkutan."
                     </p>
                   </div>
                 )}
@@ -254,7 +254,7 @@ export default function Verify({ token }) {
                 <div className="bg-surface-secondary rounded-lg p-4 space-y-3 text-sm">
                   <div className="flex justify-between border-b border-border-default pb-2">
                     <span className="text-text-tertiary">{t.signer}</span>
-                    <span className="font-semibold">{data.signer.name} ({data.signer.email})</span>
+                    <span className="font-semibold">{data.document.signer_name || data.signer.name} ({data.signer.email})</span>
                   </div>
                   <div className="flex justify-between border-b border-border-default pb-2">
                     <span className="text-text-tertiary">{t.signed_at}</span>

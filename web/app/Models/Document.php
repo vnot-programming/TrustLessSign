@@ -17,6 +17,7 @@ class Document extends Model
         'is_saved_to_drive',
         'original_filename',
         'verify_token',
+        'signer_name',
         'doc_hash_sha256',
         'qr_position',
         'reason_final',
