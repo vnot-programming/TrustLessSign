@@ -5,12 +5,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnPopout = document.getElementById('btn-popout');
   const viewLogin = document.getElementById('view-login');
   const viewMain = document.getElementById('view-main');
-  
+
   // Login fields
   const loginUrlInput = document.getElementById('login-url');
   const btnLoginWeb = document.getElementById('btn-login-web');
   const loginStatus = document.getElementById('login-status');
-  
+
   // User Info
   const userAvatar = document.getElementById('user-avatar');
   const userName = document.getElementById('user-name');
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const signatureTypeSelect = document.getElementById('signature-type');
   const qrDragText = document.getElementById('qr-drag-text');
   const qrDragImg = document.getElementById('qr-drag-img');
-  
+
   // Keygen tab fields
   const certStatusBadge = document.getElementById('cert-status-badge');
   const certExpiryText = document.getElementById('cert-expiry-text');
@@ -102,14 +102,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const permissionItemDefs = [
-    { key: 'print_highres',    labelEn: 'Allow high-res print',       labelId: 'Bisa di-print resolusi tinggi' },
-    { key: 'print_lowres',     labelEn: 'Allow low-res print',        labelId: 'Bisa di-print resolusi rendah' },
-    { key: 'modify_other',     labelEn: 'Allow editing content',      labelId: 'Bisa mengedit isi utama' },
-    { key: 'modify_annotation',labelEn: 'Allow annotations',         labelId: 'Bisa diberi anotasi/komentar' },
-    { key: 'modify_assembly',  labelEn: 'Allow page re-ordering',    labelId: 'Bisa menyusun ulang halaman' },
-    { key: 'modify_form',      labelEn: 'Allow form filling',        labelId: 'Bisa mengisi form' },
-    { key: 'extract',          labelEn: 'Allow text copy',           labelId: 'Bisa di-copy teksnya' },
-    { key: 'sign',             labelEn: 'Allow re-signing',          labelId: 'Bisa ditandatangani ulang' }
+    { key: 'print_highres', labelEn: 'Allow high-res print', labelId: 'Bisa di-print resolusi tinggi' },
+    { key: 'print_lowres', labelEn: 'Allow low-res print', labelId: 'Bisa di-print resolusi rendah' },
+    { key: 'modify_other', labelEn: 'Allow editing content', labelId: 'Bisa mengedit isi utama' },
+    { key: 'modify_annotation', labelEn: 'Allow annotations', labelId: 'Bisa diberi anotasi/komentar' },
+    { key: 'modify_assembly', labelEn: 'Allow page re-ordering', labelId: 'Bisa menyusun ulang halaman' },
+    { key: 'modify_form', labelEn: 'Allow form filling', labelId: 'Bisa mengisi form' },
+    { key: 'extract', labelEn: 'Allow text copy', labelId: 'Bisa di-copy teksnya' },
+    { key: 'sign', labelEn: 'Allow re-signing', labelId: 'Bisa ditandatangani ulang' }
   ];
 
   // Build Sealed permissions checklist
@@ -126,8 +126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       cb.type = 'checkbox';
       cb.style.cssText = 'accent-color:var(--accent-primary);flex-shrink:0;';
       cb.checked = sealedPermsState[item.key];
-      cb.addEventListener('change', () => { 
-        sealedPermsState[item.key] = cb.checked; 
+      cb.addEventListener('change', () => {
+        sealedPermsState[item.key] = cb.checked;
         console.log(`[DEBUG] Permission changed: ${item.key} = ${cb.checked}`);
       });
       label.appendChild(spanText);
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Progress Overlay
     const progressTitle = document.querySelector('#progress-overlay h4');
     if (progressTitle) progressTitle.textContent = trans.progress_title;
-    
+
     const stepDownloadText = document.querySelector('#step-download .step-text');
     if (stepDownloadText) stepDownloadText.textContent = trans.step_read;
     const stepStampText = document.querySelector('#step-stamp .step-text');
@@ -500,13 +500,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Check Auth Status
   const checkAuth = async () => {
     const baseUrlInput = loginUrlInput.value.replace(/\/$/, '');
-    
+
     // Seamless SSO: Check web cookie first
     if (chrome.cookies) {
       try {
         const apiCookie = await chrome.cookies.get({ url: baseUrlInput, name: 'tsign_api_token' });
         const gdriveCookie = await chrome.cookies.get({ url: baseUrlInput, name: 'tsign_gdrive_token' });
-        
+
         if (apiCookie && apiCookie.value) {
           await chrome.storage.local.set({
             sanctumToken: decodeURIComponent(apiCookie.value),
@@ -537,7 +537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         // Fetch current user details via Sanctum
         const response = await fetch(`${baseUrl}/api/reasons/categories`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json'
           }
@@ -552,7 +552,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Fetch user cert details
         const meRes = await fetch(`${baseUrl}/api/certificates/me`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json'
           }
@@ -569,10 +569,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             // Fallback to first if local serial doesn't match any (e.g., revoked) or not set
             if (!activeCert) {
-               // We actually shouldn't fallback to first if it's not our device!
-               // Let's only set it if it matches local, otherwise the extension has no active cert.
-               // However, to keep it backward compatible, if we don't have local serial but they have certs, let's just show no cert, they must import.
-               // So no fallback! 
+              // We actually shouldn't fallback to first if it's not our device!
+              // Let's only set it if it matches local, otherwise the extension has no active cert.
+              // However, to keep it backward compatible, if we don't have local serial but they have certs, let's just show no cert, they must import.
+              // So no fallback! 
             }
           }
         }
@@ -599,12 +599,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Fetch user info from /api/user
         const userRes = await fetch(`${baseUrl}/api/user`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json'
           }
         });
-        
+
         let userNameText = "Authenticated User";
         let userEmailText = "TrustlessSign Member";
         let avatarUrl = "";
@@ -624,21 +624,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userEmailTextEl = document.getElementById('user-email-text');
         const userEmailSkeleton = document.getElementById('user-email-skeleton');
         const avatarSkeleton = document.getElementById('avatar-skeleton');
-        
+
         if (userNameTextEl) {
           userNameTextEl.textContent = userNameText;
           userNameTextEl.classList.remove('hidden');
         }
         if (userNameSkeleton) userNameSkeleton.classList.add('hidden');
-        
+
         if (userEmailTextEl) {
           userEmailTextEl.textContent = userEmailText;
           userEmailTextEl.classList.remove('hidden');
         }
         if (userEmailSkeleton) userEmailSkeleton.classList.add('hidden');
-        
+
         if (avatarSkeleton) avatarSkeleton.classList.add('hidden');
-        
+
         if (avatarUrl) {
           userAvatar.style.backgroundImage = `url('${avatarUrl}')`;
           userAvatar.style.backgroundSize = "cover";
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loginStatus.innerHTML = '';
       return;
     }
-    
+
     if (state === 'loading') {
       loginStatus.innerHTML = `
         <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; background: var(--surface-secondary); border-radius: 8px; border: 1px solid var(--border-subtle); color: var(--text-primary); font-size: 0.75rem; font-weight: 500; width: 100%;">
@@ -743,7 +743,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 5. Generate Certificate handler
   btnGenerateCert.addEventListener('click', async () => {
     const password = keygenPasswordInput.value;
-    const confirm  = keygenConfirmInput.value;
+    const confirm = keygenConfirmInput.value;
     const deviceName = document.getElementById('keygen-device-name')?.value?.trim() || '';
     keysStatus.classList.add('hidden');
 
@@ -764,7 +764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deviceIdentifier = await generateDeviceIdentifier();
 
     chrome.storage.local.get(['sanctumToken', 'baseUrl'], async (storage) => {
-      const token   = storage.sanctumToken;
+      const token = storage.sanctumToken;
       const baseUrl = storage.baseUrl;
 
       try {
@@ -772,10 +772,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         chrome.runtime.sendMessage({
           type: 'GENERATE_KEY',
           payload: {
-            password:         password,
-            email:            userEmail.textContent.replace(/\s+/g, '').trim(),
-            apiToken:         token,
-            deviceName:       deviceName || 'This Device',
+            password: password,
+            email: userEmail.textContent.replace(/\s+/g, '').trim(),
+            apiToken: token,
+            deviceName: deviceName || 'This Device',
             deviceIdentifier: deviceIdentifier,
           }
         }, (res) => {
@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (res && res.status === 'success') {
             keysStatus.classList.remove('hidden', 'alert-danger');
             keysStatus.classList.add('alert-success');
-            
+
             let successMsg = `<strong>Success!</strong> Certificate generated and registered.`;
             if (res.driveSuccess && res.driveUrl) {
               successMsg += `<br>✅ Auto-backed up to your Google Drive.`;
@@ -833,9 +833,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // ─── IDENTITY BACKUP: Export .tsign to Google Drive ───────────────────────
-  const btnBackupDrive    = document.getElementById('btn-backup-drive');
+  const btnBackupDrive = document.getElementById('btn-backup-drive');
   const btnImportIdentity = document.getElementById('btn-import-identity');
-  const importFileInput   = document.getElementById('import-tsign-file');
+  const importFileInput = document.getElementById('import-tsign-file');
 
   if (btnBackupDrive) {
     btnBackupDrive.addEventListener('click', async () => {
@@ -851,13 +851,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        btnBackupDrive.disabled  = true;
+        btnBackupDrive.disabled = true;
         btnBackupDrive.textContent = 'Encrypting...';
 
         try {
           const tsignBlob = await encryptIdentityToTsign({
-            privateKey:   storage.trustless_private_key_enc,
-            certificate:  storage.trustless_certificate,
+            privateKey: storage.trustless_private_key_enc,
+            certificate: storage.trustless_certificate,
             serialNumber: storage.trustless_cert_serial
           }, password);
 
@@ -869,7 +869,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const fileName = `${safeDeviceName}_${safeEmail}-${dateStr}.tsign`;
 
             chrome.runtime.sendMessage({
-              type:    'UPLOAD_IDENTITY',
+              type: 'UPLOAD_IDENTITY',
               payload: { tsignBase64: btoa(String.fromCharCode(...new Uint8Array(tsignBlob))), fileName, gdriveToken: storage.gdriveToken }
             }, (res) => {
               if (res && res.status === 'success') {
@@ -904,7 +904,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) {
           showKeysError('Backup failed: ' + err.message);
         } finally {
-          btnBackupDrive.disabled   = false;
+          btnBackupDrive.disabled = false;
           btnBackupDrive.textContent = 'Backup to Drive (.tsign)';
         }
       });
@@ -932,7 +932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      btnImportIdentity.disabled   = true;
+      btnImportIdentity.disabled = true;
       btnImportIdentity.textContent = 'Importing...';
 
       try {
@@ -942,8 +942,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Restore identity to chrome.storage.local
         chrome.storage.local.set({
           'trustless_private_key_enc': identity.privateKey,
-          'trustless_certificate':     identity.certificate,
-          'trustless_cert_serial':     identity.serialNumber
+          'trustless_certificate': identity.certificate,
+          'trustless_cert_serial': identity.serialNumber
         }, () => {
           keysStatus.classList.remove('hidden', 'alert-danger');
           keysStatus.classList.add('alert-success');
@@ -954,7 +954,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (err) {
         showKeysError('Import failed: ' + err.message + ' (Wrong password or corrupted file?)');
       } finally {
-        btnImportIdentity.disabled   = false;
+        btnImportIdentity.disabled = false;
         btnImportIdentity.textContent = 'Import Identity (.tsign)';
         importFileInput.value = '';
       }
@@ -970,7 +970,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const refreshImageSignatures = async () => {
     chrome.storage.local.get(['default_image_signature_id', 'gdriveToken'], async (storage) => {
       imgSigLoading.style.display = 'inline-block';
-      
+
       try {
         const files = await getAllImageSignaturesLocal();
         const defaultId = storage.default_image_signature_id;
@@ -989,9 +989,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
           });
         }
-        
+
         imgSigList.innerHTML = '';
-        
+
         if (files.length === 0) {
           imgSigList.innerHTML = '<p style="grid-column: span 2; text-align: center; font-size: 0.75rem; color: var(--text-tertiary); padding: 12px;">No visual signatures uploaded yet.</p>';
         } else {
@@ -1012,7 +1012,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               align-items: center;
               transition: all 0.2s ease;
             `;
-            
+
             item.innerHTML = `
               <div class="del-btn" style="position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; background: rgba(0,0,0,0.6); color: white; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; z-index: 10;">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -1065,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   const badge = el.querySelector('.def-badge');
                   if (badge) badge.remove();
                 });
-                
+
                 item.style.border = '1px solid var(--accent-primary)';
                 item.style.background = 'var(--accent-primary-soft)';
                 item.insertAdjacentHTML('beforeend', '<div class="def-badge" style="position: absolute; top: -4px; right: -4px; background: var(--accent-primary); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; z-index: 10;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>');
@@ -1083,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     chrome.storage.local.remove('default_image_signature_id');
                   }
                   refreshImageSignatures(); // Full refresh is ok for deletion
-                  
+
                   // Background delete from Google Drive
                   if (file.driveId) {
                     chrome.storage.local.get(['gdriveToken'], (st) => {
@@ -1142,7 +1142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const id = crypto.randomUUID();
             const fileName = `Signature_${new Date().getTime()}`;
             const res = await saveImageSignatureLocal(id, fileName, file.type, reader.result);
-            
+
             // If it's the first one, set as default
             chrome.storage.local.get(['default_image_signature_id', 'gdriveToken'], (st) => {
               if (!st.default_image_signature_id) {
@@ -1192,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loadReasons = async (baseUrl, token) => {
     try {
       const response = await fetch(`${baseUrl}/api/reasons/categories`, {
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json'
         }
@@ -1221,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const updateSubcategories = () => {
     const selectedCatId = categorySelect.value;
     const cat = reasonsCategories.find(c => c.id.toString() === selectedCatId);
-    
+
     const placeholderText = langCode === 'id' ? '-- Pilih Alasan --' : langCode === 'th' ? '-- เลือกเหตุผล --' : '-- Select Reason --';
     subcategorySelect.innerHTML = `<option value="">${placeholderText}</option>`;
     if (cat && cat.sub_categories) {
@@ -1271,10 +1271,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Size adjustment for drag box based on scale
       const canvasRect = pdfCanvas.getBoundingClientRect();
       if (canvasRect.width > 0) {
-          const displayScale = 600 / canvasRect.width;
-          let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
-          qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
-          qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
+        const displayScale = 600 / canvasRect.width;
+        let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
+        qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
+        qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
       }
 
       // Update UI
@@ -1339,10 +1339,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const reader = new FileReader();
-    reader.onload = async function() {
+    reader.onload = async function () {
       currentFileBytes = this.result;
       const pdfUint8 = new Uint8Array(currentFileBytes.slice(0));
-      
+
       previewContainer.classList.remove('hidden');
       if (signatureTypeContainer) signatureTypeContainer.classList.remove('hidden');
       signSuccessCard.classList.add('hidden');
@@ -1363,7 +1363,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loadingTask = pdfjsLib.getDocument({ data: pdfUint8 });
         currentLoadedPdf = await loadingTask.promise;
         currentPdfNumPages = currentLoadedPdf.numPages;
-        
+
         if (paginationControls) {
           if (currentPdfNumPages > 1) {
             paginationControls.classList.remove('hidden');
@@ -1381,11 +1381,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     reader.readAsArrayBuffer(file);
   });
 
-  // Simple QR drag tracker inside canvas
+  // ─── QR DRAG + RESIZE ──────────────────────────────────────────────────────
   let isDragging = false;
+  let isResizing = false;
   let startX = 0, startY = 0;
+  let resizeStartW = 0, resizeStartH = 0;
 
+  // Create resize handle (SE corner)
+  const resizeHandle = document.createElement('div');
+  resizeHandle.id = 'qr-resize-handle';
+  resizeHandle.style.cssText = [
+    'position:absolute',
+    'bottom:-5px',
+    'right:-5px',
+    'width:14px',
+    'height:14px',
+    'background:var(--accent-primary)',
+    'border:2px solid var(--surface-primary)',
+    'border-radius:3px',
+    'cursor:se-resize',
+    'z-index:20',
+    'opacity:0.85',
+    'transition:opacity 0.2s'
+  ].join(';');
+  qrDragBox.appendChild(resizeHandle);
+
+  // Drag: mousedown on qrDragBox (not on resize handle)
   qrDragBox.addEventListener('mousedown', (e) => {
+    if (e.target === resizeHandle) return; // handled by resize
     isDragging = true;
     const rect = qrDragBox.getBoundingClientRect();
     startX = e.clientX - rect.left;
@@ -1393,27 +1416,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
   });
 
+  // Resize: mousedown on resize handle
+  resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    resizeStartW = qrDragBox.offsetWidth;
+    resizeStartH = qrDragBox.offsetHeight;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
   document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const containerRect = previewContainer.getBoundingClientRect();
-    let left = e.clientX - containerRect.left - startX;
-    let top = e.clientY - containerRect.top - startY;
+    if (isDragging) {
+      const containerRect = previewContainer.getBoundingClientRect();
+      let left = e.clientX - containerRect.left - startX;
+      let top = e.clientY - containerRect.top - startY;
 
-    // Boundary constraints
-    left = Math.max(0, Math.min(left, containerRect.width - qrDragBox.offsetWidth));
-    top = Math.max(0, Math.min(top, containerRect.height - qrDragBox.offsetHeight));
+      // Boundary constraints
+      left = Math.max(0, Math.min(left, containerRect.width - qrDragBox.offsetWidth));
+      top = Math.max(0, Math.min(top, containerRect.height - qrDragBox.offsetHeight));
 
-    qrDragBox.style.left = `${left}px`;
-    qrDragBox.style.top = `${top}px`;
+      qrDragBox.style.left = `${left}px`;
+      qrDragBox.style.top = `${top}px`;
 
-    // Map to canvas relative points
-    const canvasRect = pdfCanvas.getBoundingClientRect();
-    qrX = left - canvasRect.left + containerRect.left;
-    qrY = top - canvasRect.top + containerRect.top;
+      // Map to canvas relative points
+      const canvasRect = pdfCanvas.getBoundingClientRect();
+      qrX = left - canvasRect.left + containerRect.left;
+      qrY = top - canvasRect.top + containerRect.top;
+    }
+
+    if (isResizing) {
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const newW = Math.max(30, resizeStartW + dx);
+      const newH = Math.max(20, resizeStartH + dy);
+      qrDragBox.style.width = `${newW}px`;
+      qrDragBox.style.height = `${newH}px`;
+    }
   });
 
   document.addEventListener('mouseup', () => {
     isDragging = false;
+    isResizing = false;
   });
 
   if (signatureTypeSelect) {
@@ -1451,14 +1496,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (qrDragImg) qrDragImg.classList.add('hidden');
         if (qrDragText) qrDragText.classList.remove('hidden');
       }
-      
+
       // Update visual size of drag box
       const canvasRect = pdfCanvas.getBoundingClientRect();
       if (canvasRect.width > 0) {
-          const displayScale = 600 / canvasRect.width;
-          let isQrCode = (type === 'qr');
-          qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
-          qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
+        const displayScale = 600 / canvasRect.width;
+        let isQrCode = (type === 'qr');
+        qrDragBox.style.width = `${(isQrCode ? 72 : 115) / displayScale}px`;
+        qrDragBox.style.height = `${(isQrCode ? 46 : 76) / displayScale}px`;
       }
     });
   }
@@ -1501,23 +1546,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         // === [BARU] Pre-Sign Cert Validation (Trustless) ===
         const syncRes = await fetch(`${baseUrl}/certificates/sync-check`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ serial_number: localSerial })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ serial_number: localSerial })
         });
         const syncData = await syncRes.json();
 
         if (!syncData.active) {
-            progressOverlay.classList.add('hidden');
-            const msg = syncData.is_revoked
-                ? 'Your certificate has been revoked. Please generate a new certificate from the Dashboard.'
-                : 'Your certificate is no longer valid. Please check your Keys & Cert tab.';
-            showSignError(msg);
-            return;
+          progressOverlay.classList.add('hidden');
+          const msg = syncData.is_revoked
+            ? 'Your certificate has been revoked. Please generate a new certificate from the Dashboard.'
+            : 'Your certificate is no longer valid. Please check your Keys & Cert tab.';
+          showSignError(msg);
+          return;
         }
         // === [END] Pre-Sign Cert Validation ===
       } catch (e) {
@@ -1539,46 +1584,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         let isQrCode = (signatureTypeSelect ? signatureTypeSelect.value === 'qr' : true);
 
         if (!isQrCode) {
-            const st = await chrome.storage.local.get('default_image_signature_id');
-            if (st.default_image_signature_id) {
-                try {
-                    const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
-                    if (imgSig && imgSig.dataUrl) {
-                        uploadedImageBase64 = imgSig.dataUrl;
-                    } else {
-                        isQrCode = true;
-                    }
-                } catch (err) { 
-                    console.error("Error loading image signature", err); 
-                    isQrCode = true;
-                }
-            } else {
+          const st = await chrome.storage.local.get('default_image_signature_id');
+          if (st.default_image_signature_id) {
+            try {
+              const imgSig = await getImageSignatureLocal(st.default_image_signature_id);
+              if (imgSig && imgSig.dataUrl) {
+                uploadedImageBase64 = imgSig.dataUrl;
+              } else {
                 isQrCode = true;
+              }
+            } catch (err) {
+              console.error("Error loading image signature", err);
+              isQrCode = true;
             }
+          } else {
+            isQrCode = true;
+          }
         }
 
         let signerName = document.getElementById('user-name-text').textContent || 'TrustlessSign User';
         if (signerName === 'Authenticated User' || !signerName) {
-            const certData = await fetch(`${baseUrl}/api/certificates/me`, {
-                headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-            }).then(r=>r.json()).catch(()=>null);
-            if (certData && certData.certificates && certData.certificates.length > 0) {
-                 const activeCert = certData.certificates.find(c => c.serial_number === localSerial);
-                 if (activeCert) signerName = activeCert.subject_cn;
-            }
+          const certData = await fetch(`${baseUrl}/api/certificates/me`, {
+            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+          }).then(r => r.json()).catch(() => null);
+          if (certData && certData.certificates && certData.certificates.length > 0) {
+            const activeCert = certData.certificates.find(c => c.serial_number === localSerial);
+            if (activeCert) signerName = activeCert.subject_cn;
+          }
         }
 
         let qrPng;
         if (isQrCode) {
-            qrPng = await window.generateModernTSignQR(verifyUrl);
+          qrPng = await window.generateModernTSignQR(verifyUrl);
         } else {
-            qrPng = await window.generateSignatureFrame(
-                signerName,
-                shortId,
-                verifyUrl,
-                uploadedImageBase64,
-                false
-            );
+          qrPng = await window.generateSignatureFrame(
+            signerName,
+            shortId,
+            verifyUrl,
+            uploadedImageBase64,
+            false
+          );
         }
 
         // Compile final reason text
@@ -1593,9 +1638,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const subText = subCategory ? subCategory.reason_text_id : '';
         const detailText = customReasonText.value;
         const reasonFinal = subText && detailText ? `${subText}: ${detailText}`
-                           : subText ? subText
-                           : detailText ? detailText
-                           : 'Digital Verification';
+          : subText ? subText
+            : detailText ? detailText
+              : 'Digital Verification';
 
         // Wait a bit to simulate connecting
         await new Promise(r => setTimeout(r, 1000));
@@ -1621,22 +1666,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         const relativeY = qrY * displayScale;
 
         const now = new Date();
-        const timestamp = now.getFullYear() + '.' + 
-            String(now.getMonth() + 1).padStart(2, '0') + '.' + 
-            String(now.getDate()).padStart(2, '0') + '_' + 
-            String(now.getHours()).padStart(2, '0') + '-' + 
-            String(now.getMinutes()).padStart(2, '0') + '-' + 
-            String(now.getSeconds()).padStart(2, '0');
+        const timestamp = now.getFullYear() + '.' +
+          String(now.getMonth() + 1).padStart(2, '0') + '.' +
+          String(now.getDate()).padStart(2, '0') + '_' +
+          String(now.getHours()).padStart(2, '0') + '-' +
+          String(now.getMinutes()).padStart(2, '0') + '-' +
+          String(now.getSeconds()).padStart(2, '0');
         finalFileName = `signed_ext_${timestamp}-${file.name}`;
 
         const pageStamps = [];
+        // if (currentPdfNumPages > 1) {
         for (let i = 1; i <= currentPdfNumPages; i++) {
-            const stampStr = await window.generatePageStamp(shortId, i, currentPdfNumPages, timestamp);
-            pageStamps.push(stampStr);
+          const stampStr = await window.generatePageStamp(shortId, i, currentPdfNumPages, timestamp);
+          pageStamps.push(stampStr);
         }
+        // }
 
-        console.log("[DEBUG] Hide Frame:", optHideFrame);
-        console.log("[DEBUG] Sealed Enabled:", optSealedEnabled, sealedPermsState);
+        // console.log("[DEBUG] Hide Frame:", optHideFrame);
+        // console.log("[DEBUG] Sealed Enabled:", optSealedEnabled, sealedPermsState);
+
+        // Build footer prefix based on current language
+        const currentLangCode = langSelect ? langSelect.value : langCode;
+        const footerTranslationsExt = {
+          en: "This document has been electronically signed. To Verify visit: ",
+          id: "Dokumen ini ditandatangani secara elektronik. Verifikasi di: ",
+          th: "เอกสารนี้ได้รับการลงนามทางอิเล็กทรอนิกส์แล้ว ตรวจสอบได้ที่: "
+        };
+        const footerPrefix = footerTranslationsExt[currentLangCode] || footerTranslationsExt.en;
+
+        // Build the short verify base URL from baseUrl
+        const verifyUrlShort = `${baseUrl}/verify`;
 
         // Call background worker to sign & upload
         chrome.runtime.sendMessage({
@@ -1659,6 +1718,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             password: password,
             qrPngBase64: qrPng,
             verifyToken: verifyToken,
+            footerPrefix: footerPrefix,
+            verifyUrlShort: verifyUrlShort,
             hideFrame: optHideFrame,
             sealedPerms: optSealedEnabled ? { ...sealedPermsState } : null
           }
@@ -1671,17 +1732,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             setTimeout(() => {
               progressOverlay.style.display = 'none';
-              
+
               if (res.status === 'warning') {
-                  const successTitle = document.querySelector('#sign-success-card h4');
-                  const successDesc = document.querySelector('#sign-success-card p');
-                  if (successTitle) {
-                      successTitle.textContent = "Saved Locally";
-                      successTitle.style.color = "var(--accent-warning)";
-                  }
-                  if (successDesc) {
-                      successDesc.textContent = res.message || "Google Drive upload failed. File saved locally.";
-                  }
+                const successTitle = document.querySelector('#sign-success-card h4');
+                const successDesc = document.querySelector('#sign-success-card p');
+                if (successTitle) {
+                  successTitle.textContent = "Saved Locally";
+                  successTitle.style.color = "var(--accent-warning)";
+                }
+                if (successDesc) {
+                  successDesc.textContent = res.message || "Google Drive upload failed. File saved locally.";
+                }
               }
               const btnViewDrive = document.getElementById('btn-view-drive');
               if (res.gdriveUrl) {
@@ -1721,7 +1782,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const inputEl = document.getElementById('pwd-prompt-input');
       const btnSubmit = document.getElementById('btn-pwd-prompt-submit');
       const btnCancel = document.getElementById('btn-pwd-prompt-cancel');
-      
+
       titleEl.textContent = title;
       descEl.textContent = desc;
       inputEl.value = '';
@@ -1794,7 +1855,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentStep = steps[stage];
     if (currentStep) {
       progressDesc.textContent = currentStep.text;
-      
+
       const stepNames = {
         'step-download': tProgress.step1,
         'step-stamp': tProgress.step2,
@@ -1806,7 +1867,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const el = document.getElementById(id);
         const iconEl = el.querySelector('.step-icon');
         const textEl = el.querySelector('.step-text');
-        
+
         iconEl.innerHTML = '⏳';
         textEl.textContent = stepNames[id];
         textEl.style.color = 'var(--text-tertiary)';
@@ -1837,7 +1898,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnDownloadSigned.addEventListener('click', () => {
     if (!signedPdfBase64) return;
     const file = signFileInput.files[0];
-    
+
     // We can use chrome.downloads or data URL trigger
     const dataUrl = `data:application/pdf;base64,${signedPdfBase64}`;
 
@@ -1912,8 +1973,8 @@ async function generateDeviceIdentifier() {
     new Date().getTimezoneOffset(),
   ].join('|');
 
-  const enc    = new TextEncoder();
-  const hash   = await crypto.subtle.digest('SHA-256', enc.encode(rawData));
-  const bytes  = new Uint8Array(hash);
+  const enc = new TextEncoder();
+  const hash = await crypto.subtle.digest('SHA-256', enc.encode(rawData));
+  const bytes = new Uint8Array(hash);
   return Array.from(bytes.slice(0, 8)).map(b => b.toString(16).padStart(2, '0')).join('');
 }

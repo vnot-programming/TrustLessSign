@@ -1381,11 +1381,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     reader.readAsArrayBuffer(file);
   });
 
-  // Simple QR drag tracker inside canvas
+  // ─── QR DRAG + RESIZE ──────────────────────────────────────────────────────
   let isDragging = false;
+  let isResizing = false;
   let startX = 0, startY = 0;
+  let resizeStartW = 0, resizeStartH = 0;
 
+  // Create resize handle (SE corner)
+  const resizeHandle = document.createElement('div');
+  resizeHandle.id = 'qr-resize-handle';
+  resizeHandle.style.cssText = [
+    'position:absolute',
+    'bottom:-5px',
+    'right:-5px',
+    'width:14px',
+    'height:14px',
+    'background:var(--accent-primary)',
+    'border:2px solid var(--surface-primary)',
+    'border-radius:3px',
+    'cursor:se-resize',
+    'z-index:20',
+    'opacity:0.85',
+    'transition:opacity 0.2s'
+  ].join(';');
+  qrDragBox.appendChild(resizeHandle);
+
+  // Drag: mousedown on qrDragBox (not on resize handle)
   qrDragBox.addEventListener('mousedown', (e) => {
+    if (e.target === resizeHandle) return; // handled by resize
     isDragging = true;
     const rect = qrDragBox.getBoundingClientRect();
     startX = e.clientX - rect.left;
@@ -1393,27 +1416,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
   });
 
+  // Resize: mousedown on resize handle
+  resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    resizeStartW = qrDragBox.offsetWidth;
+    resizeStartH = qrDragBox.offsetHeight;
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
   document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const containerRect = previewContainer.getBoundingClientRect();
-    let left = e.clientX - containerRect.left - startX;
-    let top = e.clientY - containerRect.top - startY;
+    if (isDragging) {
+      const containerRect = previewContainer.getBoundingClientRect();
+      let left = e.clientX - containerRect.left - startX;
+      let top = e.clientY - containerRect.top - startY;
 
-    // Boundary constraints
-    left = Math.max(0, Math.min(left, containerRect.width - qrDragBox.offsetWidth));
-    top = Math.max(0, Math.min(top, containerRect.height - qrDragBox.offsetHeight));
+      // Boundary constraints
+      left = Math.max(0, Math.min(left, containerRect.width - qrDragBox.offsetWidth));
+      top = Math.max(0, Math.min(top, containerRect.height - qrDragBox.offsetHeight));
 
-    qrDragBox.style.left = `${left}px`;
-    qrDragBox.style.top = `${top}px`;
+      qrDragBox.style.left = `${left}px`;
+      qrDragBox.style.top = `${top}px`;
 
-    // Map to canvas relative points
-    const canvasRect = pdfCanvas.getBoundingClientRect();
-    qrX = left - canvasRect.left + containerRect.left;
-    qrY = top - canvasRect.top + containerRect.top;
+      // Map to canvas relative points
+      const canvasRect = pdfCanvas.getBoundingClientRect();
+      qrX = left - canvasRect.left + containerRect.left;
+      qrY = top - canvasRect.top + containerRect.top;
+    }
+
+    if (isResizing) {
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      const newW = Math.max(30, resizeStartW + dx);
+      const newH = Math.max(20, resizeStartH + dy);
+      qrDragBox.style.width = `${newW}px`;
+      qrDragBox.style.height = `${newH}px`;
+    }
   });
 
   document.addEventListener('mouseup', () => {
     isDragging = false;
+    isResizing = false;
   });
 
   if (signatureTypeSelect) {
@@ -1640,6 +1685,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("[DEBUG] Hide Frame:", optHideFrame);
         console.log("[DEBUG] Sealed Enabled:", optSealedEnabled, sealedPermsState);
 
+        // Build footer prefix based on current language
+        const currentLangCode = langSelect ? langSelect.value : langCode;
+        const footerTranslationsExt = {
+          en: "This document has been electronically signed. To Verify visit: ",
+          id: "Dokumen ini ditandatangani secara elektronik. Verifikasi di: ",
+          th: "เอกสารนี้ได้รับการลงนามทางอิเล็กทรอนิกส์แล้ว ตรวจสอบได้ที่: "
+        };
+        const footerPrefix = footerTranslationsExt[currentLangCode] || footerTranslationsExt.en;
+
+        // Build the short verify base URL from baseUrl
+        const verifyUrlShort = `${baseUrl}/verify`;
+
         // Call background worker to sign & upload
         chrome.runtime.sendMessage({
           type: 'SIGN_DOCUMENT',
@@ -1661,6 +1718,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             password: password,
             qrPngBase64: qrPng,
             verifyToken: verifyToken,
+            footerPrefix: footerPrefix,
+            verifyUrlShort: verifyUrlShort,
             hideFrame: optHideFrame,
             sealedPerms: optSealedEnabled ? { ...sealedPermsState } : null
           }
