@@ -43,4 +43,9 @@ Jika tidak ada perubahan pada Web Dashboard maka lakukan:
 cd /home/vnot/extra_disk/docker-temp/trustlesssign/web && npm run build
 ```
 
+```bash
+cd /home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension && npm run build
+```
+
+
 

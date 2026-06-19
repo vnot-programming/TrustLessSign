@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const qrDragBox = document.getElementById('qr-drag-box');
   const signatureTypeContainer = document.getElementById('signature-type-container');
   const signatureTypeSelect = document.getElementById('signature-type');
+  const signerModeContainer = document.getElementById('signer-mode-container');
+  const signerModeSelect = document.getElementById('signer-mode');
+  const optSignerUser = document.getElementById('opt-signer-user');
   const signerNameContainer = document.getElementById('signer-name-container');
   const signerNameInput = document.getElementById('signer-name-input');
   const qrDragText = document.getElementById('qr-drag-text');
@@ -635,6 +638,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (userNameTextEl) {
           userNameTextEl.textContent = userNameText;
           userNameTextEl.classList.remove('hidden');
+        }
+        if (optSignerUser) {
+          optSignerUser.textContent = `${userNameText} (${userEmailText})`;
         }
         if (userNameSkeleton) userNameSkeleton.classList.add('hidden');
 
@@ -1342,6 +1348,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       previewContainer.classList.add('hidden');
       if (paginationControls) paginationControls.classList.add('hidden');
       if (signatureTypeContainer) signatureTypeContainer.classList.add('hidden');
+      if (signerModeContainer) signerModeContainer.classList.add('hidden');
+      if (signerNameContainer) signerNameContainer.classList.add('hidden');
       return;
     }
 
@@ -1352,6 +1360,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       previewContainer.classList.remove('hidden');
       if (signatureTypeContainer) signatureTypeContainer.classList.remove('hidden');
+      if (signerModeContainer) signerModeContainer.classList.remove('hidden');
+      if (signerModeSelect && signerModeSelect.value === 'custom') {
+        if (signerNameContainer) signerNameContainer.classList.remove('hidden');
+      } else {
+        if (signerNameContainer) signerNameContainer.classList.add('hidden');
+      }
       signSuccessCard.classList.add('hidden');
 
       // reset signature type preview
@@ -1467,6 +1481,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     isDragging = false;
     isResizing = false;
   });
+
+  if (signerModeSelect) {
+    signerModeSelect.addEventListener('change', () => {
+      if (signerModeSelect.value === 'custom') {
+        if (signerNameContainer) signerNameContainer.classList.remove('hidden');
+      } else {
+        if (signerNameContainer) signerNameContainer.classList.add('hidden');
+      }
+    });
+  }
 
   if (signatureTypeSelect) {
     signatureTypeSelect.addEventListener('change', async (e) => {
@@ -1617,6 +1641,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (certData && certData.certificates && certData.certificates.length > 0) {
             const activeCert = certData.certificates.find(c => c.serial_number === localSerial);
             if (activeCert) signerName = activeCert.subject_cn;
+          }
+        }
+
+        if (signerModeSelect && signerModeSelect.value === 'custom') {
+          const customName = signerNameInput ? signerNameInput.value.trim() : "";
+          if (customName) {
+            signerName = customName;
           }
         }
 

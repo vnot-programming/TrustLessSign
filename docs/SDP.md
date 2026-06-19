@@ -878,6 +878,7 @@
   - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
 - **Status:** Selesai
 - **Handoff Note:** Telah dicommit. Hanya tag `ext-v1.6.3` yang di-push untuk menghindari CI/CD Web yang tidak perlu.
+
 ### [2026-06-19] — Signer Custom Name Propagation to Backend & Verification
 - **Tugas:** Menambahkan kemampuan backend untuk menyimpan dan frontend (Verify) untuk mempropagasi nama penandatangan kustom (Custom Signer Name) dari input extension/Web Dashboard.
 - **File diubah:** 

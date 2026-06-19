@@ -845,9 +845,18 @@
           </select>
         </div>
 
+        <!-- Signer Name Selector -->
+        <div class="form-group hidden" id="signer-mode-container">
+          <label id="lbl-signer-mode">Penanda tangan (Signer)</label>
+          <select id="signer-mode" class="form-control">
+            <option value="user" id="opt-signer-user">Default User</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
         <!-- Signer Name Input -->
         <div class="form-group hidden" id="signer-name-container">
-          <label id="lbl-signer-name">Penanda tangan (Signer)</label>
+          <label id="lbl-signer-name" style="font-size: 0.85rem; color: var(--text-tertiary);">Nama Penanda tangan</label>
           <input type="text" id="signer-name-input" class="form-control" placeholder="Masukkan nama penanda tangan...">
         </div>
 
