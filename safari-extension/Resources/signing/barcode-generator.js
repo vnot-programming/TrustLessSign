@@ -155,7 +155,7 @@ async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedIm
     return canvas.toDataURL('image/png');
 }
 
-const TSIGN_LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTggNDIiIHdpZHRoPSIxMTgiIGhlaWdodD0iNDIiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0U2lnbkdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM0I5MzVEIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyYTY5NDIiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICAKICA8dGV4dCB4PSIwIiB5PSIzMyIgZm9udC1mYW1pbHk9IidDb3VyaWVyIE5ldycsIG1vbm9zcGFjZSIgZm9udC1zaXplPSI0NCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9InVybCgjdFNpZ25HcmFkKSI+dDwvdGV4dD4KICAKICA8dGV4dCB4PSIyNCIgeT0iMzMiIGZvbnQtZmFtaWx5PSInSW50ZXInLCAnQXJpYWwnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMTExMTExIiBsZXR0ZXItc3BhY2luZz0iLTEiPlNpZ248L3RleHQ+CiAgCiAgPGNpcmNsZSBjeD0iMTEzIiBjeT0iMzMiIHI9IjQuNSIgZmlsbD0iIzNCOTM1RCIgLz4KPC9zdmc+Cg==";
+const TSIGN_LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTggNDIiIHdpZHRoPSIxMTgiIGhlaWdodD0iNDIiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0U2lnbkdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM0I5MzVEIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyYTY5NDIiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMTE4IiBoZWlnaHQ9IjQyIiByeD0iOCIgZmlsbD0iI2ZmZmZmZiIgLz4KICA8dGV4dCB4PSI2IiB5PSIzMSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSI0NCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9InVybCgjdFNpZ25HcmFkKSI+dDwvdGV4dD4KICA8dGV4dCB4PSIzMCIgeT0iMzEiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMTExMTExIiBsZXR0ZXItc3BhY2luZz0iLTEiPlNpZ248L3RleHQ+CiAgPGNpcmNsZSBjeD0iMTEwIiBjeT0iMzEiIHI9IjQuNSIgZmlsbD0iIzNCOTM1RCIgLz4KPC9zdmc+";
 
 /**
  * Generate a standalone modern QR Code using qr-code-styling.
@@ -177,8 +177,7 @@ async function generateModernTSignQR(verifyUrl, hideFrame = false) {
         imageOptions: {
             hideBackgroundDots: true,
             imageSize: 0.3,
-            margin: 10,
-            crossOrigin: "anonymous"
+            margin: 10
         },
         dotsOptions: {
             color: "#000000",

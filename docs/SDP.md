@@ -853,3 +853,15 @@
   - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
 - **Status:** Selesai
 - **Handoff Note:** Perbaikan telah dicommit dengan tag `ext-v1.6.1` dan `web-v1.4.8`. Tunggu CI/CD ekstensi berjalan ulang ke PC User.
+
+### 2026-06-19 — Hotfix Web QR Logo Visibility (crossOrigin & Base64 Background)
+- **Tugas yang diselesaikan:**
+  1. Menghapus konfigurasi `crossOrigin: "anonymous"` dari `qr-code-styling` options di `barcode-generator.js` (Web dan Extensions) karena properti tersebut menyebabkan masalah CORS/Opaque Origin saat merender data URI `image/svg+xml` ke Canvas di beberapa browser (Safari/WebKit/Blink).
+  2. Menambahkan `<rect fill="#ffffff" />` dengan *rounded corners* di dalam Base64 SVG `TSIGN_LOGO_BASE64` agar logo tSign terlihat kontras dan tidak menyatu/overlap dengan pola hitam QR Code.
+  3. Bumping versi web ke `1.4.9` dan extension ke `1.6.2`.
+- **File yang diubah:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`
+  - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status:** Selesai
+- **Handoff Note:** Hotfix telah dicommit dengan tag `ext-v1.6.2` dan `web-v1.4.9`. CI/CD akan membangun ulang Vite dan Extension.
