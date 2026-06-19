@@ -36,3 +36,11 @@ php artisan test --filter=TrustlessSignApiTest
 - [x] scan QR redirects to `/verify/{token}` page.
 - [x] PDF integrity checking via hash validation runs local client-side comparison.
 - [x] Revoked certificates show explicit visual status updates.
+
+## 3. Building Cache
+Jika tidak ada perubahan pada Web Dashboard maka lakukan:
+```bash
+cd /home/vnot/extra_disk/docker-temp/trustlesssign/web && npm run build
+```
+
+

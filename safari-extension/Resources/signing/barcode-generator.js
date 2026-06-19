@@ -167,7 +167,7 @@ async function generateModernTSignQR(verifyUrl, hideFrame = false) {
         height: 600,
         type: "canvas",
         data: verifyUrl,
-        image: hideFrame ? null : TSIGN_LOGO_BASE64,
+        image: TSIGN_LOGO_BASE64,
         margin: hideFrame ? 4 : 0,
         qrOptions: {
             typeNumber: 0,

@@ -7,6 +7,7 @@
 - **File yang diubah/dibuat:** `popup.js`, `popup.html`, `manifest.json` (Chrome & Safari), `Welcome.jsx`, `SocialiteController.php`, `web.php`.
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Auth flow ekstensi telah dimigrasikan dari `chrome.identity` menjadi berbasis cookie untuk SSO yang seamless dengan Web Dashboard, menghindari email persetujuan Google ganda. Ekstensi menggunakan `chrome.cookies.get` untuk memonitor token `tsign_api_token` dan `tsign_gdrive_token` yang diisukan oleh `SocialiteController` (Sanctum) dengan attribute `SameSite=None` dan `Secure=true`. Web Dashboard hanya memunculkan "Login Via TrustlessSign" tanpa branding Google di ekstensi. Pengecekan auth telah disinkronkan.
+
 - **Tanggal/Waktu:** 2026-06-17T09:05:00Z
 - **Tugas yang diselesaikan:** Refactoring UI navigasi halaman PDF di Browser Extension: Mengganti input "Go to" terpisah dengan inline pagination di antara label "Page X of Y", dan menjawab status enkripsi PDF (`ignoreEncryption`).
 - **File yang diubah/dibuat:** `chrome-extension/popup/popup.html`, `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.html`, `safari-extension/Resources/popup.js`, `chrome-extension/package.json`, `safari-extension/Resources/manifest.json`.
@@ -865,3 +866,15 @@
   - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
 - **Status:** Selesai
 - **Handoff Note:** Hotfix telah dicommit dengan tag `ext-v1.6.2` dan `web-v1.4.9`. CI/CD akan membangun ulang Vite dan Extension.
+
+### 2026-06-19 — Bugfix QR Logo Disappears when Hide Frame is Checked
+- **Tugas yang diselesaikan:**
+  1. Memperbaiki logika ternary `image: hideFrame ? null : TSIGN_LOGO_BASE64` menjadi `image: TSIGN_LOGO_BASE64` pada `generateModernTSignQR`.
+  2. Logo tSign sekarang akan selalu muncul di tengah QR Code (Cryptographic QR) terlepas dari apakah opsi *Hide Frame* diaktifkan atau tidak.
+  3. Bumping versi web ke `1.4.10` dan extension ke `1.6.3`. Mengikuti aturan baru CI/CD Exemption, tag Git hanya akan dikirim untuk modul Ekstensi (`ext-v1.6.3`) sementara modul Web hanya dikomit biasa.
+- **File yang diubah:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`
+  - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status:** Selesai
+- **Handoff Note:** Telah dicommit. Hanya tag `ext-v1.6.3` yang di-push untuk menghindari CI/CD Web yang tidak perlu.
