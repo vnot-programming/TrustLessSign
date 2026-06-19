@@ -151,6 +151,8 @@ export async function generateSignatureFrame(signerName, shortId, verifyUrl, upl
     return canvas.toDataURL('image/png');
 }
 
+const TSIGN_LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTggNDIiIHdpZHRoPSIxMTgiIGhlaWdodD0iNDIiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0U2lnbkdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM0I5MzVEIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyYTY5NDIiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICAKICA8dGV4dCB4PSIwIiB5PSIzMyIgZm9udC1mYW1pbHk9IidDb3VyaWVyIE5ldycsIG1vbm9zcGFjZSIgZm9udC1zaXplPSI0NCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9InVybCgjdFNpZ25HcmFkKSI+dDwvdGV4dD4KICAKICA8dGV4dCB4PSIyNCIgeT0iMzMiIGZvbnQtZmFtaWx5PSInSW50ZXInLCAnQXJpYWwnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMTExMTExIiBsZXR0ZXItc3BhY2luZz0iLTEiPlNpZ248L3RleHQ+CiAgCiAgPGNpcmNsZSBjeD0iMTEzIiBjeT0iMzMiIHI9IjQuNSIgZmlsbD0iIzNCOTM1RCIgLz4KPC9zdmc+Cg==";
+
 /**
  * Generate a standalone modern QR Code using qr-code-styling.
  * Contains no external borders, text, or meta info.
@@ -161,7 +163,7 @@ export async function generateModernTSignQR(verifyUrl, hideFrame = false) {
         height: 600,
         type: "canvas",
         data: verifyUrl,
-        image: hideFrame ? null : "/logo-tSign.svg",
+        image: hideFrame ? null : TSIGN_LOGO_BASE64,
         margin: hideFrame ? 4 : 0,
         qrOptions: {
             typeNumber: 0,

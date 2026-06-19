@@ -1615,14 +1615,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let qrPng;
         if (isQrCode) {
-          qrPng = await window.generateModernTSignQR(verifyUrl);
+          qrPng = await window.generateModernTSignQR(verifyUrl, optHideFrame);
         } else {
           qrPng = await window.generateSignatureFrame(
             signerName,
             shortId,
             verifyUrl,
             uploadedImageBase64,
-            false
+            false,
+            "Signed by:",
+            "Verifikasi di:",
+            optHideFrame
           );
         }
 
@@ -1899,13 +1902,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!signedPdfBase64) return;
     const file = signFileInput.files[0];
 
-    // We can use chrome.downloads or data URL trigger
-    const dataUrl = `data:application/pdf;base64,${signedPdfBase64}`;
+    // Convert base64 to blob to ensure filename is respected by chrome.downloads API
+    const byteCharacters = atob(signedPdfBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
 
     chrome.downloads.download({
-      url: dataUrl,
+      url: blobUrl,
       filename: finalFileName,
       saveAs: true
+    }, () => {
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
     });
   });
 

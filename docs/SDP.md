@@ -830,3 +830,26 @@
 - **Tugas yang diselesaikan:** Menambahkan mekanisme sinkronisasi di latar belakang pada fungsi `refreshImageSignatures` untuk mendeteksi *visual signature* di IndexedDB lokal yang belum ter-upload (tidak punya `driveId`) dan langsung meng-upload-nya ke Google Drive jika `gdriveToken` tersedia.
 - **File yang diubah:** chrome-extension/popup/popup.js
 - **Status:** Selesai
+
+### 2026-06-19 — Extension QR Resize Handle & Footer Fix
+- **Tugas yang diselesaikan:**
+  1. Menambahkan SE (South-East) resize handle pada kotak drag penempatan visual signature/QR di preview (Chrome & Safari popup.js) sehingga pengguna dapat secara presisi mengatur ukuran QR/Image Signature sebelum mengeksekusi proses Sign Document.
+  2. Memperbaiki bug ekstensi gagal menambahkan footer text pada Marginal Page Stamp dengan menambahkan argumen `footerPrefix` dan `verifyUrlShort` ke dalam struktur `SIGN_DOCUMENT` payload.
+  3. Menginkremen versi ekstensi (chrome & safari) menjadi `1.6.0` dengan git tag `ext-v1.6.0`.
+- **File yang diubah:** `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`.
+- **Status:** Selesai
+- **Handoff Note:** Semua request User sudah disinkronisasikan di kedua ekstensi (Chrome/Safari) dan dipush melalui `ext-v1.6.0`. CI/CD pipeline seharusnya sekarang sedang berjalan membangun dan mengirim .crx ke Desktop-PC.
+
+### 2026-06-19 — Bugfix Extension Download Filename, Hide Frame, & Web QR Logo
+- **Tugas yang diselesaikan:**
+  1. **Extension Filename**: Memperbaiki `chrome.downloads.download` yang mengabaikan nama file untuk URL `data:`. Solusi menggunakan Blob URL (`URL.createObjectURL`).
+  2. **Hide Frame**: Menyinkronkan argumen `hideFrame` pada `generateSignatureFrame` dan `generateModernTSignQR` di Chrome/Safari Extension `barcode-generator.js` agar sejajar dengan versi Web. Serta memastikan argumen `optHideFrame` dipassing saat rendering di `popup.js`.
+  3. **Web QR Logo**: Memperbaiki masalah logo SVG tidak muncul di tengah QR Code pada Web Dashboard dengan mengonversi `logo-tSign.svg` menjadi Base64 string langsung di dalam `web/resources/js/Utils/barcode-generator.js`.
+  4. Bumping versi web ke `1.4.8` dan extension ke `1.6.1`.
+- **File yang diubah:**
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`
+  - `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js`
+  - `web/package.json`, `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status:** Selesai
+- **Handoff Note:** Perbaikan telah dicommit dengan tag `ext-v1.6.1` dan `web-v1.4.8`. Tunggu CI/CD ekstensi berjalan ulang ke PC User.

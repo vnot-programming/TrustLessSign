@@ -4,7 +4,7 @@
  * Adheres to Zero-Trust architecture and Bio-Digital Minimalism.
  */
 
-async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:") {
+async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedImageBase64 = null, isQrCode = true, textSignedBy = "Signed by:", textVerifyAt = "Verifikasi di:", hideFrame = false) {
     // Zero-Trust Validation is handled by Sanctum tokens in the Web Dashboard.
 
     // 2. Set up Canvas
@@ -30,44 +30,47 @@ async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedIm
     const width = logicalWidth;
     const height = logicalHeight;
 
-    const bodyStartX = 12; // super tight to the green line
+    // If hideFrame, use tight layout without any decoration
+    const bodyStartX = hideFrame ? 4 : 12;
     const rightPadding = 6;
 
-    // Artistic Green Border (Left)
-    ctx.strokeStyle = '#3B935D';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    // Top left curve
-    ctx.moveTo(padding + 6, padding);
-    ctx.quadraticCurveTo(padding, padding, padding, padding + 6);
-    // Line down
-    ctx.lineTo(padding, height - padding - 6);
-    // Bottom left curve
-    ctx.quadraticCurveTo(padding, height - padding, padding + 6, height - padding);
-    ctx.stroke();
+    if (!hideFrame) {
+        // Artistic Green Border (Left)
+        ctx.strokeStyle = '#3B935D';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        // Top left curve
+        ctx.moveTo(padding + 6, padding);
+        ctx.quadraticCurveTo(padding, padding, padding, padding + 6);
+        // Line down
+        ctx.lineTo(padding, height - padding - 6);
+        // Bottom left curve
+        ctx.quadraticCurveTo(padding, height - padding, padding + 6, height - padding);
+        ctx.stroke();
 
-    // Header: Check icon + "Signed by: [signerName]"
-    // Check mark
-    ctx.beginPath();
-    ctx.moveTo(bodyStartX, padding + 5);
-    ctx.lineTo(bodyStartX + 5, padding + 10);
-    ctx.lineTo(bodyStartX + 12, padding + 1);
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#3B935D';
-    ctx.stroke();
+        // Header: Check icon + "Signed by: [signerName]"
+        // Check mark
+        ctx.beginPath();
+        ctx.moveTo(bodyStartX, padding + 5);
+        ctx.lineTo(bodyStartX + 5, padding + 10);
+        ctx.lineTo(bodyStartX + 12, padding + 1);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#3B935D';
+        ctx.stroke();
 
-    ctx.fillStyle = '#111111';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${textSignedBy} ${signerName}`, bodyStartX + 16, padding + 5);
+        ctx.fillStyle = '#111111';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${textSignedBy} ${signerName}`, bodyStartX + 16, padding + 5);
+    }
 
     // Body: Image or Cursive Text
-    const bodyStartY = padding + 14; 
+    const bodyStartY = hideFrame ? padding : padding + 14; 
     // Give image more vertical space but keep it away from meta
-    const bodyHeight = height - padding - 14 - (isQrCode ? 0 : 50); 
+    const bodyHeight = hideFrame ? height - padding * 2 : height - padding - 14 - (isQrCode ? 0 : 50); 
     const maxImgWidth = width - rightPadding - bodyStartX; 
     
     if (uploadedImageBase64) {
@@ -101,7 +104,7 @@ async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedIm
         ctx.fillText(signerName, drawX, bodyStartY + bodyHeight / 2);
     }
 
-    if (!isQrCode) {
+    if (!isQrCode && !hideFrame) {
         // Meta Info
         const metaY = height - padding - 32; 
         
@@ -152,18 +155,20 @@ async function generateSignatureFrame(signerName, shortId, verifyUrl, uploadedIm
     return canvas.toDataURL('image/png');
 }
 
+const TSIGN_LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTggNDIiIHdpZHRoPSIxMTgiIGhlaWdodD0iNDIiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJ0U2lnbkdyYWQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM0I5MzVEIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMyYTY5NDIiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICAKICA8dGV4dCB4PSIwIiB5PSIzMyIgZm9udC1mYW1pbHk9IidDb3VyaWVyIE5ldycsIG1vbm9zcGFjZSIgZm9udC1zaXplPSI0NCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9InVybCgjdFNpZ25HcmFkKSI+dDwvdGV4dD4KICAKICA8dGV4dCB4PSIyNCIgeT0iMzMiIGZvbnQtZmFtaWx5PSInSW50ZXInLCAnQXJpYWwnLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM4IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMTExMTExIiBsZXR0ZXItc3BhY2luZz0iLTEiPlNpZ248L3RleHQ+CiAgCiAgPGNpcmNsZSBjeD0iMTEzIiBjeT0iMzMiIHI9IjQuNSIgZmlsbD0iIzNCOTM1RCIgLz4KPC9zdmc+Cg==";
+
 /**
  * Generate a standalone modern QR Code using qr-code-styling.
  * Contains no external borders, text, or meta info.
  */
-async function generateModernTSignQR(verifyUrl) {
+async function generateModernTSignQR(verifyUrl, hideFrame = false) {
     const qrCode = new QRCodeStyling({
         width: 600,
         height: 600,
         type: "canvas",
         data: verifyUrl,
-        image: "../assets/logo-tSign.svg",
-        margin: 0,
+        image: hideFrame ? null : TSIGN_LOGO_BASE64,
+        margin: hideFrame ? 4 : 0,
         qrOptions: {
             typeNumber: 0,
             mode: "Byte",
