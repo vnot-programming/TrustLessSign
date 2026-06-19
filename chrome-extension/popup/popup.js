@@ -183,6 +183,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_keygen_pwd: "Enter key password...",
       placeholder_keygen_confirm: "Confirm key password...",
       advanced_options: "Advanced Options",
+      signer_mode: "Signer",
+      signer_default: "Default User",
+      custom_signer_name: "Signer Name",
+      placeholder_signer_name: "Enter signer name...",
       hide_frame: "Hide Frame",
       hide_frame_desc: "Only QR Code or signature is embedded, without decorative border.",
       sealed: "Sealed (permanent)",
@@ -229,6 +233,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_keygen_pwd: "Masukkan kata sandi kunci...",
       placeholder_keygen_confirm: "Konfirmasi kata sandi kunci...",
       advanced_options: "Fitur Lanjutan",
+      signer_mode: "Penanda tangan (Signer)",
+      signer_default: "Default User",
+      custom_signer_name: "Nama Penanda tangan",
+      placeholder_signer_name: "Masukkan nama penanda tangan...",
       hide_frame: "Hilangkan Frame",
       hide_frame_desc: "Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai.",
       sealed: "Sealed (permanent)",
@@ -275,6 +283,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       placeholder_keygen_pwd: "ป้อนรหัสผ่านหลัก...",
       placeholder_keygen_confirm: "ยืนยันรหัสผ่านหลัก...",
       advanced_options: "ตัวเลือกขั้นสูง",
+      signer_mode: "ผู้ลงนาม (Signer)",
+      signer_default: "ผู้ใช้เริ่มต้น",
+      custom_signer_name: "ชื่อผู้ลงนาม",
+      placeholder_signer_name: "ใส่ชื่อผู้ลงนาม...",
       hide_frame: "ซ่อนกรอบ",
       hide_frame_desc: "แสดงเฉพาะ QR Code หรือลายเซ็น ไม่มีกรอบตกแต่ง",
       sealed: "ปิดผนึก (ถาวร)",
@@ -322,6 +334,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (reasonNotesLabel) reasonNotesLabel.textContent = trans.reason_notes;
 
     const pwdInput = document.getElementById('sign-password');
+    if (pwdInput && pwdInput.previousElementSibling) {
+      pwdInput.previousElementSibling.textContent = trans.master_pwd;
+    }
+    if (pwdInput) pwdInput.setAttribute('placeholder', trans.placeholder_pwd);
+
+    // Signer Mode and Advanced Options
+    const lblSignerMode = document.getElementById('lbl-signer-mode');
+    if (lblSignerMode) lblSignerMode.textContent = trans.signer_mode || "Signer";
+    const optSignerUser = document.getElementById('opt-signer-user');
+    if (optSignerUser) optSignerUser.textContent = trans.signer_default || "Default User";
+    const lblSignerName = document.getElementById('lbl-signer-name');
+    if (lblSignerName) lblSignerName.textContent = trans.custom_signer_name || "Signer Name";
+    const inputSignerName = document.getElementById('signer-name-input');
+    if (inputSignerName) inputSignerName.placeholder = trans.placeholder_signer_name || "Enter signer name...";
+
+    const lblAdvanced = document.getElementById('advanced-btn-label');
+    if (lblAdvanced) lblAdvanced.textContent = trans.advanced_options || "Advanced Options";
+    const lblHideFrame = document.getElementById('lbl-hide-frame');
+    if (lblHideFrame) lblHideFrame.textContent = trans.hide_frame || "Hide Frame";
+    const lblHideFrameDesc = document.getElementById('lbl-hide-frame-desc');
+    if (lblHideFrameDesc) lblHideFrameDesc.textContent = trans.hide_frame_desc || "Only QR Code or signature is embedded, without decorative border.";
+    const lblSealed = document.getElementById('lbl-sealed');
+    if (lblSealed) lblSealed.textContent = trans.sealed || "Sealed (permanent)";
+    const lblSealedDesc = document.getElementById('lbl-sealed-desc');
+    if (lblSealedDesc) lblSealedDesc.textContent = trans.sealed_desc || "Locks PDF permissions. Anyone can open it, but cannot change settings without TrustlessSign.";
+    const lblPermsTitle = document.getElementById('lbl-perms-title');
+    if (lblPermsTitle) lblPermsTitle.textContent = trans.perms_title || "Document Permissions";
     if (pwdInput && pwdInput.previousElementSibling) {
       pwdInput.previousElementSibling.textContent = trans.master_pwd;
     }

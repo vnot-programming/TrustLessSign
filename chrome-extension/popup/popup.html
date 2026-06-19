@@ -847,7 +847,7 @@
 
         <!-- Signer Name Selector -->
         <div class="form-group hidden" id="signer-mode-container">
-          <label id="lbl-signer-mode">Penanda tangan (Signer)</label>
+          <label id="lbl-signer-mode">Signer</label>
           <select id="signer-mode" class="form-control">
             <option value="user" id="opt-signer-user">Default User</option>
             <option value="custom">Custom</option>
@@ -856,8 +856,8 @@
 
         <!-- Signer Name Input -->
         <div class="form-group hidden" id="signer-name-container">
-          <label id="lbl-signer-name" style="font-size: 0.85rem; color: var(--text-tertiary);">Nama Penanda tangan</label>
-          <input type="text" id="signer-name-input" class="form-control" placeholder="Masukkan nama penanda tangan...">
+          <label id="lbl-signer-name" style="font-size: 0.85rem; color: var(--text-tertiary);">Signer Name</label>
+          <input type="text" id="signer-name-input" class="form-control" placeholder="Enter signer name...">
         </div>
 
         <!-- PDF Preview and Position selection -->
@@ -902,7 +902,7 @@
           <button type="button" id="btn-toggle-advanced" style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--surface-secondary);color:var(--text-secondary);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
             <span style="display:flex;align-items:center;gap:6px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-              <span id="advanced-btn-label">Fitur Lanjutan</span>
+              <span id="advanced-btn-label">Advanced Options</span>
             </span>
             <svg id="advanced-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -913,8 +913,8 @@
             <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:10px;">
               <input type="checkbox" id="opt-hide-frame" style="margin-top:2px;accent-color:var(--accent-primary);">
               <div>
-                <span id="lbl-hide-frame" style="font-size:0.75rem;font-weight:600;color:var(--text-primary);display:block;">Hilangkan Frame</span>
-                <span id="lbl-hide-frame-desc" style="font-size:0.65rem;color:var(--text-tertiary);display:block;margin-top:2px;">Hanya QR Code atau tanda tangan yang tertempel, tanpa bingkai.</span>
+                <span id="lbl-hide-frame" style="font-size:0.75rem;font-weight:600;color:var(--text-primary);display:block;">Hide Frame</span>
+                <span id="lbl-hide-frame-desc" style="font-size:0.65rem;color:var(--text-tertiary);display:block;margin-top:2px;">Only QR Code or signature is embedded, without decorative border.</span>
               </div>
             </label>
 
@@ -923,13 +923,13 @@
               <input type="checkbox" id="opt-sealed" style="margin-top:2px;accent-color:var(--accent-primary);">
               <div>
                 <span id="lbl-sealed" style="font-size:0.75rem;font-weight:600;color:var(--text-primary);display:block;">Sealed (permanent)</span>
-                <span id="lbl-sealed-desc" style="font-size:0.65rem;color:var(--text-tertiary);display:block;margin-top:2px;">Mengunci permission PDF. Dapat dibuka semua orang, namun tidak dapat diubah tanpa TrustlessSign.</span>
+                <span id="lbl-sealed-desc" style="font-size:0.65rem;color:var(--text-tertiary);display:block;margin-top:2px;">Locks PDF permissions. Anyone can open it, but cannot change settings without TrustlessSign.</span>
               </div>
             </label>
 
             <!-- Sealed Permissions Panel -->
             <div id="sealed-perms-panel" style="display:none;margin-top:8px;margin-left:20px;padding:8px;background:var(--surface-secondary);border-radius:6px;border:1px solid var(--border-subtle);">
-              <p id="lbl-perms-title" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:6px;">Izin Dokumen</p>
+              <p id="lbl-perms-title" style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:6px;">Document Permissions</p>
               <div id="sealed-perms-list" style="display:flex;flex-direction:column;gap:5px;"></div>
             </div>
           </div>

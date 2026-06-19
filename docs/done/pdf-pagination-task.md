@@ -16,6 +16,6 @@
 - [x] Bind `currentPage` to the `TRUSTLESS_SIGN_REQUEST` payload.
 
 ### Task 5.3: Verification & Polish
-- [ ] Upload a multi-page PDF in Web Dashboard, test navigation and jumping to a specific page.
-- [ ] Upload a multi-page PDF in Extension, test navigation and jumping.
-- [ ] Verify placing the QR/Image on a non-first page actually embeds correctly on that target page.
+- [x] Upload a multi-page PDF in Web Dashboard, test navigation and jumping to a specific page.
+- [x] Upload a multi-page PDF in Extension, test navigation and jumping.
+- [x] Verify placing the QR/Image on a non-first page actually embeds correctly on that target page.

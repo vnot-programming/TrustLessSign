@@ -640,20 +640,20 @@ export default function SignDocument() {
                     <>
                       {/* Signature Type Selector */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Signature Type</label>
+                        <label className="block text-xs font-semibold text-text-secondary">{t.signature_type || 'Signature Type'}</label>
                         <select 
                           value={signatureType} 
                           onChange={(e) => setSignatureType(e.target.value)}
                           className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
                         >
-                          <option value="qr">Cryptographic QR Code</option>
-                          <option value="image">Visual Signature (Image)</option>
+                          <option value="qr">{t.crypto_qr || 'Cryptographic QR Code'}</option>
+                          <option value="image">{t.visual_signature || 'Visual Signature (Image)'}</option>
                         </select>
                       </div>
 
                       {/* Penanda tangan (Signer) Selector */}
                       <div className="space-y-1">
-                        <label className="block text-xs font-semibold text-text-secondary">Penanda tangan (Signer)</label>
+                        <label className="block text-xs font-semibold text-text-secondary">{t.signer_label || 'Signer'}</label>
                         <select 
                           value={signerMode} 
                           onChange={(e) => {
@@ -672,12 +672,12 @@ export default function SignDocument() {
                       {/* Custom Signer Input */}
                       {signerMode === 'custom' && (
                         <div className="space-y-1 animate-fade-in">
-                          <label className="block text-xs font-semibold text-text-secondary">Nama Penanda tangan</label>
+                          <label className="block text-xs font-semibold text-text-secondary">{t.custom_signer_name || 'Signer Name'}</label>
                           <input 
                             type="text" 
                             value={customSigner}
                             onChange={(e) => setCustomSigner(e.target.value)}
-                            placeholder="Masukkan nama penanda tangan..."
+                            placeholder={t.custom_signer_placeholder || 'Enter signer name...'}
                             className="w-full px-3 py-2 border border-border-default rounded-md bg-surface-elevated text-sm text-text-primary focus:ring focus:outline-none focus:border-accent-primary"
                             required
                           />
