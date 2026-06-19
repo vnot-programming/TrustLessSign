@@ -900,3 +900,13 @@
   - `chrome-extension/package.json`, `safari-extension/Resources/manifest.json` dll.
 - **Status:** Selesai.
 - **Handoff Note:** Form input penanda tangan sekarang menggunakan UI Select/Dropdown untuk memilih apakah akan menggunakan "Default User" (nama asli) atau "Custom" (bisa diedit inputnya). Telah dipush dengan tag `ext-v1.6.5` dan CI/CD ekstensi berjalan.
+
+### [2026-06-19] — Extension Metadata Author & Rule Updates
+- **Tugas:** Memperbaiki bug metadata author pada PDF Document Properties agar menggunakan nilai Name/Email Signer yang benar dari UI Popup. Menambahkan aturan wajib membaca SDP di rule dev-trustlesssign.
+- **File diubah:**
+  - `.agents/rules/dev-trustlesssign.md`
+  - `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`
+  - `chrome-extension/background/service-worker.js`, `safari-extension/Resources/background.js`
+  - `chrome-extension/package.json`, `safari-extension/Resources/manifest.json`, dll.
+- **Status:** Selesai.
+- **Handoff Note:** Author metadata PDF yang disisipkan (`pdfDoc.setAuthor()`) sekarang menarik nilai string textContent dari elemen dropdown UI popup. Rules bot telah diperketat. Commit dan tag `ext-v1.6.6` telah dieksekusi untuk memicu auto-build ekstensi ke local client.

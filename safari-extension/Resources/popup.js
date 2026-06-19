@@ -1637,8 +1637,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (signerModeSelect && signerModeSelect.value === 'custom') {
           signerName = signerNameInput ? signerNameInput.value.trim() : "";
         } else {
-          const optUser = document.getElementById('opt-signer-user');
-          signerName = optUser ? optUser.textContent : (document.getElementById('user-name-text').textContent || 'TrustlessSign User');
+          signerName = document.getElementById('user-name-text').textContent || 'TrustlessSign User';
         }
 
         if (signerName === 'Authenticated User' || !signerName) {

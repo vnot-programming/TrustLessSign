@@ -89,6 +89,7 @@ class VerificationController extends Controller
                 'is_saved_to_drive' => $document->is_saved_to_drive,
                 'reason' => $document->reason_final ?? 'Digital Verification',
                 'signed_at' => $document->signed_at->toIso8601String(),
+                'signer_name' => $document->signer_name,
                 'notes' => $document->notes,
             ],
             'signer' => [
