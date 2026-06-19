@@ -1633,7 +1633,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
-        let signerName = document.getElementById('user-name-text').textContent || 'TrustlessSign User';
+        let signerName = '';
+        if (signerModeSelect && signerModeSelect.value === 'custom') {
+          signerName = signerNameInput ? signerNameInput.value.trim() : "";
+        } else {
+          const optUser = document.getElementById('opt-signer-user');
+          signerName = optUser ? optUser.textContent : (document.getElementById('user-name-text').textContent || 'TrustlessSign User');
+        }
+
         if (signerName === 'Authenticated User' || !signerName) {
           const certData = await fetch(`${baseUrl}/api/certificates/me`, {
             headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
@@ -1641,13 +1648,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (certData && certData.certificates && certData.certificates.length > 0) {
             const activeCert = certData.certificates.find(c => c.serial_number === localSerial);
             if (activeCert) signerName = activeCert.subject_cn;
-          }
-        }
-
-        if (signerModeSelect && signerModeSelect.value === 'custom') {
-          const customName = signerNameInput ? signerNameInput.value.trim() : "";
-          if (customName) {
-            signerName = customName;
           }
         }
 

@@ -213,7 +213,7 @@ async function handleSignDocument(payload, baseUrl) {
     certificate_serial: certSerial,
     verify_token: verifyToken,
     original_filename: filename,
-    author: payload.author || 'TrustlessSign User',
+    author: payload.signerName || payload.author || 'TrustlessSign User',
     reason: reason_final || 'Digital Verification',
     signed_at: new Date().toISOString(),
     footerPrefix: payload.footerPrefix || "This document has been electronically signed. To Verify visit: ",

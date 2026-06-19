@@ -892,3 +892,11 @@
 - **Status:** Selesai.
 - **Handoff Note:** Kolom `signer_name` telah ditambahkan ke database (PostgreSQL via Docker). Ekstensi sekarang akan mengirimkan nama penandatangan (yang bisa dikustomisasi) ke endpoint `/api/documents/register`. Halaman Verify akan menampilkan `signer_name` jika ada, fallback ke `signer.name` dari sertifikat. Build Web (Vite) dan database migration telah dieksekusi di server VPS secara otomatis. Ekstensi siap di komit dan bump version untuk memicu CI/CD.
 
+### [2026-06-19] — Extension UI Signer Mode Dropdown
+- **Tugas:** Menambahkan dropdown Signer Mode (Default User / Custom) di antarmuka popup Extension untuk menyesuaikan fitur yang ada di Web Dashboard.
+- **File diubah:**
+  - `chrome-extension/popup/popup.html`, `safari-extension/Resources/popup.html`
+  - `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js`
+  - `chrome-extension/package.json`, `safari-extension/Resources/manifest.json` dll.
+- **Status:** Selesai.
+- **Handoff Note:** Form input penanda tangan sekarang menggunakan UI Select/Dropdown untuk memilih apakah akan menggunakan "Default User" (nama asli) atau "Custom" (bisa diedit inputnya). Telah dipush dengan tag `ext-v1.6.5` dan CI/CD ekstensi berjalan.
