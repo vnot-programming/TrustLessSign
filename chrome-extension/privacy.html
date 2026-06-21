@@ -3,63 +3,356 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TrustlessSign - Privacy Policy</title>
+  <title>Privacy Policy — Trust Less Sign Extension</title>
   <style>
     :root {
-      --bg-color: #f8f9fa;
-      --text-color: #333;
-      --primary-color: #2665fd;
+      --surface-primary:     hsl(220, 18%, 7%);
+      --surface-elevated:    hsl(220, 16%, 11%);
+      --surface-card:        hsl(220, 14%, 15%);
+      --text-primary:        hsl(220, 16%, 92%);
+      --text-secondary:      hsl(220, 10%, 64%);
+      --text-tertiary:       hsl(220, 8%, 48%);
+      --accent-primary:      hsl(160, 84%, 39%);
+      --accent-primary-soft: hsla(160, 84%, 39%, 0.12);
+      --border-subtle:       hsl(220, 14%, 18%);
+      --border-default:      hsl(220, 14%, 24%);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --radius-md: 10px;
+      --radius-lg: 16px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-color: #121212;
-        --text-color: #f0f0f0;
-        --primary-color: #5b8dfd;
-      }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      line-height: 1.6;
-      max-width: 800px;
+      background-color: var(--surface-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      background: hsla(220, 20%, 10%, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: hsl(160, 84%, 60%);
+      background: var(--accent-primary-soft);
+      border: 1px solid hsla(160, 84%, 39%, 0.25);
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+
+    /* ── Content ── */
+    .content {
+      max-width: 720px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 48px 24px 80px;
     }
+
+    /* ── Hero Header ── */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--accent-primary-soft);
+      border: 1px solid hsla(160, 84%, 39%, 0.25);
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 700;
+      color: hsl(160, 84%, 60%);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
     h1 {
-      color: var(--primary-color);
-      border-bottom: 2px solid var(--primary-color);
-      padding-bottom: 10px;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 14px;
     }
-    h2 {
-      margin-top: 30px;
+
+    .hero-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      max-width: 540px;
+      margin-bottom: 8px;
     }
-    .footer {
-      margin-top: 50px;
-      font-size: 0.9em;
+
+    .hero-date {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+      margin-bottom: 40px;
+    }
+
+    /* ── Extension Badge ── */
+    .ext-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      background: hsla(160, 84%, 39%, 0.05);
+      border: 1px solid hsla(160, 84%, 39%, 0.2);
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+    }
+
+    .ext-banner-icon { font-size: 24px; }
+
+    .ext-banner-text strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: hsl(160, 84%, 60%);
+      margin-bottom: 4px;
+    }
+
+    .ext-banner-text p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ── Sections ── */
+    .section {
+      margin-bottom: 20px;
+      padding: 22px 26px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      transition: border-color 0.2s ease;
+    }
+
+    .section:hover {
+      border-color: var(--border-default);
+    }
+
+    .section h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text-primary);
+    }
+
+    .section-icon {
+      font-size: 1rem;
+    }
+
+    .section p, .section li {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+
+    .section ul {
+      padding-left: 18px;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .section strong {
+      color: hsl(220, 14%, 82%);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.78rem;
+      background: hsl(220, 14%, 13%);
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      color: hsl(220, 16%, 78%);
+    }
+
+    a {
+      color: hsl(160, 84%, 50%);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Permission Chips ── */
+    .permission-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .permission-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 10px 12px;
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    .permission-chip code {
+      font-size: 0.72rem;
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: hsl(160, 84%, 50%);
+    }
+
+    .permission-chip span {
+      font-size: 0.73rem;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
       text-align: center;
-      opacity: 0.7;
+    }
+
+    .footer-heart {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .footer-contact {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
     }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Privacy Policy</h1>
-  <p>Last updated: June 10, 2026</p>
 
-  <h2>1. Information Collection</h2>
-  <p>TrustlessSign operates on a zero-trust model. We do not store your private keys or cryptographic material on our servers. Your keys are generated and stored entirely locally within your browser extension.</p>
+  <nav>
+    <img src="assets/icon-32.png" alt="Trust Less Sign" width="24" height="24" style="border-radius: 4px;">
+    <span class="brand-name">Trust Less Sign</span>
+    <span class="nav-badge">🔒 Extension</span>
+  </nav>
 
-  <h2>2. Google Drive Integration</h2>
-  <p>The TrustlessSign extension requests access to your Google Drive to read PDF files and save digitally signed documents back to your Drive. We do not read, access, or modify any files other than those you explicitly choose to sign.</p>
+  <div class="content">
 
-  <h2>3. Document Privacy</h2>
-  <p>The PDF documents you sign are processed locally inside the extension. The document content itself is never transmitted to our backend servers. Only cryptographic hashes are used for verification purposes.</p>
+    <div class="hero-badge">🔒 Privacy Policy</div>
+    <h1>Your Privacy, Our Core Principle</h1>
+    <p class="hero-desc">
+      This document applies specifically to the <strong>Trust Less Sign Chrome Extension</strong> and explains how your data is collected, processed, and protected.
+    </p>
+    <p class="hero-date">Last updated: June 20, 2026</p>
 
-  <h2>4. Usage Data</h2>
-  <p>We may collect anonymous analytics data regarding extension usage to help improve the product. No personally identifiable information or document contents are collected.</p>
+    <div class="ext-banner">
+      <div class="ext-banner-icon">🛡️</div>
+      <div class="ext-banner-text">
+        <strong>Zero-Trust Architecture</strong>
+        <p>This extension operates on a zero-trust model. Your private keys and the contents of your PDF documents never leave your browser.</p>
+      </div>
+    </div>
 
-  <div class="footer">
-    &copy; 2026 TrustlessSign. All rights reserved.
+    <!-- Section 1 -->
+    <div class="section">
+      <h2><span class="section-icon">📡</span> 1. Requested Permissions</h2>
+      <p>The extension requests the following permissions with transparent and limited purposes:</p>
+      <div class="permission-grid">
+        <div class="permission-chip">
+          <code>storage</code>
+          <span>Save your encrypted cryptographic keys locally.</span>
+        </div>
+        <div class="permission-chip">
+          <code>identity</code>
+          <span>Optional Google Drive integration.</span>
+        </div>
+        <div class="permission-chip">
+          <code>activeTab</code>
+          <span>Interact with PDFs when you initiate signing.</span>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section">
+      <h2><span class="section-icon">📋</span> 2. Data Collection</h2>
+      <ul>
+        <li><strong>Zero Data Collection</strong> — We do not collect or store any of your cryptographic material, passwords, or the contents of the documents you sign.</li>
+        <li><strong>Local Storage</strong> — Your private key and certificate are stored exclusively in your browser's local storage and are encrypted at rest with a Master Password you define.</li>
+      </ul>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section">
+      <h2><span class="section-icon">🚫</span> 3. What the Extension Does NOT Do</h2>
+      <ul>
+        <li>Does not transmit your private keys or document contents to our servers or any third party.</li>
+        <li>Does not track your browsing history or activity.</li>
+        <li>Does not inject ads or track you across the web.</li>
+        <li>Does not read files in your Google Drive other than the documents you explicitly choose to sign.</li>
+      </ul>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section">
+      <h2><span class="section-icon">🔐</span> 4. Security & Cryptography</h2>
+      <p>All document signing operations (hashing, signing, embedding QR codes) are performed locally inside your browser using the <code>forge</code> cryptography library and <code>pdf-lib</code>. Only the cryptographic public hashes are used for verification.</p>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section">
+      <h2><span class="section-icon">✉️</span> 5. Contact & Inquiries</h2>
+      <p>If you have any questions regarding this extension's privacy policy, please contact us at:</p>
+      <p style="margin-top:8px;"><a href="mailto:feri.febria2017@gmail.com">Support</a></p>
+    </div>
+
+    <footer>
+      <p class="footer-contact">© 2026 Trust Less Sign · <a href="https://tsign.vnot.my.id/privacy" target="_blank">View full policy on web</a></p>
+    </footer>
+
   </div>
 </body>
 </html>

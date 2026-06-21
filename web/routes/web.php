@@ -15,6 +15,14 @@ Route::get('/login', function () {
     ]);
 })->name('login');
 
+Route::get('/privacy', function () {
+    return Inertia::render('Privacy');
+})->name('privacy');
+
+Route::get('/terms', function () {
+    return Inertia::render('Terms');
+})->name('terms');
+
 Route::get('/verify/{token?}', function ($token = null) {
     return Inertia::render('Verify', ['token' => $token]);
 })->name('verify.page');

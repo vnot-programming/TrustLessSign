@@ -2,6 +2,30 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-21T00:37:00Z
+- **Tugas yang diselesaikan:** Fixing Chrome Web Store Rejection (Unused 'scripting' permission)
+- **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`, `docs/releases/store/Product_details.md`, `chrome-extension/privacy.html`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `1.6.9`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menghapus *permission* `scripting` dari `manifest.json` karena ditolak oleh reviewer Chrome Web Store (fitur tersebut digantikan oleh message passing melalui content scripts). Melakukan version bump ekstensi ke `1.6.9`. Menambahkan property `"key"` kembali ke dalam `manifest.json` untuk keperluan development sesuai instruksi pengguna, namun menghapusnya secara aman di dalam skrip saat melakukan kompresi `.zip` untuk rilis. `Product_details.md` dan `privacy.html` juga sudah dibersihkan dari penyebutan `scripting`.
+
+- **Tanggal/Waktu:** 2026-06-20T08:48:00Z
+- **Tugas yang diselesaikan:** Implement Privacy Policy & Terms of Service untuk Chrome Store Publishing
+- **File yang diubah/dibuat:** `chrome-extension/privacy.html`, `chrome-extension/terms.html`, `web/resources/js/Pages/Privacy.jsx`, `web/resources/js/Pages/Terms.jsx`, `web/routes/web.php`, `web/resources/js/Pages/Welcome.jsx`, `docs/releases/store/Product_details.md`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Halaman Privacy Policy dan Terms of Service telah dibuat, baik secara statis di dalam *extension* (`.html` files yang diperbarui secara modern dengan gaya bio-digital minimalism), maupun secara dinamis di Web Dashboard menggunakan React/Inertia. Tautan-tautan tersebut disematkan pada Landing Page (`Welcome.jsx`). Selain itu, informasi detail Store seperti Deskripsi, Kategori, Single Purpose, dan Data Usage telah di-generate ke dalam file referensi `Product_details.md`.
+
+- **Tanggal/Waktu:** 2026-06-20T07:12:00Z
+- **Tugas yang diselesaikan:** Update Extension Icons (icon-t2.svg)
+- **File yang diubah/dibuat:** `chrome-extension/assets/icon-*.png`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mengonversi ulang logo terbaru `icon-t2.svg` dari folder `docs` menjadi file PNG (`16`, `32`, `48`, `128`) menggunakan *library* `sharp`. Kemudian meng-update kembali arsip `trustlesssign-v1.6.8-production.zip` agar memuat set ikon yang baru ini.
+
+- **Tanggal/Waktu:** 2026-06-20T06:56:00Z
+- **Tugas yang diselesaikan:** Preparations for Chrome Extension Store Publishing
+- **File yang diubah/dibuat:** `chrome-extension/manifest.json`, `README.md`, `chrome-extension/assets/icon-*.png`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menghapus property `"key"` pada `manifest.json` karena Chrome Web Store mewajibkan file tersebut dihapus sebelum diunggah (proses sign dilakukan oleh Store). Membuat file icon PNG beresolusi 16, 32, 48, dan 128 dari SVG lalu meregistrasikannya ke dalam `manifest.json` pada property `"icons"`. Memperbarui dokumentasi `README.md` agar mencerminkan fitur-fitur terbaru (Seamless SSO, Hybrid Multi-Device, PDF Pagination, dan Marginal Page Stamp). Ekstensi siap untuk dipaketkan (.zip) dan dipublish.
+
 - **Tanggal/Waktu:** 2026-06-18T20:00:00Z
 - **Tugas yang diselesaikan:** Implement Seamless SSO (Web-Only Auth) untuk Ekstensi
 - **File yang diubah/dibuat:** `popup.js`, `popup.html`, `manifest.json` (Chrome & Safari), `Welcome.jsx`, `SocialiteController.php`, `web.php`.
@@ -910,3 +934,22 @@
   - `chrome-extension/package.json`, `safari-extension/Resources/manifest.json`, dll.
 - **Status:** Selesai.
 - **Handoff Note:** Author metadata PDF yang disisipkan (`pdfDoc.setAuthor()`) sekarang menarik nilai string textContent dari elemen dropdown UI popup. Rules bot telah diperketat. Commit dan tag `ext-v1.6.6` telah dieksekusi untuk memicu auto-build ekstensi ke local client.
+
+### [2026-06-19] — Verify Page and QR Code Logo Fixes
+- **Tugas:** Memperbaiki bug halaman Verify yang menampilkan nama/email ganda akibat fallback, dan bug hilangnya logo di tengah QR code saat opsi "Hide Frame" dicentang.
+- **File diubah:**
+  - `web/app/Http/Controllers/VerificationController.php` (tambah `signer_name` ke payload)
+  - `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js` (memperbaiki logika extract nama default user)
+  - `web/resources/js/Utils/barcode-generator.js`
+  - `chrome-extension/signing/barcode-generator.js`, `safari-extension/Resources/signing/barcode-generator.js` (margin 0)
+- **Status:** Selesai.
+- **Handoff Note:** Bug hilangnya logo akibat margin `qr-code-styling` telah diperbaiki. Halaman Verify sekarang juga merender string nama Signer yang murni tanpa duplikasi. Siap untuk push web CI/CD dan extension CI/CD.
+
+### [2026-06-19] — Localization (i18n) Consistency Fixes
+- **Tugas:** Memperbaiki string antarmuka (UI) yang *hardcoded* dengan bahasa Indonesia agar default ke bahasa Inggris sesuai standar, serta mengaktifkan translasinya secara dinamis.
+- **File diubah:**
+  - `web/resources/js/Pages/SignDocument.jsx` (Memperbarui fallback default ke Inggris)
+  - `chrome-extension/popup/popup.html`, `safari-extension/Resources/popup.html` (Mengganti teks label menjadi default Inggris)
+  - `chrome-extension/popup/popup.js`, `safari-extension/Resources/popup.js` (Menambah kamus `en`, `id`, `th` dan memasukkannya ke fungsi `translateUI`)
+- **Status:** Selesai.
+- **Handoff Note:** Form "Advanced Options" dan "Signer" sekarang sepenuhnya mematuhi konfigurasi bahasa Global. Telah dipush (Web `v1.4.12`, Extension `v1.6.8`).

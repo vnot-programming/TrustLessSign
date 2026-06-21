@@ -1,6 +1,6 @@
 # 🛡️ TrustlessSign
 
-TrustlessSign is a modern, premium, secure web application designed to sign, verify, and seal documents in a secure, privacy-preserving manner using cryptography (PKI/RSA-2048) and Google Drive integration.
+**Trust Less Sign** is a modern, premium, secure web application designed to sign, verify, and seal documents in a secure, privacy-preserving manner using cryptography (PKI/RSA-2048) and Google Drive integration.
 
 ---
 ## How it WORK!
@@ -38,11 +38,13 @@ Ekstensi bertindak layaknya **"Dompet Kripto Pribadi (Crypto Wallet)"** Anda. We
 ## ✨ Features
 
 - **Decentralized PKI / RSA-2048 Signature**: Generate, sign, and verify documents natively using certificates issued by our built-in Certificate Authority.
+- **Hybrid Multi-Device Architecture**: Use multiple devices with individual certificates and securely backup your encrypted identity (`.tsign`) to Google Drive.
+- **Seamless SSO (Web-Only Auth)**: Login securely via the Web Dashboard without double Google consent loops in the extension.
+- **Advanced PDF Tools**: Navigate multi-page PDFs, select specific pages for your signature, and automatically inject Marginal Page Stamps to prevent page swapping.
 - **Draggable QR Code**: Position the signature seal dynamically on documents.
 - **Google Drive Storage**: Keep files safe by saving them directly to Google Drive.
 - **Dual-Theme & Circadian-Sync**: Smooth Light and Dark modes.
-- **Color Blindness Accessibility Modes**: Optimized themes for deuteranopia, protanopia, and complete color blindness.
-- **Multi-language Support (i18n)**: Out of the box English, Indonesian, Thai, and Malay localizations.
+- **Multi-language Support (i18n)**: Out of the box English, Indonesian, and Thai localizations.
 
 ---
 

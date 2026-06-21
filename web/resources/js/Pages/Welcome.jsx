@@ -99,6 +99,14 @@ export default function Welcome({ autoOpenLogin = false }) {
           </div>
         </main>
 
+        <footer className="w-full py-6 text-center border-t border-border-subtle text-text-tertiary text-sm flex flex-col sm:flex-row justify-center items-center gap-4 mt-auto">
+          <span>&copy; 2026 TrustlessSign. All rights reserved.</span>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-accent-primary transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-accent-primary transition-colors">Terms of Service</Link>
+          </div>
+        </footer>
+
         {/* Premium Login Modal Dialog */}
         {isLoginModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-normal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
