@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-22T11:35:00Z
+- **Tugas yang diselesaikan:** Fixing Chrome Web Store Rejection (Unused 'activeTab' permission)
+- **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`, `docs/releases/store/Product_details.md`, `chrome-extension/privacy.html`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `1.6.10`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menghapus *permission* `activeTab` dari `manifest.json` karena ditolak oleh reviewer Chrome Web Store (tidak digunakan). Melakukan version bump ekstensi ke `1.6.10`. `Product_details.md` dan `privacy.html` juga sudah dibersihkan dari penyebutan `activeTab`.
+
 - **Tanggal/Waktu:** 2026-06-21T00:37:00Z
 - **Tugas yang diselesaikan:** Fixing Chrome Web Store Rejection (Unused 'scripting' permission)
 - **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`, `docs/releases/store/Product_details.md`, `chrome-extension/privacy.html`

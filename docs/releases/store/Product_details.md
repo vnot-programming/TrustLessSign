@@ -58,8 +58,7 @@ The `cookies` permission is required to enable a seamless Single Sign-On (SSO) e
 **Downloads justification:**
 The `downloads` permission acts as a critical fallback mechanism for our zero-trust signature process. If a user chooses not to link their Google Drive, or if a network error occurs during the cloud upload, the extension will automatically download the cryptographically signed PDF document and the user's encrypted identity backup (`.tsign` file) directly to their local machine. This guarantees that users never lose access to their secure documents or digital identities.
 
-**ActiveTab justification:**
-The `activeTab` permission is necessary to establish a secure, on-demand communication bridge between the user's active browser tab (specifically the Trust Less Sign Web Dashboard) and the extension's local signing engine. When a user clicks "Sign Document" on the web dashboard, the extension must temporarily interact with the active tab to receive the document payload securely.
+
 **Host permission justification:**
 Host permissions are strictly required for the core functionality of the extension:
 1. `https://www.googleapis.com/*`: Used exclusively to upload the user's signed PDF documents and encrypted identity backups (`.tsign`) to their personal Google Drive folder via the official Drive API, based on their explicit consent.
