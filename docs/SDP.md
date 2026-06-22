@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+- **Tanggal/Waktu:** 2026-06-22T11:40:00Z
+- **Tugas yang diselesaikan:** Menganalisa dan Menghapus Unused 'windows' permission
+- **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
+- **Status saat ini:** Selesai (Versi Ekstensi naik ke `1.6.11`)
+- **Catatan untuk AI selanjutnya (Handoff Note):** Menghapus *permission* `windows` dari `manifest.json`. Meskipun ekstensi menggunakan fungsi `chrome.windows.create()` untuk Popout UI, API tersebut sebenarnya tidak memerlukan *permission* `windows` (hanya diperlukan untuk mengakses metadata *tab* di semua *window*). Ini mencegah ekstensi ditolak lagi oleh peninjau Chrome Web Store akibat meminta *permission* yang berlebihan tanpa justifikasi. Melakukan version bump ekstensi ke `1.6.11`.
+
 - **Tanggal/Waktu:** 2026-06-22T11:35:00Z
 - **Tugas yang diselesaikan:** Fixing Chrome Web Store Rejection (Unused 'activeTab' permission)
 - **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`, `docs/releases/store/Product_details.md`, `chrome-extension/privacy.html`
