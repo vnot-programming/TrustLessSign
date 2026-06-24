@@ -52,9 +52,9 @@ new_keys = {
 }
 
 paths = {
-    'en': '/home/vnot/extra_disk/docker-temp/trustlesssign/web/resources/messages/en.json',
-    'id': '/home/vnot/extra_disk/docker-temp/trustlesssign/web/resources/messages/id.json',
-    'th': '/home/vnot/extra_disk/docker-temp/trustlesssign/web/resources/messages/th.json',
+    'en': '/home/vnot/docker/trustlesssign/web/resources/messages/en.json',
+    'id': '/home/vnot/docker/trustlesssign/web/resources/messages/id.json',
+    'th': '/home/vnot/docker/trustlesssign/web/resources/messages/th.json',
 }
 
 for lang, path in paths.items():

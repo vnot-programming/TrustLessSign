@@ -10,7 +10,7 @@ on:
   #   branches: [main]
 
 env:
-  PROJECT_PATH:  /home/vnot/extra_disk/docker-temp/trustlesssign
+  PROJECT_PATH:  /home/vnot/docker/trustlesssign
   APP_CONTAINER: trustlesssign-app
 
 jobs:

@@ -12,7 +12,7 @@ Selain itu, menghapus debug `console.log` pada halaman dashboard web.
 
 ### 1. [MODIFY] SignDocument.jsx — Hapus debug console.log
 
-#### [MODIFY] [SignDocument.jsx](file:///home/vnot/extra_disk/docker-temp/trustlesssign/web/resources/js/Pages/SignDocument.jsx)
+#### [MODIFY] [SignDocument.jsx](file:///home/vnot/docker/trustlesssign/web/resources/js/Pages/SignDocument.jsx)
 
 Hapus 4 baris `console.log` di dalam `onDragStop` dan `onResizeStop`:
 - Line 821–822: log ukuran + posisi saat drag
@@ -101,7 +101,7 @@ sealedPerms: sealedEnabled ? sealedPerms : null,
 
 ### 3. [MODIFY] barcode-generator.js — Tambah parameter `hideFrame`
 
-#### [MODIFY] [barcode-generator.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/web/resources/js/Utils/barcode-generator.js)
+#### [MODIFY] [barcode-generator.js](file:///home/vnot/docker/trustlesssign/web/resources/js/Utils/barcode-generator.js)
 
 Ubah signature fungsi `generateSignatureFrame`:
 ```js

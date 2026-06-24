@@ -40,12 +40,9 @@ php artisan test --filter=TrustlessSignApiTest
 ## 3. Building Cache
 Jika tidak ada perubahan pada Web Dashboard maka lakukan:
 ```bash
-cd /home/vnot/extra_disk/docker-temp/trustlesssign/web && npm run build
+cd /home/vnot/docker/trustlesssign/web && npm run build
 ```
-
+2. Build Browser Extension (Chrome/Safari)
 ```bash
-cd /home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension && npm run build
+cd /home/vnot/docker/trustlesssign/chrome-extension && npm run build
 ```
-
-
-

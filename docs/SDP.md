@@ -2,6 +2,12 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+### 2026-06-24 — Move to Persistent Storage
+- **Tugas yang diselesaikan:** Relokasi proyek TrustlessSign dari direktori `docker-temp` ke `docker` persistent storage.
+- **File yang diubah/dibuat:** Seluruh folder `/home/vnot/docker/trustlesssign` dipindahkan ke `/home/vnot/docker/trustlesssign`.
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Proyek saat ini berjalan di `/home/vnot/docker/trustlesssign`. Container docker berhasil direstart dan berjalan stabil.
+
 - **Tanggal/Waktu:** 2026-06-22T11:40:00Z
 - **Tugas yang diselesaikan:** Menganalisa dan Menghapus Unused 'windows' permission
 - **File yang diubah/dibuat:** `chrome-extension/package.json`, `chrome-extension/manifest.json`, `safari-extension/Resources/manifest.json`
@@ -228,19 +234,19 @@
 
 - **Tanggal/Waktu:** 2026-06-10T12:20:00Z
 - **Tugas yang diselesaikan:** Fix database wiping issue caused by test environment using main database connection and RefreshDatabase
-- **File yang diubah/dibuat:** [phpunit.xml](file:///home/vnot/extra_disk/docker-temp/trustlesssign/web/phpunit.xml)
+- **File yang diubah/dibuat:** [phpunit.xml](file:///home/vnot/docker/trustlesssign/web/phpunit.xml)
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Isolated testing environment to SQLite in-memory, preventing test suite run via CI/CD (which triggers RefreshDatabase) from wiping the main PostgreSQL database. Re-seeded Reason Categories using `ReasonCategorySeeder` so dropdowns are fully loaded again.
 
 - **Tanggal/Waktu:** 2026-06-10T12:55:00Z
 - **Tugas yang diselesaikan:** Fix ReferenceError on subCategories and Auth check error loop in Chrome/Safari extension.
-- **File yang diubah/dibuat:** [popup.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/popup/popup.js), [popup.js](file:///home/vnot/extra_disk/docker-temp/trustlesssign/safari-extension/Resources/popup.js), [package.json](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/package.json), [manifest.json](file:///home/vnot/extra_disk/docker-temp/trustlesssign/chrome-extension/manifest.json)
+- **File yang diubah/dibuat:** [popup.js](file:///home/vnot/docker/trustlesssign/chrome-extension/popup/popup.js), [popup.js](file:///home/vnot/docker/trustlesssign/safari-extension/Resources/popup.js), [package.json](file:///home/vnot/docker/trustlesssign/chrome-extension/package.json), [manifest.json](file:///home/vnot/docker/trustlesssign/chrome-extension/manifest.json)
 - **Status saat ini:** Selesai (Bumped version to 1.0.2)
 - **Catatan untuk AI selanjutnya (Handoff Note):** Fixed ReferenceError where subCategories was used without declaration in popup.js during document signing. Handled 401 Unauthorized by removing expired/invalid tokens from chrome.storage.local. Bumped version to 1.0.2 in both package.json and manifest.json. Rebuilt trustlesssign-v1.0.2.crx.
 
 - **Tanggal/Waktu:** 2026-06-10T14:25:00Z
 - **Tugas yang diselesaikan:** Fix IDE Git tracking issue by ignoring node_modules globally and adding extension build artifacts.
-- **File yang diubah/dibuat:** [.gitignore](file:///home/vnot/extra_disk/docker-temp/trustlesssign/.gitignore)
+- **File yang diubah/dibuat:** [.gitignore](file:///home/vnot/docker/trustlesssign/.gitignore)
 - **Status saat ini:** Selesai
 - **Catatan untuk AI selanjutnya (Handoff Note):** Ignored node_modules recursively using `node_modules/` and `**/node_modules/` in root `.gitignore`. Also ignored compiled `service-worker.bundle.js` for both Chrome and Safari extensions. This reduced IDE untracked files count from 3000++ to 1.
 
