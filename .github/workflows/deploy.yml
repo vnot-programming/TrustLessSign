@@ -87,8 +87,8 @@ jobs:
       - name: 📦 Build Chrome Extension (.crx)
         run: |
           echo "📦 Packaging Chrome Extension CRX..."
-          cd ${{ env.PROJECT_PATH }}/chrome-extension
-          docker run --rm -v $(pwd):/app -w /app node:22-alpine sh -c "npm install && npm run build:crx"
+          cd ${{ env.PROJECT_PATH }}
+          docker run --rm -v $(pwd):/app -w /app/chrome-extension node:22-alpine sh -c "npm install && npm run build:crx"
 
       - name: 🪟 Sync Desktop-PC via Tailscale SSH
         run: |
