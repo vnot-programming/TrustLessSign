@@ -6,7 +6,7 @@ import { LogOut, FileSignature, UploadCloud, ShieldCheck, AlertTriangle, Key, Lo
 import axios from 'axios';
 
 export default function Dashboard() {
-  const { auth, activeCertificate, activeCertificates, messages, versionName, extensionMinVersion } = usePage().props;
+  const { auth, activeCertificate, activeCertificates, messages, versionName, extensionLatestVersion, extensionMinVersion } = usePage().props;
   const user = auth.user;
   // Multi-device: activeCertificates is the array, activeCertificate is the first (newest) for backward compat
   const certs = activeCertificates || (activeCertificate ? [activeCertificate] : []);
@@ -22,7 +22,7 @@ export default function Dashboard() {
   const [success, setSuccess] = useState(false);
   const [backupData, setBackupData] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
-  const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, outdated: false });
+  const [extensionStatus, setExtensionStatus] = useState({ checked: false, installed: false, version: null, isHardOutdated: false, isSoftOutdated: false });
   const [syncStatus, setSyncStatus] = useState(null); // { status: 'active' | 'mismatch' | 'no_extension_cert' | 'revoked' | 'error' | 'timeout', data: null }
   const [extensionModalOpen, setExtensionModalOpen] = useState(false);
   const [extensionOutdatedOpen, setExtensionOutdatedOpen] = useState(false);
@@ -97,7 +97,7 @@ export default function Dashboard() {
   useEffect(() => {
     const checkExtension = () => {
       const timeout = setTimeout(() => {
-        setExtensionStatus({ checked: true, installed: false, version: null, outdated: false });
+        setExtensionStatus({ checked: true, installed: false, version: null, isHardOutdated: false, isSoftOutdated: false });
       }, 1500);
 
       const handlePingResponse = (e) => {
@@ -105,8 +105,9 @@ export default function Dashboard() {
           clearTimeout(timeout);
           window.removeEventListener('message', handlePingResponse);
           const extVersion = e.data.version || null;
-          const outdated = isVersionOutdated(extVersion, extensionMinVersion);
-          setExtensionStatus({ checked: true, installed: true, version: extVersion, outdated });
+          const isHardOutdated = isVersionOutdated(extVersion, extensionMinVersion);
+          const isSoftOutdated = !isHardOutdated && isVersionOutdated(extVersion, extensionLatestVersion);
+          setExtensionStatus({ checked: true, installed: true, version: extVersion, isHardOutdated, isSoftOutdated });
         }
       };
 
@@ -178,7 +179,7 @@ export default function Dashboard() {
       setExtensionModalOpen(true);
       return;
     }
-    if (extensionStatus.outdated) {
+    if (extensionStatus.isHardOutdated) {
       setExtensionOutdatedOpen(true);
       return;
     }
@@ -206,7 +207,7 @@ export default function Dashboard() {
       setExtensionModalOpen(true);
       return;
     }
-    if (extensionStatus.outdated) {
+    if (extensionStatus.isHardOutdated) {
       e.preventDefault();
       setExtensionOutdatedOpen(true);
       return;
@@ -443,21 +444,21 @@ export default function Dashboard() {
             <Link
               href="/sign"
               onClick={handleSignNewDoc}
-              className={`glass-panel p-6 flex flex-col items-center text-center gap-4 group transition-all ${extensionStatus.outdated
+              className={`glass-panel p-6 flex flex-col items-center text-center gap-4 group transition-all ${extensionStatus.isHardOutdated
                   ? 'border-accent-warning hover:border-accent-warning cursor-pointer'
                   : 'hover:border-accent-primary cursor-pointer'
                 }`}
             >
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${extensionStatus.outdated
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform ${extensionStatus.isHardOutdated
                   ? 'bg-accent-warning-soft text-accent-warning'
                   : 'bg-accent-primary-soft text-accent-primary'
                 }`}>
-                {extensionStatus.outdated ? <AlertTriangle size={32} /> : <FileSignature size={32} />}
+                {extensionStatus.isHardOutdated ? <AlertTriangle size={32} /> : <FileSignature size={32} />}
               </div>
               <div>
                 <h3 className="font-bold text-lg">{t.sign_new_doc}</h3>
                 <p className="text-sm text-text-secondary mt-1">{t.sign_new_doc_desc}</p>
-                {extensionStatus.outdated && (
+                {extensionStatus.isHardOutdated && (
                   <p className="text-xs text-accent-warning font-semibold mt-2">{t.ext_outdated_hint || '⚠ Extension update required'}</p>
                 )}
               </div>
@@ -500,7 +501,7 @@ export default function Dashboard() {
                   {t.ext_not_installed || 'Not Installed'}
                 </span>
               )}
-              {extensionStatus.checked && extensionStatus.installed && !extensionStatus.outdated && (
+              {extensionStatus.checked && extensionStatus.installed && !extensionStatus.isHardOutdated && !extensionStatus.isSoftOutdated && (
                 <>
                   <span className="text-text-tertiary">— {extensionStatus.version}</span>
                   <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-success-soft text-accent-success">
@@ -509,10 +510,19 @@ export default function Dashboard() {
                   </span>
                 </>
               )}
-              {extensionStatus.checked && extensionStatus.installed && extensionStatus.outdated && (
+              {extensionStatus.checked && extensionStatus.installed && extensionStatus.isSoftOutdated && (
                 <>
                   <span className="text-text-tertiary">— {extensionStatus.version}</span>
                   <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-warning-soft text-accent-warning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+                    {t.ext_status_update_available || 'Update Available'}
+                  </span>
+                </>
+              )}
+              {extensionStatus.checked && extensionStatus.installed && extensionStatus.isHardOutdated && (
+                <>
+                  <span className="text-text-tertiary">— {extensionStatus.version}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full bg-accent-danger-soft text-accent-danger">
                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
                     {t.ext_status_outdated || 'Outdated'}
                   </span>

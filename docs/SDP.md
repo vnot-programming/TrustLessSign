@@ -2,6 +2,16 @@
 ## Project: TrustlessSign
 ## Current State / Log Progress
 
+### 2026-06-24 — Dynamic Versioning (Soft-Block/Hard-Block)
+- **Tugas yang diselesaikan:** Implementasi Dynamic Versioning di Backend dan Frontend React untuk mengatasi masalah Deadlock Outdated Extension pada pengguna publik.
+- **File yang diubah/dibuat:**
+  - `web/.env` & `web/.env.example`
+  - `web/config/trustlesssign.php`
+  - `web/app/Http/Middleware/HandleInertiaRequests.php`
+  - `web/resources/js/Pages/Dashboard.jsx`
+- **Status saat ini:** Selesai
+- **Catatan untuk AI selanjutnya (Handoff Note):** Mulai sekarang, *trigger* pemblokiran tidak lagi otomatis membaca dari `package.json` lokal server, melainkan dikontrol penuh oleh variabel lingkungan `EXTENSION_LATEST_VERSION` (untuk memunculkan Banner "Update Available") dan `EXTENSION_MIN_VERSION` (untuk memunculkan Modal Pemblokir Keras) di `.env`.
+
 ### 2026-06-24 — Move to Persistent Storage
 - **Tugas yang diselesaikan:** Relokasi proyek TrustlessSign dari direktori `docker-temp` ke `docker` persistent storage.
 - **File yang diubah/dibuat:** Seluruh folder `/home/vnot/docker/trustlesssign` dipindahkan ke `/home/vnot/docker/trustlesssign`.

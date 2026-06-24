@@ -34,13 +34,19 @@ class HandleInertiaRequests extends Middleware
             $versionName = $packageData['version_name'] ?? $packageData['version'] ?? '1.0.0-dev';
         }
 
-        // Extension minimum required version from chrome-extension/package.json
-        // (same as the latest released extension version — the web always tracks the latest)
-        $extPackageJsonPath = base_path('../chrome-extension/package.json');
-        $extensionMinVersion = '1.0.0';
-        if (File::exists($extPackageJsonPath)) {
-            $extPackageData = json_decode(File::get($extPackageJsonPath), true);
-            $extensionMinVersion = $extPackageData['version_name'] ?? $extPackageData['version'] ?? '1.0.0';
+        // Extension versions from dynamic config (which reads from .env)
+        // Fallback to package.json only if not set
+        $extensionLatestVersion = config('trustlesssign.extension_latest_version', '1.0.0');
+        $extensionMinVersion = config('trustlesssign.extension_min_version', '1.0.0');
+
+        if ($extensionLatestVersion === '1.0.0' || $extensionMinVersion === '1.0.0') {
+            $extPackageJsonPath = base_path('../chrome-extension/package.json');
+            if (File::exists($extPackageJsonPath)) {
+                $extPackageData = json_decode(File::get($extPackageJsonPath), true);
+                $fallbackVersion = $extPackageData['version_name'] ?? $extPackageData['version'] ?? '1.0.0';
+                if ($extensionLatestVersion === '1.0.0') $extensionLatestVersion = $fallbackVersion;
+                if ($extensionMinVersion === '1.0.0') $extensionMinVersion = $fallbackVersion;
+            }
         }
 
         return array_merge(parent::share($request), [
@@ -50,6 +56,7 @@ class HandleInertiaRequests extends Middleware
             'locale' => $locale,
             'messages' => $messages,
             'versionName' => $versionName,
+            'extensionLatestVersion' => $extensionLatestVersion,
             'extensionMinVersion' => $extensionMinVersion,
         ]);
     }
